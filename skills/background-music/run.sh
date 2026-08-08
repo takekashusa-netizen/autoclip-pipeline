@@ -29,7 +29,7 @@ if [[ -z "$track" ]]; then
   cp "$video_in" "$out_path"
 else
   log "background-music: found $(basename "$track") — sidechain ducking under voice + re-normalizing"
-  ffmpeg -y -i "$video_in" -i "$track" -filter_complex \
+  ffmpeg -nostdin -y -i "$video_in" -i "$track" -filter_complex \
     "[1:a]volume=0.35[music];[music][0:a]sidechaincompress=threshold=0.03:ratio=8:attack=5:release=250[ducked];[0:a][ducked]amix=inputs=2:duration=first:dropout_transition=2,loudnorm[aout]" \
     -map 0:v -map "[aout]" -c:v copy -shortest "$out_path" -loglevel error
 fi

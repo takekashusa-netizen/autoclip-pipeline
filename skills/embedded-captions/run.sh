@@ -39,7 +39,7 @@ if [[ "$caption_lines" == "0" ]]; then
   cp "$graphics_video" "${out_dir}/captions_cut.mp4"
 else
   log "embedded-captions: burning in on-beat"
-  ffmpeg -y -i "$graphics_video" -vf "ass=${ass_path}" -c:a copy "${out_dir}/captions_cut.mp4" -loglevel error
+  ffmpeg -nostdin -y -i "$graphics_video" -vf "ass=${ass_path}" -c:a copy "${out_dir}/captions_cut.mp4" -loglevel error
 fi
 
 state_set "$job" "artifacts.captions_video" "\"projects/${job}/captions/captions_cut.mp4\""

@@ -77,7 +77,7 @@ def main():
 
     vf = build_filter(width, height, beats, style, reframe)
     cmd = [
-        "ffmpeg", "-y", "-i", rough_cut,
+        "ffmpeg", "-nostdin", "-y", "-i", rough_cut,
         "-vf", vf,
         "-c:v", "libx264", "-preset", "veryfast",
         "-c:a", "aac",

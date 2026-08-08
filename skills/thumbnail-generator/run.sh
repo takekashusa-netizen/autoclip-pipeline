@@ -50,7 +50,7 @@ mkdir -p "$out_dir"
 out_path="${out_dir}/thumb.jpg"
 
 log "thumbnail-generator: grabbing frame at t=${grab_time}s (hook beat if available)"
-ffmpeg -y -ss "$grab_time" -i "$video" -frames:v 1 -q:v 2 "$out_path" -loglevel error
+ffmpeg -nostdin -y -ss "$grab_time" -i "$video" -frames:v 1 -q:v 2 "$out_path" -loglevel error
 
 state_set "$job" "artifacts.thumbnail" "\"projects/${job}/thumbnail/thumb.jpg\""
 log "thumbnail-generator: done -> projects/${job}/thumbnail/thumb.jpg"
