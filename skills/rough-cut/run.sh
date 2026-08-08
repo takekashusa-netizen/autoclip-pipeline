@@ -17,6 +17,7 @@ out_dir="$(job_dir "$job")/rough-cut"
 audio_path="${work_dir}/audio.wav"
 mkdir -p "$work_dir" "$out_dir"
 
+progress_report "$job" "extracting_audio"
 log "rough-cut: extracting audio from $(basename "$raw_video")"
 has_audio="$(ffprobe -v error -select_streams a -show_entries stream=index -of csv=p=0 "$raw_video" | head -n1)"
 if [[ -z "$has_audio" ]]; then
@@ -54,7 +55,12 @@ json.dump({'job': '${job}', 'keep': [], 'cut': []}, open('${out_dir}/edl.json', 
 "
   else
     log "rough-cut: transcribing + building EDL"
-    result="$(python3 "${SKILL_DIR}/cut_engine.py" "$job" "$raw_video" "$audio_path" "$out_dir" "$work_dir")"
+    if ! result="$(python3 "${SKILL_DIR}/cut_engine.py" "$job" "$raw_video" "$audio_path" "$out_dir" "$work_dir" 2>&1)"; then
+      diagnosis="$(python3 "${PIPELINE_ROOT}/lib/diagnose.py" "$result" 2>/dev/null || echo '{}')"
+      log "rough-cut: FAILED — $(python3 -c "import json,sys; d=json.loads(sys.argv[1]); print(d.get('reason','unknown error'))" "$diagnosis" 2>/dev/null || echo "$result")"
+      state_set "$job" "diagnosis" "$diagnosis"
+      exit 1
+    fi
     log "rough-cut: $result"
   fi
 fi

@@ -23,6 +23,9 @@ import os
 import subprocess
 import sys
 
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "lib"))
+import progress as progress_mod  # noqa: E402
+
 FILLER_WORDS = {
     "um", "umm", "uh", "uhh", "erm", "hm", "hmm",
     "like", "you know", "i mean", "kind of", "sort of", "basically",
@@ -46,15 +49,54 @@ WHISPER_MODEL = os.environ.get("PIPELINE_WHISPER_MODEL", "small")
 # or =base for a big speed jump on CPU-only machines (much faster, some
 # accuracy loss). "small" is the previous default, kept unless overridden.
 
+MODEL_LOAD_TIMEOUT_SEC = int(os.environ.get("PIPELINE_MODEL_LOAD_TIMEOUT", 180))
+# hard timeout on model load/download — direct fix for a real failure: a
+# stalled network connection during a first-time model download left the
+# process hanging with zero progress or error for over an hour. Python
+# threads can't be force-killed, so this can't reclaim the stuck network
+# call itself, but it DOES let the process detect the stall and exit with
+# a clear diagnosis instead of hanging silently forever.
 
-def try_whisperx(audio_path):
+
+def _load_with_timeout(loader_fn, timeout_sec=MODEL_LOAD_TIMEOUT_SEC):
+    import threading
+    result = {}
+
+    def _run():
+        try:
+            result["value"] = loader_fn()
+        except Exception as e:
+            result["error"] = e
+
+    t = threading.Thread(target=_run, daemon=True)
+    t.start()
+    t.join(timeout_sec)
+    if t.is_alive():
+        raise TimeoutError(
+            f"model load/download stalled past {timeout_sec}s with no progress "
+            f"(likely a network hang, not a code bug) — check "
+            f"~/.cache/huggingface/hub for a partial/broken download and "
+            f"consider deleting it, or retry on a better connection"
+        )
+    if "error" in result:
+        raise result["error"]
+    return result["value"]
+
+
+def try_whisperx(audio_path, job=None, duration=None):
     try:
         import whisperx  # noqa: F401
     except ImportError:
         return None
     import whisperx
-    model = whisperx.load_model(WHISPER_MODEL, device="cpu", compute_type="int8")
+    if job:
+        progress_mod.report(job, "transcribing", 0, "loading model")
+    model = _load_with_timeout(lambda: whisperx.load_model(WHISPER_MODEL, device="cpu", compute_type="int8"))
     result = model.transcribe(audio_path, batch_size=16)
+    # whisperx doesn't stream segments — no incremental progress possible here,
+    # but we can still mark the phase so the tracker shows *something* moving
+    if job:
+        progress_mod.report(job, "transcribing", 50, "whisperx transcribing (no incremental progress available)")
     segments = [
         {"start": s["start"], "end": s["end"], "text": s["text"].strip()}
         for s in result["segments"]
@@ -62,22 +104,43 @@ def try_whisperx(audio_path):
     return segments
 
 
-def try_faster_whisper(audio_path):
+def try_faster_whisper(audio_path, job=None, duration=None):
     try:
         from faster_whisper import WhisperModel
     except ImportError:
         return None
+    if job:
+        progress_mod.report(job, "transcribing", 0, "loading model")
     cpu_count = os.cpu_count() or 4
-    model = WhisperModel(
+    model = _load_with_timeout(lambda: WhisperModel(
         WHISPER_MODEL, device="cpu", compute_type="int8",
         cpu_threads=cpu_count,  # was using library default (often just 4)
-    )
-    segs, _ = model.transcribe(
+    ))
+    seg_iter, info = model.transcribe(
         audio_path,
         vad_filter=True,   # skips silence/dead-air — speed win with no
                             # quality cost, doesn't touch actual speech
     )
-    return [{"start": s.start, "end": s.end, "text": s.text.strip()} for s in segs]
+    total = duration or getattr(info, "duration", None) or 0
+
+    segments = []
+    last_report = 0
+    for s in seg_iter:
+        segments.append({"start": s.start, "end": s.end, "text": s.text.strip()})
+        if job and total:
+            now = __import__("time").time()
+            if now - last_report > 2:  # throttle writes to every ~2s, not every segment
+                pct = min(99.0, (s.end / total) * 100)
+                mins_done = s.end / 60
+                mins_total = total / 60
+                progress_mod.report(
+                    job, "transcribing", round(pct, 1),
+                    f"{mins_done:.0f} of {mins_total:.0f} min transcribed",
+                )
+                last_report = now
+    if job:
+        progress_mod.report(job, "transcribing", 100, "transcription complete")
+    return segments
 
 
 def is_filler(text):
@@ -207,13 +270,15 @@ def main():
 
     duration = ffprobe_duration(raw_video)
 
-    segments = try_whisperx(audio_path) or try_faster_whisper(audio_path)
+    segments = try_whisperx(audio_path, job=job, duration=duration) \
+        or try_faster_whisper(audio_path, job=job, duration=duration)
     transcription_available = segments is not None
     if segments is None:
         segments = [{"start": 0.0, "end": duration, "text": ""}]
 
     kept, cut = build_edl(segments)
 
+    progress_mod.report(job, "rendering_cut", None, f"rendering {len(kept)} kept segments")
     render_cut(raw_video, kept if transcription_available else [], os.path.join(out_dir, "rough_cut.mp4"), work_dir)
 
     script_text = " ".join(s["text"] for s in kept if s["text"]).strip()

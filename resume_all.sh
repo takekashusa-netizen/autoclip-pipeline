@@ -57,6 +57,36 @@ except Exception:
     continue
   fi
 
+  # If the last attempt left a diagnosis behind, show it and — for
+  # categories we can actually verify — check the precondition is fixed
+  # before blindly retrying into the same wall again.
+  diagnosis_category="$(python3 -c "
+import json
+try:
+    d = json.load(open('${job_json}'))
+    diag = d.get('diagnosis') or {}
+    print(diag.get('category', ''))
+except Exception:
+    print('')
+")"
+
+  if [[ -n "$diagnosis_category" ]]; then
+    diagnosis_reason="$(python3 -c "
+import json
+d = json.load(open('${job_json}'))
+print((d.get('diagnosis') or {}).get('reason', ''))
+")"
+    echo "note: ${job}'s last attempt failed — ${diagnosis_reason}"
+
+    if [[ "$diagnosis_category" == "missing_dependency" ]]; then
+      if ! python3 -c "import faster_whisper" 2>/dev/null; then
+        echo "skip ${job}: still missing faster_whisper — install it before resuming this job (pip install faster-whisper)"
+        continue
+      fi
+      echo "  faster_whisper now importable — retrying"
+    fi
+  fi
+
   format="$(python3 -c "
 import json
 print(json.load(open('${job_json}')).get('format', ''))
