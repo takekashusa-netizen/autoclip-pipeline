@@ -1,0 +1,23 @@
+{
+  "format": "short-tiktok-raw",
+  "fmt": {
+    "aspect": "9:16",
+    "resolution": [
+      1080,
+      1920
+    ]
+  },
+  "graphics": {
+    "style": "hook card -> raw",
+    "preset": "tiktok-raw-style",
+    "reframe": "crop"
+  },
+  "captions": {
+    "enabled": true,
+    "position": "low, under face",
+    "locked": false,
+    "preset": "captions-style"
+  },
+  "thumbnail": "skip",
+  "content_type": "podcast"
+}

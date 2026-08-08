@@ -1,0 +1,31 @@
+{
+  "engine": {
+    "name": "hyperframes",
+    "version": "0.0.0",
+    "source": "vendored",
+    "path": "engine/hyperframes",
+    "note": "Update only by bumping this version and re-vendoring. Never hand-edit engine/hyperframes."
+  },
+  "skills": {
+    "rough-cut": { "version": "0.1.0", "path": "skills/rough-cut" },
+    "graphics-plan": { "version": "0.1.0", "path": "skills/graphics-plan" },
+    "embedded-captions": { "version": "0.1.0", "path": "skills/embedded-captions" },
+    "background-music": { "version": "0.1.0", "path": "skills/background-music" },
+    "thumbnail-generator": { "version": "0.1.0", "path": "skills/thumbnail-generator" },
+    "to-premiere": { "version": "0.1.0", "path": "skills/to-premiere" },
+    "finalize": { "version": "0.1.0", "path": "skills/finalize.sh" },
+    "prune": { "version": "0.1.0", "path": "skills/prune.sh" }
+  },
+  "presets": {
+    "signature-style": "presets/signature-style.json",
+    "captions-style": "presets/captions-style.json",
+    "tiktok-raw-style": "presets/tiktok-raw-style.json",
+    "liquid-glass-style": "presets/liquid-glass-style.json",
+    "caption-corrections": "presets/caption-corrections.json"
+  },
+  "formats": {
+    "short-explainer": "formats/short-explainer.json",
+    "short-tiktok-raw": "formats/short-tiktok-raw.json",
+    "long-form-youtube": "formats/long-form-youtube.json"
+  }
+}

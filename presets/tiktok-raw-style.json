@@ -1,0 +1,6 @@
+{
+  "preset": "tiktok-raw-style",
+  "locked": true,
+  "description": "Graphics style for short-tiktok-raw format (hook card -> raw).",
+  "params": {}
+}

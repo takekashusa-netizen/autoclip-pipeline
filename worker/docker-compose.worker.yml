@@ -1,0 +1,25 @@
+services:
+  pipeline-worker:
+    build:
+      context: ..
+      dockerfile: worker/Dockerfile
+    command: celery -A worker.celery_app worker --loglevel=info --concurrency=2
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+    volumes:
+      - ../projects:/app/projects
+      - ../outputs:/app/outputs
+    depends_on:
+      - redis
+
+  pipeline-beat:
+    build:
+      context: ..
+      dockerfile: worker/Dockerfile
+    command: celery -A worker.gc beat --loglevel=info
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+    volumes:
+      - ../projects:/app/projects
+    depends_on:
+      - redis

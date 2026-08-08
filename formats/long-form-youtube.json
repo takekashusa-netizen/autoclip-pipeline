@@ -1,0 +1,21 @@
+{
+  "format": "long-form-youtube",
+  "fmt": {
+    "aspect": "16:9",
+    "resolution": [
+      1920,
+      1080
+    ]
+  },
+  "graphics": {
+    "style": "glass + zoom",
+    "preset": "liquid-glass-style",
+    "reframe": "crop"
+  },
+  "captions": {
+    "enabled": false,
+    "note": "none burned in - relies on YouTube CC"
+  },
+  "thumbnail": "always",
+  "content_type": "podcast"
+}

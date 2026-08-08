@@ -1,0 +1,437 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>autoclip-pipeline</title>
+<style>
+  :root {
+    --bg: #0b0b0d;
+    --panel: #16161a;
+    --border: #2a2a30;
+    --text: #eaeaec;
+    --muted: #8b8b93;
+    --accent: #5b8cff;
+    --accent-dark: #3f6cd8;
+    --green: #2e9e5b;
+    --amber: #b8811a;
+    --red: #c04444;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 32px 20px 80px;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.4;
+  }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .subtitle { color: var(--muted); font-size: 14px; margin-bottom: 28px; }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .field { margin-bottom: 14px; }
+  .field:last-child { margin-bottom: 0; }
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .row { display: flex; gap: 12px; }
+  .row > .field { flex: 1; }
+
+  input[type="text"], input[type="url"], input[type="number"], input[type="file"], select {
+    width: 100%;
+    padding: 9px 10px;
+    background: #1e1e24;
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+  }
+  input:focus, select:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  .checkbox-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .checkbox-field input { width: auto; }
+  .checkbox-field label { margin: 0; }
+  .hint { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  button {
+    padding: 10px 18px;
+    background: var(--accent);
+    border: none;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  button:hover { background: var(--accent-dark); }
+  button:disabled { opacity: 0.5; cursor: default; }
+  button.small {
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 400;
+  }
+  button.secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  button.secondary:hover { border-color: var(--accent); background: transparent; }
+
+  .jobs-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 12px;
+  }
+  .jobs-header h2 { font-size: 15px; margin: 0; color: var(--muted); font-weight: 500; }
+
+  .job {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .job:last-child { border-bottom: none; }
+  .job-info { flex: 1; min-width: 0; }
+  .job-title { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .job-id { font-family: ui-monospace, monospace; font-size: 13px; }
+  .status {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: #333340;
+    color: var(--muted);
+  }
+  .status.done { background: rgba(46,158,91,0.18); color: var(--green); }
+  .status.paused { background: rgba(184,129,26,0.18); color: var(--amber); }
+  .status.failed { background: rgba(192,68,68,0.18); color: var(--red); }
+  .status.downloading { background: rgba(91,140,255,0.18); color: var(--accent); }
+
+  .steps { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+  .steps .step-done { color: var(--green); }
+
+  .error-text {
+    font-size: 12px;
+    color: var(--red);
+    background: rgba(192,68,68,0.08);
+    border-radius: 4px;
+    padding: 6px 8px;
+    margin-bottom: 8px;
+    word-break: break-word;
+  }
+
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .actions a { color: var(--accent); font-size: 13px; text-decoration: none; }
+  .actions a:hover { text-decoration: underline; }
+
+  .thumb {
+    width: 96px;
+    height: 96px;
+    object-fit: cover;
+    border-radius: 6px;
+    flex-shrink: 0;
+    background: #1e1e24;
+  }
+
+  .empty { color: var(--muted); font-size: 14px; padding: 20px 0; text-align: center; }
+</style>
+</head>
+<body>
+<h1>autoclip-pipeline</h1>
+<div class="subtitle">Upload a clip or paste a link - get short clips, captioned and ready to post.</div>
+
+<div class="panel">
+  <form id="uploadForm">
+    <div class="field">
+      <label for="sourceSelect">Source</label>
+      <select name="source" id="sourceSelect">
+        <option value="file">Upload a file</option>
+        <option value="url">Video or livestream URL</option>
+      </select>
+    </div>
+
+    <div class="field" id="fileField">
+      <label for="fileInput">Raw clip</label>
+      <input type="file" name="file" id="fileInput">
+    </div>
+
+    <div class="field" id="urlField" style="display:none">
+      <label for="urlInput">Video or livestream link</label>
+      <input type="url" name="url" id="urlInput" placeholder="youtube.com/watch?v=..., twitch.tv/videos/..., etc.">
+      <div class="hint">Works with YouTube, Twitch, TikTok, X, Instagram, and 1000+ other sites via yt-dlp.</div>
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label for="modeSelect">Mode</label>
+        <select name="mode" id="modeSelect">
+          <option value="single">Single output</option>
+          <option value="clip">Clip into multiple</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="formatSelect">Format</label>
+        <select name="format" id="formatSelect" required></select>
+      </div>
+      <div class="field">
+        <label for="contentTypeSelect">Content type</label>
+        <select name="content_type" id="contentTypeSelect"></select>
+      </div>
+    </div>
+
+    <div class="row" id="clipFields" style="display:none">
+      <div class="field">
+        <label for="clipLength">Clip length (seconds)</label>
+        <input type="number" name="clip_length" id="clipLength" value="60" min="5" max="600">
+      </div>
+      <div class="field">
+        <label for="clipCount">Number of clips</label>
+        <input type="number" name="clip_count" id="clipCount" value="3" min="1" max="20">
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="jobInput">Job ID (optional)</label>
+      <input type="text" name="job" id="jobInput" placeholder="auto-generated if left blank">
+    </div>
+
+    <div class="checkbox-field">
+      <input type="checkbox" name="skip_music" id="skipMusic">
+      <label for="skipMusic">Skip background music</label>
+    </div>
+
+    <button type="submit" id="submitBtn">Run pipeline</button>
+  </form>
+</div>
+
+<div class="jobs-header">
+  <h2>Jobs</h2>
+  <button class="secondary small" id="refreshBtn">Refresh</button>
+</div>
+<div id="jobs"></div>
+
+<script>
+const STEP_ORDER = ['intake', 'rough_cut', 'graphics', 'second_pass', 'captions', 'background_music', 'export'];
+const STEP_LABELS = {
+  intake: 'intake', rough_cut: 'rough cut', graphics: 'graphics',
+  second_pass: 'review', captions: 'captions',
+  background_music: 'music', export: 'export',
+};
+
+async function loadFormats() {
+  try {
+    const res = await fetch('/api/formats');
+    const formats = await res.json();
+    const sel = document.getElementById('formatSelect');
+    sel.innerHTML = formats.map(f => '<option value="' + f + '">' + f + '</option>').join('');
+  } catch (e) {
+    console.error('failed to load formats', e);
+  }
+}
+
+async function loadContentTypes() {
+  try {
+    const res = await fetch('/api/content-types');
+    const types = await res.json();
+    const sel = document.getElementById('contentTypeSelect');
+    sel.innerHTML = '<option value="">(use format default)</option>' +
+      types.map(t => '<option value="' + t + '">' + t + '</option>').join('');
+  } catch (e) {
+    console.error('failed to load content types', e);
+  }
+}
+
+document.getElementById('modeSelect').addEventListener('change', function(e) {
+  document.getElementById('clipFields').style.display = e.target.value === 'clip' ? 'flex' : 'none';
+});
+
+document.getElementById('sourceSelect').addEventListener('change', function(e) {
+  var isUrl = e.target.value === 'url';
+  document.getElementById('fileField').style.display = isUrl ? 'none' : 'block';
+  document.getElementById('urlField').style.display = isUrl ? 'block' : 'none';
+  document.getElementById('fileInput').required = !isUrl;
+});
+
+document.getElementById('refreshBtn').addEventListener('click', loadJobs);
+
+function fmtStatus(job) {
+  var failed = !!job.error;
+  var exported = job.steps && job.steps.export && job.steps.export.status === 'done';
+  var started = job.steps && job.steps.intake && job.steps.intake.status === 'done';
+  var graphicsDone = job.steps && job.steps.graphics && job.steps.graphics.status === 'done';
+  var secondPassDone = job.steps && job.steps.second_pass && job.steps.second_pass.status === 'done';
+  var paused = !failed && !exported && !secondPassDone && graphicsDone;
+  var downloading = !failed && !started;
+
+  if (failed) return { cls: 'failed', label: 'failed' };
+  if (exported) return { cls: 'done', label: 'done' };
+  if (paused) return { cls: 'paused', label: 'needs review' };
+  if (downloading) return { cls: 'downloading', label: 'downloading' };
+  return { cls: 'downloading', label: 'processing' };
+}
+
+function stepSummary(job) {
+  var steps = job.steps || {};
+  return STEP_ORDER.map(function(s) {
+    var done = (steps[s] || {}).status === 'done';
+    var cls = done ? 'step-done' : '';
+    return '<span class="' + cls + '">' + STEP_LABELS[s] + '</span>';
+  }).join(' &rarr; ');
+}
+
+function escapeHtml(s) {
+  var d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function renderJob(job) {
+  var st = fmtStatus(job);
+  var exported = job.steps && job.steps.export && job.steps.export.status === 'done';
+  var paused = st.cls === 'paused';
+
+  var thumb = exported
+    ? '<img class="thumb" src="/api/jobs/' + job.job + '/thumbnail" onerror="this.style.display=\'none\'">'
+    : '';
+
+  var errorHtml = job.error
+    ? '<div class="error-text">' + escapeHtml(String(job.error).slice(0, 300)) + '</div>'
+    : '';
+
+  var actions = '';
+  if (exported) {
+    actions = '<a href="/api/jobs/' + job.job + '/output">download</a> ' +
+      '<a href="/api/jobs/' + job.job + '/download-all">download all</a> ' +
+      '<button class="small secondary" data-publish="' + job.job + '">publish to YouTube</button>';
+  } else if (paused) {
+    actions = '<button class="small" data-approve="' + job.job + '">approve &amp; continue</button>';
+  }
+
+  return '<div class="job">' +
+    '<div class="job-info">' +
+      '<div class="job-title">' +
+        '<span class="job-id">' + job.job + '</span>' +
+        '<span class="status ' + st.cls + '">' + st.label + '</span>' +
+      '</div>' +
+      '<div class="steps">' + (job.format || '') + ' &middot; ' + stepSummary(job) + '</div>' +
+      errorHtml +
+      '<div class="actions">' + actions + '</div>' +
+    '</div>' +
+    thumb +
+  '</div>';
+}
+
+async function loadJobs() {
+  try {
+    var res = await fetch('/api/jobs');
+    var jobs = await res.json();
+    var el = document.getElementById('jobs');
+    el.innerHTML = jobs.length
+      ? jobs.map(renderJob).join('')
+      : '<div class="panel empty">No jobs yet - submit one above.</div>';
+
+    el.querySelectorAll('[data-approve]').forEach(function(btn) {
+      btn.onclick = function() { approve(btn.dataset.approve); };
+    });
+    el.querySelectorAll('[data-publish]').forEach(function(btn) {
+      btn.onclick = function() { publish(btn.dataset.publish); };
+    });
+  } catch (e) {
+    console.error('failed to load jobs', e);
+  }
+}
+
+async function approve(job) {
+  await fetch('/api/jobs/' + job + '/approve', { method: 'POST' });
+  loadJobs();
+}
+
+async function publish(job) {
+  var fd = new FormData();
+  fd.set('platform', 'youtube');
+  fd.set('privacy', 'private');
+  var res = await fetch('/api/jobs/' + job + '/publish', { method: 'POST', body: fd });
+  var data = await res.json();
+  if (!res.ok) {
+    alert('Publish failed: ' + (data.error || res.status));
+  } else {
+    alert('Publishing started: ' + (data.files || []).join(', ') + '\n(uploads default to private - check YouTube Studio)');
+  }
+}
+
+document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  var submitBtn = document.getElementById('submitBtn');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Starting...';
+
+  try {
+    var fd = new FormData(e.target);
+    var mode = fd.get('mode');
+    var source = fd.get('source');
+    fd.set('skip_music', document.getElementById('skipMusic').checked);
+    fd.delete('mode');
+    fd.delete('source');
+    if (mode !== 'clip') {
+      fd.delete('clip_length');
+      fd.delete('clip_count');
+    }
+    if (source === 'url') {
+      fd.delete('file');
+    } else {
+      fd.delete('url');
+    }
+    var endpoint = source === 'url'
+      ? (mode === 'clip' ? '/api/clip-jobs-url' : '/api/jobs-url')
+      : (mode === 'clip' ? '/api/clip-jobs' : '/api/jobs');
+
+    var res = await fetch(endpoint, { method: 'POST', body: fd });
+    var data = await res.json();
+    if (!res.ok) {
+      alert('Failed to start: ' + (data.error || res.status));
+    } else {
+      e.target.reset();
+      document.getElementById('clipFields').style.display = 'none';
+      document.getElementById('urlField').style.display = 'none';
+      document.getElementById('fileField').style.display = 'block';
+    }
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Run pipeline';
+    loadJobs();
+  }
+});
+
+loadFormats();
+loadContentTypes();
+loadJobs();
+setInterval(loadJobs, 4000);
+</script>
+</body>
+</html>

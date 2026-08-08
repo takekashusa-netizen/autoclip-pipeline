@@ -1,0 +1,6 @@
+{
+  "preset": "liquid-glass-style",
+  "locked": true,
+  "description": "Graphics style for long-form-youtube format (glass + zoom).",
+  "params": {}
+}

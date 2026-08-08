@@ -1,0 +1,23 @@
+{
+  "format": "short-explainer",
+  "fmt": {
+    "aspect": "9:16",
+    "resolution": [
+      1080,
+      1920
+    ]
+  },
+  "graphics": {
+    "style": "top-half cards",
+    "preset": "signature-style",
+    "reframe": "crop"
+  },
+  "captions": {
+    "enabled": true,
+    "position": "centered",
+    "locked": true,
+    "preset": "captions-style"
+  },
+  "thumbnail": "usually_skip",
+  "content_type": "podcast"
+}

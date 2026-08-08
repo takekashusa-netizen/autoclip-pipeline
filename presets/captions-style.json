@@ -1,0 +1,6 @@
+{
+  "preset": "captions-style",
+  "locked": true,
+  "description": "Default caption typography/timing for short-form formats.",
+  "params": {}
+}

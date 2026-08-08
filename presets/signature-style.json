@@ -1,0 +1,6 @@
+{
+  "preset": "signature-style",
+  "locked": true,
+  "description": "Default graphics look used across formats unless overridden.",
+  "params": {}
+}
