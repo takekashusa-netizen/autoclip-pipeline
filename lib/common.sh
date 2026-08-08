@@ -6,7 +6,8 @@
 # Resolve repo root regardless of where this is sourced from.
 COMMON_SH_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export PIPELINE_ROOT="$(cd "${COMMON_SH_DIR}/.." && pwd)"
-export JOBSTATE="python3 ${PIPELINE_ROOT}/lib/jobstate.py"
+jobstate_cmd() { python3 "${PIPELINE_ROOT}/lib/jobstate.py" "$@"; }
+export -f jobstate_cmd
 
 log() { echo "  [$(date +%H:%M:%S)] $*"; }
 export -f log
@@ -24,11 +25,11 @@ job_raw_file() {
 }
 export -f job_raw_file
 
-state_init()      { $JOBSTATE init "$1" "$2" "$3"; }
-state_get()       { $JOBSTATE get "$1" "$2" "${@:3}"; }
-state_set()       { $JOBSTATE set "$1" "$2" "$3"; }
-state_step_done() { $JOBSTATE step-done "$1" "$2"; }
-state_mark()      { $JOBSTATE mark "$1" "$2" "$3" "${4:-}"; }
+state_init()      { jobstate_cmd init "$1" "$2" "$3"; }
+state_get()       { jobstate_cmd get "$1" "$2" "${@:3}"; }
+state_set()       { jobstate_cmd set "$1" "$2" "$3"; }
+state_step_done() { jobstate_cmd step-done "$1" "$2"; }
+state_mark()      { jobstate_cmd mark "$1" "$2" "$3" "${4:-}"; }
 
 # Aborts if free space on the pipeline volume is less than N x raw file size.
 # Default margin=4 covers rough-cut render + graphics render + captions
