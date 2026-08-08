@@ -6,6 +6,8 @@ source "${SKILL_DIR}/../../lib/common.sh"
 
 job="$1"; format="$2"
 
+progress_report "$job" "graphics"
+
 script_path="$(job_dir "$job")/rough-cut/script.json"
 rough_cut="$(job_dir "$job")/rough-cut/rough_cut.mp4"
 if [[ ! -f "$script_path" || ! -f "$rough_cut" ]]; then

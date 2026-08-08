@@ -31,6 +31,19 @@ state_set()       { jobstate_cmd set "$1" "$2" "$3"; }
 state_step_done() { jobstate_cmd step-done "$1" "$2"; }
 state_mark()      { jobstate_cmd mark "$1" "$2" "$3" "${4:-}"; }
 
+# Marks which stage a job is currently in — separate from job.json's
+# step-done tracking, this is what the live tracker (track.sh) reads for
+# "what's happening right now" + percent/detail when available. Fine to
+# call with no percent for coarse stage transitions (e.g. "extracting
+# audio") — cut_engine.py calls progress.report() directly with real
+# percentages during the actual whisper pass, since only Python has
+# visibility into per-segment progress.
+progress_report() {
+  local job="$1" stage="$2" detail="${3:-}"
+  python3 "${PIPELINE_ROOT}/lib/progress.py" "$job" "$stage" "$detail" 2>/dev/null || true
+}
+export -f progress_report
+
 # Aborts if free space on the pipeline volume is less than N x raw file size.
 # Default margin=4 covers rough-cut render + graphics render + captions
 # render + scored render existing briefly before prune runs.

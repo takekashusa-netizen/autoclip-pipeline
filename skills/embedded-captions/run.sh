@@ -6,6 +6,8 @@ source "${SKILL_DIR}/../../lib/common.sh"
 
 job="$1"; format="$2"
 
+progress_report "$job" "captions"
+
 captions_enabled="$(format_get "$format" captions.enabled)"
 if [[ "$captions_enabled" != "True" && "$captions_enabled" != "true" ]]; then
   log "embedded-captions: format '${format}' has captions disabled (e.g. long-form relies on YT CC) — skipping"

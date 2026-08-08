@@ -6,6 +6,8 @@ source "${SKILL_DIR}/../../lib/common.sh"
 
 job="$1"; format="$2"
 
+progress_report "$job" "background_music"
+
 video_in="$(job_dir "$job")/captions/captions_cut.mp4"
 if [[ ! -f "$video_in" ]]; then
   video_in="$(job_dir "$job")/graphics/graphics_cut.mp4"
