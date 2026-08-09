@@ -3,6 +3,8 @@ set -euo pipefail
 
 # Usage: ./clip_pipeline.sh <job> <format> --clip-length SECONDS --clip-count N \
 #          [--content-type podcast|gaming|irl] [--skip-music] [--bonus-clips N] [--keep-raw]
+#        OR, for highlight-reel montages instead of one-moment-per-clip:
+#        ./clip_pipeline.sh <job> <format> --montage-minutes 15 --montage-count N [other flags]
 #
 # For long-form source (podcast episodes, livestream VODs): runs rough-cut
 # ONCE on the full source to get a real transcript, picks the N best
@@ -12,12 +14,20 @@ set -euo pipefail
 # re-transcription per clip — the expensive whisper pass happens exactly
 # once regardless of clip count.
 #
+# --montage-minutes switches to montage mode: instead of one short clip
+# per highlight moment, packs the best available moments (transcript +
+# visual action, same scoring) into --montage-count long highlight-reel
+# clips of ~N minutes each — jam-packed with exciting moments back to
+# back, not just one longer contiguous window. Each moment is used in at
+# most one montage, never duplicated.
+#
 # By default, the big intermediates (the full raw source download and the
 # full rough-cut render) are deleted once all clips are extracted — pass
 # --keep-raw to keep them around (e.g. if you plan to re-run clip-select
 # with different settings without re-downloading/re-transcribing).
 #
 # Outputs: outputs/<job>__clip01.final.mp4 ... outputs/<job>__clipN.final.mp4
+#      or: outputs/<job>__montage01.final.mp4 ... in montage mode
 
 job="${1:?job id required}"
 format="${2:?format required}"
@@ -27,6 +37,8 @@ clip_length=60
 clip_count=3
 bonus_clips=3   # default on — grab up to 3 extra strong-highlight moments
                 # beyond clip_count if the source has more worth clipping
+montage_minutes=0   # 0 = montage mode disabled, use single-window mode
+montage_count=3
 skip_music=false
 content_type=""
 keep_raw=false
@@ -37,6 +49,8 @@ while [[ $i -lt ${#args[@]} ]]; do
     --clip-length) i=$((i+1)); clip_length="${args[$i]}" ;;
     --clip-count)  i=$((i+1)); clip_count="${args[$i]}" ;;
     --bonus-clips) i=$((i+1)); bonus_clips="${args[$i]}" ;;
+    --montage-minutes) i=$((i+1)); montage_minutes="${args[$i]}" ;;
+    --montage-count) i=$((i+1)); montage_count="${args[$i]}" ;;
     --skip-music)  skip_music=true ;;
     --content-type) i=$((i+1)); content_type="${args[$i]}" ;;
     --keep-raw) keep_raw=true ;;
@@ -55,7 +69,11 @@ fi
 
 check_disk_space "$job" || exit 1
 
-echo "== clip_pipeline: job=${job} format=${format} clip_length=${clip_length}s clip_count=${clip_count} =="
+if [[ "$montage_minutes" != "0" ]]; then
+  echo "== clip_pipeline: job=${job} format=${format} montage_minutes=${montage_minutes} montage_count=${montage_count} =="
+else
+  echo "== clip_pipeline: job=${job} format=${format} clip_length=${clip_length}s clip_count=${clip_count} =="
+fi
 
 if [[ ! -f "$(job_dir "$job")/job.json" ]]; then
   raw_file="$(job_raw_file "$job")"
@@ -84,15 +102,124 @@ else
   visual_json=""
 fi
 
-echo "-- selecting ${clip_count} best clip windows (~${clip_length}s each, +${bonus_clips} bonus if strong highlights exist) --"
-result="$(python3 "${SKILL_DIR}/select.py" "$script_path" "$clip_length" "$clip_count" "$clips_json" "$bonus_clips" "$visual_json")"
-log "clip-select: ${result}"
-
-clip_count_actual="$(python3 -c "import json; print(len(json.load(open('${clips_json}'))['clips']))")"
-if [[ "$clip_count_actual" == "0" ]]; then
-  echo "== no clips selected (no transcript, or no highlight/hook beats found) =="
-  exit 1
+echo "-- selecting best moments (montage_minutes=${montage_minutes}) --"
+if [[ "$montage_minutes" != "0" ]]; then
+  result="$(python3 "${SKILL_DIR}/build_montage.py" "$script_path" "$visual_json" "$montage_minutes" "$montage_count" "$clips_json")"
+  log "build-montage: ${result}"
+  clip_count_actual="$(python3 -c "import json; print(len(json.load(open('${clips_json}'))['montages']))")"
+  if [[ "$clip_count_actual" == "0" ]]; then
+    echo "== no montages built (no transcript, or no highlight/action beats found) =="
+    exit 1
+  fi
+else
+  result="$(python3 "${SKILL_DIR}/select.py" "$script_path" "$clip_length" "$clip_count" "$clips_json" "$bonus_clips" "$visual_json")"
+  log "clip-select: ${result}"
+  clip_count_actual="$(python3 -c "import json; print(len(json.load(open('${clips_json}'))['clips']))")"
+  if [[ "$clip_count_actual" == "0" ]]; then
+    echo "== no clips selected (no transcript, or no highlight/hook beats found) =="
+    exit 1
+  fi
 fi
+
+if [[ "$montage_minutes" != "0" ]]; then
+  mapfile -t montage_ids < <(python3 -c "
+import json
+for m in json.load(open('${clips_json}'))['montages']:
+    print(m['id'])
+")
+
+  for montage_id in "${montage_ids[@]}"; do
+    subjob="${job}__${montage_id}"
+    seg_count="$(python3 -c "
+import json
+montages = json.load(open('${clips_json}'))['montages']
+m = next(m for m in montages if m['id'] == '${montage_id}')
+print(len(m['segments']))
+")"
+    total_dur="$(python3 -c "
+import json
+montages = json.load(open('${clips_json}'))['montages']
+m = next(m for m in montages if m['id'] == '${montage_id}')
+print(m['total_duration'])
+")"
+    echo "-- ${montage_id}: ${seg_count} moments, ${total_dur}s total --"
+
+    sub_raw_dir="$(job_raw_dir "$subjob")"
+    sub_rough_dir="$(job_dir "$subjob")/rough-cut"
+    sub_work_dir="$(job_work_dir "$subjob")/montage"
+    mkdir -p "$sub_raw_dir" "$sub_rough_dir" "$sub_work_dir"
+
+    # extract each segment, concat into one continuous montage video —
+    # same batching pattern used elsewhere in this pipeline, just applied
+    # to hand-picked highlight segments instead of whisper's keep-list
+    mapfile -t seg_lines < <(python3 -c "
+import json
+montages = json.load(open('${clips_json}'))['montages']
+m = next(m for m in montages if m['id'] == '${montage_id}')
+for s in m['segments']:
+    print(f\"{s['start']}\t{s['end']}\")
+")
+    part_files=()
+    part_idx=0
+    for seg_line in "${seg_lines[@]}"; do
+      IFS=$'\t' read -r seg_start seg_end <<< "$seg_line"
+      part_file="${sub_work_dir}/part_$(printf '%04d' $part_idx).mp4"
+      ffmpeg -nostdin -y -i "$rough_cut_video" -ss "$seg_start" -to "$seg_end" \
+        -c:v libx264 -preset veryfast -c:a aac \
+        "$part_file" -loglevel error
+      part_files+=("$part_file")
+      part_idx=$((part_idx + 1))
+    done
+
+    concat_list="${sub_work_dir}/concat.txt"
+    : > "$concat_list"
+    for pf in "${part_files[@]}"; do
+      echo "file '${pf}'" >> "$concat_list"
+    done
+    ffmpeg -nostdin -y -f concat -safe 0 -i "$concat_list" -c copy \
+      "${sub_raw_dir}/source.mp4" -loglevel error
+    cp "${sub_raw_dir}/source.mp4" "${sub_rough_dir}/rough_cut.mp4"
+    rm -rf "$sub_work_dir"
+
+    # build a synthetic script.json spanning the WHOLE montage, with each
+    # segment's text preserved and re-timed to its position in the
+    # concatenated output (offset by the cumulative duration of the
+    # segments before it) — captions/graphics downstream just see one
+    # continuous transcript, no different from a real single-source video
+    python3 -c "
+import json
+montages = json.load(open('${clips_json}'))['montages']
+m = next(m for m in montages if m['id'] == '${montage_id}')
+segs = []
+offset = 0.0
+for s in m['segments']:
+    dur = s['end'] - s['start']
+    segs.append({'start': offset, 'end': offset + dur, 'text': s['text']})
+    offset += dur
+out = {
+    'job': '${subjob}', 'transcription_available': True,
+    'source_duration_sec': offset,
+    'kept_segments': segs, 'cut_segments': [],
+    'script_text': ' '.join(s['text'] for s in segs),
+}
+json.dump(out, open('${sub_rough_dir}/script.json', 'w'), indent=2)
+json.dump({'job': '${subjob}', 'keep': [[s['start'], s['end']] for s in segs], 'cut': []},
+          open('${sub_rough_dir}/edl.json', 'w'), indent=2)
+"
+
+    if [[ ! -f "$(job_dir "$subjob")/job.json" ]]; then
+      state_init "$subjob" "$format" "${sub_raw_dir}/source.mp4"
+    fi
+    state_mark "$subjob" rough_cut done "{\"note\":\"montage of ${seg_count} moments from ${job}\"}"
+
+    run_args=("${PIPELINE_ROOT}/run_pipeline.sh" "$subjob" "$format")
+    [[ "$skip_music" == true ]] && run_args+=(--skip-music)
+    [[ -n "$content_type" ]] && run_args+=(--content-type "$content_type")
+
+    "${run_args[@]}" || log "  ${montage_id}: paused for second-pass review (normal) — approve with: python3 lib/jobstate.py mark ${subjob} second_pass done && ./run_pipeline.sh ${subjob} ${format}"
+  done
+
+else
 
 mapfile -t clip_lines < <(python3 -c "
 import json
@@ -152,6 +279,8 @@ json.dump({'job': '${subjob}', 'keep': [[s['start'], s['end']] for s in segs], '
   "${run_args[@]}" || log "  ${clip_id}: paused for second-pass review (normal) — approve with: python3 lib/jobstate.py mark ${subjob} second_pass done && ./run_pipeline.sh ${subjob} ${format}"
 done
 
+fi
+
 if [[ "$keep_raw" == false ]]; then
   # every clip has its own extracted copy already (projects/<job>__clipNN/raw/),
   # so the parent's full-length raw download + full rough-cut render are
@@ -171,4 +300,4 @@ else
   log "cleanup: --keep-raw set, leaving parent raw source and rough-cut render in place"
 fi
 
-echo "== clip_pipeline done: check outputs/${job}__clip*.final.mp4 =="
+echo "== clip_pipeline done: check outputs/${job}__clip*.final.mp4 or outputs/${job}__montage*.final.mp4 =="
