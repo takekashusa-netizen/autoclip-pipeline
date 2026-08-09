@@ -1,85 +1,5 @@
-== resuming 4f7090e48c6c (format=short-tiktok-raw) ==
-== pipeline: job=4f7090e48c6c format=short-tiktok-raw ==
--- [1/7] intake --
-  [19:16:43] [intake] already done, skipping (use --force to redo)
--- [2/7] rough cut --
-  [19:16:43] [rough_cut] already done, skipping (use --force to redo)
--- [3/7] graphics (format-specific: short-tiktok-raw) --
-  [19:16:44] graphics-plan: reading script from rough-cut (no re-transcription)
-  [19:16:44] graphics-plan: style='hook card -> raw' preset='tiktok-raw-style' reframe='crop' target=1080x1920
-  [19:16:44] graphics-plan: planning beats
-  [19:16:44] graphics-plan: {"beat_count": 0}
-  [19:16:44] graphics-plan: rendering (reframe + beat cards) via engine stand-in
-./resume_all.sh: line 75: 52508 Killed: 9               "${ROOT}/run_pipeline.sh" "$job" "$format"
-  [19:19:53]   4f7090e48c6c: stopped (paused for review, or hit an error — check job.json)
+skip 4f7090e48c6c: locked (already running, or a stale lock — check manually if this persists)
 skip 55ffc8ca0948: no raw file present (download never completed) — re-submit this one manually
-== resuming 881bb850f75b (format=long-form-youtube) ==
-== pipeline: job=881bb850f75b format=long-form-youtube ==
--- [1/7] intake --
-  [19:19:54] [intake] already done, skipping (use --force to redo)
--- [2/7] rough cut --
-  [19:19:55] [rough_cut] already done, skipping (use --force to redo)
--- [3/7] graphics (format-specific: long-form-youtube) --
-  [19:19:55] [graphics] already done, skipping (use --force to redo)
--- [4/7] second pass (manual review) --
-  [19:19:55] waiting on manual review/incremental re-composite — mark done with:
-  [19:19:55]   python3 lib/jobstate.py mark 881bb850f75b second_pass  [19:31:29] graphics-plan: {"beats_rendered": 0}
-  [19:31:31] graphics-plan: done -> projects/881bb850f75b/graphics/{graphics-plan.json,graphics_cut.mp4}
-/Users/Apple/autoclip-pipeline/run_pipeline.sh: line 79: syntax error near unexpected token `then'
-  [19:31:31]   881bb850f75b: stopped (paused for review, or hit an error — check job.json)
 skip c285bd63e77b: locked (already running, or a stale lock — check manually if this persists)
-./resume_all.sh: line 115: syntax error near unexpected token `)'
-uilding EDL
-  [19:21:03] rough-cut: ffmpeg version 8.1.2 Copyright (c) 2000-2026 the FFmpeg developers
-  built with Apple clang version 16.0.0 (clang-1600.0.26.6)
-  configuration: --prefix=/usr/local/Cellar/ffmpeg/8.1.2_1 --enable-shared --enable-pthreads --enable-version3 --cc=clang --host-cflags= --host-ldflags= --enable-ffplay --enable-gpl --enable-libsvtav1 --enable-libopus --enable-libx264 --enable-libmp3lame --enable-libdav1d --enable-libvmaf --enable-libvpx --enable-libx265 --enable-openssl --enable-videotoolbox --enable-audiotoolbox
-  libavutil      60. 26.102 / 60. 26.102
-  libavcodec     62. 28.102 / 62. 28.102
-  libavformat    62. 12.102 / 62. 12.102
-  libavdevice    62.  3.102 / 62.  3.102
-  libavfilter    11. 14.102 / 11. 14.102
-  libswscale      9.  5.102 /  9.  5.102
-  libswresample   6.  3.102 /  6.  3.102
-Input #0, mov,mp4,m4a,3gp,3g2,mj2, from '/Users/Apple/autoclip-pipeline/projects/c285bd63e77b/raw/source.mp4':
-  Metadata:
-    major_brand     : isom
-    minor_version   : 512
-    compatible_brands: isomiso2avc1mp41
-    encoder         : Lavf62.12.102
-  Duration: 05:39:43.44, start: 0.000000, bitrate: 317 kb/s
-  Stream #0:0[0x1](und): Audio: aac (LC) (mp4a / 0x6134706D), 48000 Hz, stereo, fltp, 157 kb/s, start 0.015000 (default)
-    Metadata:
-      handler_name    : SoundHandler
-  Stream #0:1[0x2](und): Video: h264 (Main) (avc1 / 0x31637661), yuv420p(progressive), 1920x1080, 3114 kb/s, 29.90 fps, 29.97 tbr, 90k tbn (default)
-    Metadata:
-      handler_name    : VideoHandler
-Stream mapping:
-  Stream #0:1 -> #0:0 (copy)
-  Stream #0:0 -> #0:1 (copy)
-Output #0, mp4, to '/Users/Apple/autoclip-pipeline/projects/c285bd63e77b/rough-cut/rough_cut.mp4':
-  Metadata:
-    major_brand     : isom
-    minor_version   : 512
-    compatible_brands: isomiso2avc1mp41
-    encoder         : Lavf62.12.102
-  Stream #0:0(und): Video: h264 (Main) (avc1 / 0x31637661), yuv420p(progressive), 1920x1080, q=2-31, 3114 kb/s, 29.90 fps, 29.97 tbr, 90k tbn (default)
-    Metadata:
-      handler_name    : VideoHandler
-  Stream #0:1(und): Audio: aac (LC) (mp4a / 0x6134706D), 48000 Hz, stereo, fltp, 157 kb/s (default)
-    Metadata:
-      handler_name    : SoundHandler
-frame= 5515 fps=0.0 q=-1.0 size=   38144KiB time=00:03:04.12 bitrate=1697.1kbits/s speed= 367x elapsed=0:00:00.50    frame= 9392 fps=9373 q=-1.0 size=   69376KiB time=00:05:13.48 bitrate=1813.0kbits/s speed= 313x elapsed=0:00:01.00    frame=11401 fps=7588 q=-1.0 size=   88832KiB time=00:06:20.51 bitrate=1912.4kbits/s speed= 253x elapsed=0:00:01.50    frame=13020 fps=6500 q=-1.0 size=  113408KiB time=00:07:14.53 bitrate=2138.0kbits/s speed= 217x elapsed=0:00:02.00    frame=14219 fps=5676 q=-1.0 size=  131840KiB time=00:07:54.54 bitrate=2275.9kbits/s speed= 189x elapsed=0:00:02.50    frame=15184 fps=5052 q=-1.0 size=  146688KiB time=00:08:26.64 bitrate=2371.8kbits/s speed= 169x elapsed=0:00:03.00    frame=16399 fps=4674 q=-1.0 size=  164608KiB time=00:09:07.27 bitrate=2464.0kbits/s speed= 156x elapsed=0:00:03.50    frame=16884 fps=4208 q=-1.0 size=  172032KiB time=00:09:23.46 bitrate=2501.1kbits/s speed= 140x elapsed=0:00:04.01    frame=16896 fps=3743 q=-1.0 size=  172288KiB time=00:09:23.86 bitrate=2503.1kbits/s speed= 125x elapsed=0:00:04.51    frame=18074 fps=3604 q=-1.0 size=  190208KiB time=00:10:03.17 bitrate=2583.3kbits/s speed= 120x elapsed=0:00:05.01    frame=18142 fps=3289 q=-1.0 size=  191232KiB time=00:10:05.44 bitrate=2587.5kbits/s speed= 110x elapsed=0:00:05.51    frame=19731 fps=3280 q=-1.0 size=  215552KiB time=00:10:58.46 bitrate=2681.7kbits/s speed= 109x elapsed=0:00:06.01    frame=20222 fps=3103 q=-1.0 size=  223232KiB time=00:11:14.72 bitrate=2710.3kbits/s speed= 104x elapsed=0:00:06.51    frame=21949 fps=3128 q=-1.0 size=  249600KiB time=00:12:12.36 bitrate=2791.9kbits/s speed= 104x elapsed=0:00:07.01    frame=23344 fps=3106 q=-1.0 size=  270848KiB time=00:12:59.01 bitrate=2848.2kbits/s speed= 104x elapsed=0:00:07.51    frame=24342 fps=3035 q=-1.0 size=  286208KiB time=00:13:32.31 bitrate=2886.3kbits/s speed= 101x elapsed=0:00:08.01    frame=25079 fps=2942 q=-1.0 size=  297472KiB time=00:13:56.90 bitrate=2911.8kbits/s speed=98.2x elapsed=0:00:08.52    frame=25887 fps=2869 q=-1.0 size=  309760KiB time=00:14:23.86 bitrate=2937.4kbits/s speed=95.7x elapsed=0:00:09.02    frame=25984 fps=2727 q=-1.0 size=  311296KiB time=00:14:27.10 bitrate=2941.0kbits/s speed=  91x elapsed=0:00:09.52    frame=26705 fps=2662 q=-1.0 size=  322304KiB time=00:14:51.16 bitrate=2962.8kbits/s speed=88.8x elapsed=0:00:10.03    frame=27175 fps=2580 q=-1.0 size=  329472KiB time=00:15:06.84 bitrate=2976.3kbits/s speed=86.1x elapsed=0:00:10.53    frame=28696 fps=2600 q=-1.0 size=  352768KiB time=00:15:57.59 bitrate=3017.9kbits/s speed=86.8x elapsed=0:00:11.03    frame=29768 fps=2580 q=-1.0 size=  369152KiB time=00:16:33.35 bitrate=3044.3kbits/s speed=86.1x elapsed=0:00:11.53    frame=30984 fps=2573 q=-1.0 size=  387584KiB time=00:17:13.93 bitrate=3070.9kbits/s speed=85.9x elapsed=0:00:12.04    frame=32534 fps=2593 q=-1.0 size=  411136KiB time=00:18:05.64 bitrate=3102.3kbits/s speed=86.5x elapsed=0:00:12.54    frame=33870 fps=2596 q=-1.0 size=  431616KiB time=00:18:50.23 bitrate=3128.4kbits/s speed=86.6x elapsed=0:00:13.04    frame=35141 fps=2593 q=-1.0 size=  451072KiB time=00:19:32.64 bitrate=3151.2kbits/s speed=86.5x elapsed=0:00:13.55    frame=36211 fps=2577 q=-1.0 size=  467456KiB time=00:20:08.34 bitrate=3169.1kbits/s speed=  86x elapsed=0:00:14.05    frame=37200 fps=2556 q=-1.0 size=  482816KiB time=00:20:41.24 bitrate=3186.5kbits/s speed=85.3x elapsed=0:00:14.55    frame=37557 fps=2495 q=-1.0 size=  488192KiB time=00:20:53.15 bitrate=3191.4kbits/s speed=83.2x elapsed=0:00:15.05    frame=38598 fps=2481 q=-1.0 size=  504064KiB time=00:21:27.99 bitrate=3206.0kbits/s speed=82.8x elapsed=0:00:15.55    frame=39055 fps=2432 q=-1.0 size=  510976KiB time=00:21:43.13 bitrate=3212.2kbits/s speed=81.2x elapsed=0:00:16.05    frame=39436 fps=2381 q=-1.0 size=  516864KiB time=00:21:55.95 bitrate=3217.6kbits/s speed=79.5x elapsed=0:00:16.55    frame=40440 fps=2370 q=-1.0 size=  532224KiB time=00:22:29.35 bitrate=3231.2kbits/s speed=79.1x elapsed=0:00:17.06    frame=40441 fps=2302 q=-1.0 size=  532224KiB time=00:22:29.48 bitrate=3230.8kbits/s speed=76.8x elapsed=0:00:17.56    frame=40740 fps=2255 q=-1.0 size=  536832KiB time=00:22:39.36 bitrate=3235.1kbits/s speed=75.2x elapsed=0:00:18.06    frame=41530 fps=2237 q=-1.0 size=  547072KiB time=00:23:05.72 bitrate=3234.1kbits/s speed=74.6x elapsed=0:00:18.56    frame=42780 fps=2244 q=-1.0 size=  559104KiB time=00:23:47.43 bitrate=3208.7kbits/s speed=74.9x elapsed=0:00:19.06    frame=43032 fps=2199 q=-1.0 size=  562944KiB time=00:23:55.83 bitrate=3211.8kbits/s speed=73.4x elapsed=0:00:19.56    frame=43479 fps=2166 q=-1.0 size=  569600KiB time=00:24:10.85 bitrate=3216.2kbits/s speed=72.3x elapsed=0:00:20.06    frame=44150 fps=2146 q=-1.0 size=  578816KiB time=00:24:33.23 bitrate=3218.5kbits/s speed=71.6x elapsed=0:00:20.57    frame=44820 fps=2127 q=-1.0 size=  589312KiB time=00:24:55.49 bitrate=3228.1kbits/s speed=  71x elapsed=0:00:21.07    frame=45300 fps=2099 q=-1.0 size=  596480KiB time=00:25:11.51 bitrate=3232.8kbits/s speed=70.1x elapsed=0:00:21.57    frame=45802 fps=2073 q=-1.0 size=  604160KiB time=00:25:28.26 bitrate=3238.5kbits/s speed=69.2x elapsed=0:00:22.09    frame=46281 fps=2048 q=-1.0 size=  611584KiB time=00:25:44.24 bitrate=3244.4kbits/s speed=68.3x elapsed=0:00:22.59    frame=46672 fps=2021 q=-1.0 size=  617472KiB time=00:25:57.29 bitrate=3248.2kbits/s speed=67.4x elapsed=0:00:23.09    frame=46890 fps=1987 q=-1.0 size=  620800KiB time=00:26:04.66 bitrate=3250.3kbits/s speed=66.3x elapsed=0:00:23.60    frame=47580 fps=1974 q=-1.0 size=  631296KiB time=00:26:27.69 bitrate=3257.3kbits/s speed=65.9x elapsed=0:00:24.10    frame=47647 fps=1937 q=-1.0 size=  632320KiB time=00:26:29.92 bitrate=3258.0kbits/s speed=64.6x elapsed=0:00:24.60    frame=48180 fps=1919 q=-1.0 size=  640768KiB time=00:26:47.61 bitrate=3265.2kbits/s speed=  64x elapsed=0:00:25.10    frame=48900 fps=1910 q=-1.0 size=  651520KiB time=00:27:11.63 bitrate=3271.1kbits/s speed=63.7x elapsed=0:00:25.60    frame=49773 fps=1907 q=-1.0 size=  664064KiB time=00:27:40.86 bitrate=3275.4kbits/s speed=63.6x elapsed=0:00:26.10    frame=50640 fps=1904 q=-1.0 size=  677376KiB time=00:28:09.69 bitrate=3284.1kbits/s speed=63.5x elapsed=0:00:26.60    frame=51780 fps=1910 q=-1.0 size=  694784KiB time=00:28:47.73 bitrate=3294.3kbits/s speed=63.7x elapsed=0:00:27.10    frame=52800 fps=1913 q=-1.0 size=  710400KiB time=00:29:21.76 bitrate=3303.3kbits/s speed=63.8x elapsed=0:00:27.60    frame=53186 fps=1893 q=-1.0 size=  716288KiB time=00:29:34.64 bitrate=3306.5kbits/s speed=63.1x elapsed=0:00:28.10    frame=54465 fps=1904 q=-1.0 size=  735744KiB time=00:30:17.42 bitrate=3316.4kbits/s speed=63.5x elapsed=0:00:28.60    frame=55136 fps=1894 q=-1.0 size=  745984KiB time=00:30:39.81 bitrate=3321.6kbits/s speed=63.2x elapsed=0:00:29.10    frame=55553 fps=1876 q=-1.0 size=  752384KiB time=00:30:53.72 bitrate=3324.9kbits/s speed=62.6x elapsed=0:00:29.60    frame=56096 fps=1863 q=-1.0 size=  760832KiB time=00:31:11.74 bitrate=3329.9kbits/s speed=62.2x elapsed=0:00:30.10    [in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f7eaef05f40] Packet corrupt (stream = 1, dts = 169075440).
-[h264 @ 0x7f7eb0206dc0] Invalid NAL unit size (18636 > 6199).
-[h264 @ 0x7f7eb0206dc0] missing picture in access unit with size 6209
-[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f7eaef05e00] corrupt input packet in stream 1
-[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f7eaef05f40] stream 0, offset 0x30303095: partial file
-[out#0/mp4 @ 0x7f7eb0004080] video:728017KiB audio:36087KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.249535%
-frame=56303 fps=1800 q=-1.0 Lsize=  766011KiB time=00:31:18.62 bitrate=3340.3kbits/s speed=60.1x elapsed=0:00:31.27    
-{"transcription_available": false, "kept_segments": 0, "cut_segments": 1, "script_chars": 0}
-  [19:21:04] rough-cut: done -> projects/c285bd63e77b/rough-cut/{rough_cut.mp4,script.json,edl.json}
--- [3/7] graphics (format-specific: long-form-youtube) --
-  [19:21:06] graphics-plan: reading script from rough-cut (no re-transcription)
-  [19:21:07] graphics-plan: style='glass + zoom' preset='liquid-glass-style' reframe='crop' target=1920x1080
-  [19:21:07] graphics-plan: planning beats
-  [19:21:07] graphics-plan: {"beat_count": 0}
-  [19:21:07] graphics-plan: rendering (reframe + beat cards) via engine stand-in
+
+== resume_all summary: 4 jobs found, 0 resumed, 1 already done, 2 locked/running, 1 missing raw file ==
