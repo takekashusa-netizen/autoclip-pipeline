@@ -95,8 +95,23 @@ clips_json="$(job_dir "$job")/rough-cut/clips.json"
 echo "-- analyzing visual content (action/motion detection) --"
 visual_json="$(job_dir "$job")/rough-cut/visual-analysis.json"
 if python3 -c "import cv2" 2>/dev/null; then
-  vis_result="$(python3 "${PIPELINE_ROOT}/lib/visual_analysis.py" "$rough_cut_video" "$visual_json" --interval 2.0 2>&1)"
-  log "visual-analysis: ${vis_result}"
+  # Real bug fixed: visual analysis is supposed to be optional/best-effort
+  # — but under set -euo pipefail, if visual_analysis.py exited non-zero
+  # for ANY reason (a crash, an OOM kill, anything), this assignment's own
+  # failure silently killed the ENTIRE clip_pipeline.sh run with zero
+  # visible error, since the captured stderr never got a chance to print
+  # before the script died. The `|| vis_exit=$?` pattern below prevents
+  # set -e from treating this as fatal, so a broken/crashed visual
+  # analysis degrades to "no visual data" instead of taking down clips
+  # that don't even depend on it (transcript-based selection still works).
+  vis_exit=0
+  vis_result="$(python3 "${PIPELINE_ROOT}/lib/visual_analysis.py" "$rough_cut_video" "$visual_json" --interval 2.0 2>&1)" || vis_exit=$?
+  if [[ $vis_exit -ne 0 ]]; then
+    log "visual-analysis: FAILED (exit ${vis_exit}) — continuing WITHOUT visual data, transcript-based selection still works. Error was: $(echo "$vis_result" | tail -5)"
+    visual_json=""
+  else
+    log "visual-analysis: ${vis_result}"
+  fi
 else
   log "visual-analysis: opencv not installed — skipping action-moment detection (pip install opencv-python-headless to enable). Transcript-based selection still works normally."
   visual_json=""
