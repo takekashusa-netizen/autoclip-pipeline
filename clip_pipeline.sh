@@ -74,8 +74,18 @@ script_path="$(job_dir "$job")/rough-cut/script.json"
 rough_cut_video="$(job_dir "$job")/rough-cut/rough_cut.mp4"
 clips_json="$(job_dir "$job")/rough-cut/clips.json"
 
+echo "-- analyzing visual content (action/motion detection) --"
+visual_json="$(job_dir "$job")/rough-cut/visual-analysis.json"
+if python3 -c "import cv2" 2>/dev/null; then
+  vis_result="$(python3 "${PIPELINE_ROOT}/lib/visual_analysis.py" "$rough_cut_video" "$visual_json" --interval 2.0 2>&1)"
+  log "visual-analysis: ${vis_result}"
+else
+  log "visual-analysis: opencv not installed — skipping action-moment detection (pip install opencv-python-headless to enable). Transcript-based selection still works normally."
+  visual_json=""
+fi
+
 echo "-- selecting ${clip_count} best clip windows (~${clip_length}s each, +${bonus_clips} bonus if strong highlights exist) --"
-result="$(python3 "${SKILL_DIR}/select.py" "$script_path" "$clip_length" "$clip_count" "$clips_json" "$bonus_clips")"
+result="$(python3 "${SKILL_DIR}/select.py" "$script_path" "$clip_length" "$clip_count" "$clips_json" "$bonus_clips" "$visual_json")"
 log "clip-select: ${result}"
 
 clip_count_actual="$(python3 -c "import json; print(len(json.load(open('${clips_json}'))['clips']))")"

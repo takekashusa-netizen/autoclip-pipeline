@@ -18,17 +18,23 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "graphics-plan"))
 from beat_planner import classify  # noqa: E402
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "lib"))
+from visual_analysis import motion_beats  # noqa: E402
 
-PRIORITY = {"highlight": 3, "hook": 2, "stat": 1, "list_item": 1, "question": 1}
+PRIORITY = {"action": 3, "highlight": 3, "hook": 2, "stat": 1, "list_item": 1, "question": 1}
 
 
 def score(tags):
     return max((PRIORITY.get(t, 0) for t in tags), default=0)
 
 
-def candidate_windows(kept_segments, clip_length, duration):
+def candidate_windows(kept_segments, clip_length, duration, visual_analysis=None):
     """One candidate window per tagged beat, centered on that beat,
-    clamped to source bounds."""
+    clamped to source bounds. Transcript-based beats (highlight/hook/etc)
+    plus, when visual_analysis is provided, motion-based 'action' beats —
+    visual activity spikes independent of what was said, so a genuinely
+    silent action moment (a fight, a big on-screen event) still gets
+    picked up instead of only reacting to hype words in the transcript."""
     candidates = []
     for i, seg in enumerate(kept_segments):
         tags = classify(seg, i, is_first=(i == 0))
@@ -40,6 +46,16 @@ def candidate_windows(kept_segments, clip_length, duration):
         end = min(duration, start + clip_length)
         start = max(0.0, end - clip_length)  # re-clamp if end hit the ceiling
         candidates.append({"start": start, "end": end, "score": s, "text": seg["text"]})
+
+    if visual_analysis:
+        for beat in motion_beats(visual_analysis):
+            mid = (beat["start"] + beat["end"]) / 2
+            start = max(0.0, mid - clip_length / 2)
+            end = min(duration, start + clip_length)
+            start = max(0.0, end - clip_length)
+            candidates.append({"start": start, "end": end, "score": score(beat["tags"]),
+                                "text": beat["text"]})
+
     return candidates
 
 
@@ -79,6 +95,7 @@ def main():
     script_path, clip_length, clip_count, out_path = sys.argv[1:5]
     clip_length, clip_count = float(clip_length), int(clip_count)
     bonus_cap = int(sys.argv[5]) if len(sys.argv) > 5 else 0
+    visual_analysis_path = sys.argv[6] if len(sys.argv) > 6 else None
 
     script = json.load(open(script_path))
     if not script.get("transcription_available"):
@@ -90,7 +107,16 @@ def main():
     kept = script.get("kept_segments", [])
     duration = script.get("source_duration_sec", 0)
 
-    candidates = candidate_windows(kept, clip_length, duration)
+    visual_analysis = None
+    if visual_analysis_path and os.path.exists(visual_analysis_path):
+        try:
+            data = json.load(open(visual_analysis_path))
+            if "samples" in data:  # not an {"error": ...} fallback file
+                visual_analysis = data
+        except Exception:
+            pass
+
+    candidates = candidate_windows(kept, clip_length, duration, visual_analysis)
     picked = pick_non_overlapping(candidates, clip_count, bonus_cap)
 
     clips = [
