@@ -35,7 +35,20 @@ def analyze(video_path, interval_sec=2.0):
     if cv2 is None:
         return None
 
-    cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
+    # Real bug fixed: face detection setup used to crash the ENTIRE
+    # analysis if CascadeClassifier wasn't available in this particular
+    # opencv build — but motion detection (VideoCapture/absdiff/resize)
+    # doesn't depend on it at all. Face detection now degrades to
+    # "unavailable" instead of taking down clip selection with it.
+    cascade = None
+    try:
+        cascade_path = cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
+        cascade = cv2.CascadeClassifier(cascade_path)
+        if cascade.empty():
+            cascade = None
+    except AttributeError:
+        cascade = None  # this cv2 build doesn't have CascadeClassifier/objdetect at all
+
     cap = cv2.VideoCapture(video_path)
     if not cap.isOpened():
         return None
@@ -59,14 +72,17 @@ def analyze(video_path, interval_sec=2.0):
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         h, w = gray.shape[:2]
 
-        # face detection on the full-res grayscale frame
-        faces = cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(40, 40))
+        # face detection on the full-res grayscale frame (skipped entirely
+        # if the cascade isn't available in this cv2 build — motion score
+        # below still works either way)
         face_center = None
-        if len(faces) > 0:
-            # largest detected face (most likely the main subject, not a
-            # background extra) — bbox is (x, y, width, height)
-            fx, fy, fw, fh = max(faces, key=lambda b: b[2] * b[3])
-            face_center = [round((fx + fw / 2) / w, 4), round((fy + fh / 2) / h, 4)]
+        if cascade is not None:
+            faces = cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(40, 40))
+            if len(faces) > 0:
+                # largest detected face (most likely the main subject, not a
+                # background extra) — bbox is (x, y, width, height)
+                fx, fy, fw, fh = max(faces, key=lambda b: b[2] * b[3])
+                face_center = [round((fx + fw / 2) / w, 4), round((fy + fh / 2) / h, 4)]
 
         # motion score: downsample for speed, compare to previous sample
         small = cv2.resize(gray, (64, 36))
