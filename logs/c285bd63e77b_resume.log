@@ -1,0 +1,21 @@
+== pipeline: job=c285bd63e77b format=long-form-youtube ==
+-- [1/7] intake --
+  [23:26:53] [intake] already done, skipping (use --force to redo)
+-- [2/7] rough cut --
+  [23:26:53] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: long-form-youtube) --
+  [23:26:53] [graphics] already done, skipping (use --force to redo)
+-- [4/7] second pass (manual review) --
+  [23:26:53] [second_pass] already approved, skipping
+-- [5/7] captions (format-specific: long-form-youtube) --
+  [23:26:53] embedded-captions: format 'long-form-youtube' has captions disabled (e.g. long-form relies on YT CC) — skipping
+-- [6/7] background music (optional) --
+  [23:26:53] background-music: no track found at projects/c285bd63e77b/music/ — this step is optional, passing video through unchanged
+  [23:26:53] background-music: to add a score, drop an mp3/wav/m4a into projects/c285bd63e77b/music/ and re-run with --force
+  [23:28:12] background-music: done -> projects/c285bd63e77b/music-out/scored_cut.mp4
+-- [7/7] export --
+  [23:29:46] finalize: promoted scored_cut.mp4 -> outputs/c285bd63e77b.final.mp4
+  [23:29:48] prune: removed 3 intermediate render(s) + scratch work dir for job 'c285bd63e77b'
+  [23:29:48] thumbnail-generator: grabbing frame at t=1.0s (hook beat if available)
+  [23:29:49] thumbnail-generator: done -> projects/c285bd63e77b/thumbnail/thumb.jpg
+== done: outputs/c285bd63e77b.final.mp4 ==
