@@ -1,0 +1,14 @@
+== pipeline: job=881bb850f75b format=long-form-youtube ==
+-- [1/7] intake --
+  [18:52:30] raw file: /Users/Apple/autoclip-pipeline/projects/881bb850f75b/raw/source.mp4
+-- [2/7] rough cut --
+  [18:52:32] rough-cut: extracting audio from source.mp4
+[in#0/mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f78f9304500] stream 1, offset 0x3100311d: partial file
+  [18:53:05] rough-cut: audio track is effectively silent (-91.0dB) — skipping transcription, pass-through only
+  [18:53:33] rough-cut: done -> projects/881bb850f75b/rough-cut/{rough_cut.mp4,script.json,edl.json}
+-- [3/7] graphics (format-specific: long-form-youtube) --
+  [18:53:36] graphics-plan: reading script from rough-cut (no re-transcription)
+  [18:53:36] graphics-plan: style='glass + zoom' preset='liquid-glass-style' reframe='crop' target=1920x1080
+  [18:53:36] graphics-plan: planning beats
+  [18:53:36] graphics-plan: {"beat_count": 0}
+  [18:53:36] graphics-plan: rendering (reframe + beat cards) via engine stand-in

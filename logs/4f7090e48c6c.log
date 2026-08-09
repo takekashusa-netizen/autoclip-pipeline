@@ -1,0 +1,11 @@
+== pipeline: job=4f7090e48c6c format=short-tiktok-raw ==
+-- [1/7] intake --
+  [18:52:30] [intake] already done, skipping (use --force to redo)
+-- [2/7] rough cut --
+  [18:52:30] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [18:52:32] graphics-plan: reading script from rough-cut (no re-transcription)
+  [18:52:32] graphics-plan: style='hook card -> raw' preset='tiktok-raw-style' reframe='crop' target=1080x1920
+  [18:52:32] graphics-plan: planning beats
+  [18:52:32] graphics-plan: {"beat_count": 0}
+  [18:52:32] graphics-plan: rendering (reframe + beat cards) via engine stand-in
