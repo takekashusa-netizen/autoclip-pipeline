@@ -61,6 +61,54 @@ if [[ ! -f "$(job_dir "$job")/job.json" ]]; then
   state_init "$job" "$format" "${raw_file:-}"
 fi
 
+# Real bug found and fixed: run_pipeline.sh had NO locking of its own —
+# only the web app's background-task wrapper created .lock files. Running
+# resume_all.sh (or run_pipeline.sh directly) more than once while a job
+# was still mid-run spawned duplicate ffmpeg processes racing to write the
+# SAME output file simultaneously. This is the actual fix, at the actual
+# entry point every execution path goes through.
+lock_file="$(job_dir "$job")/.lock"
+if [[ -f "$lock_file" ]]; then
+  existing_pid="$(cat "$lock_file" 2>/dev/null || echo "")"
+  if [[ -n "$existing_pid" ]] && kill -0 "$existing_pid" 2>/dev/null; then
+    echo "abort: job '${job}' is already running (pid ${existing_pid}) — refusing to start a duplicate run" >&2
+    exit 1
+  fi
+  echo "note: found a stale lock (pid ${existing_pid} is not running) — proceeding" >&2
+fi
+mkdir -p "$(job_dir "$job")"
+echo $$ > "$lock_file"
+
+# Clear any stale error/diagnosis from a previous failed attempt — without
+# this, a job that failed hours ago keeps showing as FAILED forever even
+# after it starts succeeding, since only the web app was clearing this
+# field. run_pipeline.sh is the actual common entry point for every
+# execution path (web app, CLI, resume_all.sh), so this belongs here.
+state_set "$job" "error" "null"
+state_set "$job" "diagnosis" "null"
+
+# On any failure past this point, record what broke — with a diagnosis —
+# so job.json always reflects the truth about the CURRENT attempt, not a
+# stale one.
+on_failure() {
+  local exit_code=$?
+  rm -f "$lock_file"  # always release the lock on exit, success or failure
+  if [[ $exit_code -ne 0 ]]; then
+    # don't clobber a specific diagnosis a step already wrote for itself
+    # (e.g. rough-cut/run.sh) — only fall back to a generic message if
+    # nothing more specific is already there
+    local existing_diag
+    existing_diag="$(state_get "$job" "diagnosis" --default 'null' 2>/dev/null || echo 'null')"
+    if [[ "$existing_diag" == "null" ]]; then
+      local diagnosis
+      diagnosis="$(python3 "${PIPELINE_ROOT}/lib/diagnose.py" "pipeline exited with code ${exit_code}" 2>/dev/null || echo '{}')"
+      state_set "$job" "error" "\"pipeline failed at exit code ${exit_code} — check terminal output for details\""
+      state_set "$job" "diagnosis" "$diagnosis"
+    fi
+  fi
+}
+trap on_failure EXIT
+
 echo "-- [1/7] intake --"
 run_step intake bash -c "log 'raw file: $(job_raw_file "$job" || echo none)'"
 
