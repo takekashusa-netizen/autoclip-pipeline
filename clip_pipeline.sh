@@ -122,7 +122,10 @@ else
 fi
 
 if [[ "$montage_minutes" != "0" ]]; then
-  mapfile -t montage_ids < <(python3 -c "
+  montage_ids=()
+  while IFS= read -r line; do
+    [[ -n "$line" ]] && montage_ids+=("$line")
+  done < <(python3 -c "
 import json
 for m in json.load(open('${clips_json}'))['montages']:
     print(m['id'])
@@ -152,7 +155,10 @@ print(m['total_duration'])
     # extract each segment, concat into one continuous montage video —
     # same batching pattern used elsewhere in this pipeline, just applied
     # to hand-picked highlight segments instead of whisper's keep-list
-    mapfile -t seg_lines < <(python3 -c "
+    seg_lines=()
+    while IFS= read -r line; do
+      [[ -n "$line" ]] && seg_lines+=("$line")
+    done < <(python3 -c "
 import json
 montages = json.load(open('${clips_json}'))['montages']
 m = next(m for m in montages if m['id'] == '${montage_id}')
@@ -221,7 +227,10 @@ json.dump({'job': '${subjob}', 'keep': [[s['start'], s['end']] for s in segs], '
 
 else
 
-mapfile -t clip_lines < <(python3 -c "
+clip_lines=()
+while IFS= read -r line; do
+  [[ -n "$line" ]] && clip_lines+=("$line")
+done < <(python3 -c "
 import json
 clips = json.load(open('${clips_json}'))['clips']
 for c in clips:

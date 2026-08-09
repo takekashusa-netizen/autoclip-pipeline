@@ -53,7 +53,10 @@ while true; do
   fi
 
   new_count=0
-  mapfile -t new_videos < <(python3 -c "
+  new_videos=()
+  while IFS= read -r line; do
+    [[ -n "$line" ]] && new_videos+=("$line")
+  done < <(python3 -c "
 import json
 seen = set(json.load(open('${seen_file}')))
 data = json.loads('''${videos_json}''')
