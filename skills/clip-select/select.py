@@ -98,14 +98,6 @@ def main():
     visual_analysis_path = sys.argv[6] if len(sys.argv) > 6 else None
 
     script = json.load(open(script_path))
-    if not script.get("transcription_available"):
-        json.dump({"clips": [], "note": "no transcript available — nothing to select from"},
-                   open(out_path, "w"), indent=2)
-        print(json.dumps({"clip_count": 0}))
-        return
-
-    kept = script.get("kept_segments", [])
-    duration = script.get("source_duration_sec", 0)
 
     visual_analysis = None
     if visual_analysis_path and os.path.exists(visual_analysis_path):
@@ -115,6 +107,21 @@ def main():
                 visual_analysis = data
         except Exception:
             pass
+
+    has_transcript = script.get("transcription_available")
+    if not has_transcript and not visual_analysis:
+        # real fix: this used to bail out completely whenever there was no
+        # transcript, even when visual motion data COULD still pick good
+        # clips (e.g. silent audio, or a transcription that failed) —
+        # visual-only selection doesn't need a transcript at all, so only
+        # give up when there's truly no signal of either kind
+        json.dump({"clips": [], "note": "no transcript AND no visual analysis available — nothing to select from"},
+                   open(out_path, "w"), indent=2)
+        print(json.dumps({"clip_count": 0}))
+        return
+
+    kept = script.get("kept_segments", []) if has_transcript else []
+    duration = script.get("source_duration_sec", 0)
 
     candidates = candidate_windows(kept, clip_length, duration, visual_analysis)
     picked = pick_non_overlapping(candidates, clip_count, bonus_cap)
