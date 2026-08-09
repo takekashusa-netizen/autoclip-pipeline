@@ -32,12 +32,14 @@ source "${ROOT}/lib/common.sh"
 
 dry_run=false
 parallel=1
+auto_approve=false
 args=("$@")
 i=0
 while [[ $i -lt ${#args[@]} ]]; do
   case "${args[$i]}" in
     --dry-run) dry_run=true ;;
     --parallel) i=$((i+1)); parallel="${args[$i]}" ;;
+    --auto-approve) auto_approve=true ;;
   esac
   i=$((i+1))
 done
@@ -147,14 +149,17 @@ print(json.load(open('${job_json}')).get('format', ''))
     continue
   fi
 
+  extra_args=()
+  [[ "$auto_approve" == true ]] && extra_args+=(--auto-approve)
+
   if [[ "$parallel" -le 1 ]]; then
-    "${ROOT}/run_pipeline.sh" "$job" "$format" || \
+    "${ROOT}/run_pipeline.sh" "$job" "$format" "${extra_args[@]}" || \
       log "  ${job}: stopped (paused for review, or hit an error — check job.json)"
     resumed=$((resumed + 1))
   else
     wait_for_slot
     log "  launching ${job} in background -> logs/${job}.log"
-    nohup "${ROOT}/run_pipeline.sh" "$job" "$format" > "${ROOT}/logs/${job}.log" 2>&1 &
+    nohup "${ROOT}/run_pipeline.sh" "$job" "$format" "${extra_args[@]}" > "${ROOT}/logs/${job}.log" 2>&1 &
     bg_pids+=("$!")
     # NOT disowned deliberately — this script's own `wait "$pid"` loop
     # below needs to actually track these to block correctly. disown

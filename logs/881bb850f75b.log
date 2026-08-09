@@ -12,3 +12,6 @@
   [18:53:36] graphics-plan: planning beats
   [18:53:36] graphics-plan: {"beat_count": 0}
   [18:53:36] graphics-plan: rendering (reframe + beat cards) via engine stand-in
+  [19:16:44] graphics-plan: {"beats_rendered": 0}
+  [19:16:44] graphics-plan: done -> projects/881bb850f75b/graphics/{graphics-plan.json,graphics_cut.mp4}
+/Users/Apple/autoclip-pipeline/run_pipeline.sh: line 79: syntax error near unexpected token `then'

@@ -1,13 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Usage: ./run_pipeline.sh <job> <format> [--skip-music] [--to-premiere] [--force] [--content-type podcast|gaming|irl]
+# Usage: ./run_pipeline.sh <job> <format> [--skip-music] [--to-premiere] [--force] [--content-type podcast|gaming|irl] [--auto-approve]
 #   job     job id, used for projects/<job>/... and outputs/<job>.final.mp4
 #   format  one of: short-explainer | short-tiktok-raw | long-form-youtube
 #   --force  re-run steps even if job.json says they're already done
 #   --content-type  overrides the format's default reframe strategy —
 #                   'gaming' forces letterbox (no crop) so HUD/killfeed
 #                   survives; defaults to the format's own content_type
+#   --auto-approve  skips the manual second-pass review pause entirely —
+#                   the pipeline runs straight through to export with no
+#                   human check in between. This removes the one built-in
+#                   quality gate; use it deliberately, not as a default.
 
 job="${1:?job id required}"
 format="${2:?format required (short-explainer|short-tiktok-raw|long-form-youtube)}"
@@ -17,6 +21,7 @@ skip_music=false
 to_premiere=false
 force=false
 content_type=""
+auto_approve=false
 args=("$@")
 i=0
 while [[ $i -lt ${#args[@]} ]]; do
@@ -25,6 +30,7 @@ while [[ $i -lt ${#args[@]} ]]; do
     --to-premiere) to_premiere=true ;;
     --force) force=true ;;
     --content-type) i=$((i+1)); content_type="${args[$i]}" ;;
+    --auto-approve) auto_approve=true ;;
   esac
   i=$((i+1))
 done
@@ -128,6 +134,9 @@ run_step graphics "${PIPELINE_ROOT}/skills/graphics-plan/run.sh" "$job" "$format
 echo "-- [4/7] second pass (manual review) --"
 if [[ "$force" == false ]] && state_step_done "$job" "second_pass" >/dev/null 2>&1; then
   log "[second_pass] already approved, skipping"
+elif [[ "$auto_approve" == true ]]; then
+  log "[second_pass] --auto-approve set, skipping manual review"
+  state_mark "$job" "second_pass" "done"
 else
   log "waiting on manual review/incremental re-composite — mark done with:"
   log "  python3 lib/jobstate.py mark ${job} second_pass done"
