@@ -1,0 +1,10 @@
+== clip_pipeline: job=881bb850f75b format=long-form-youtube montage_minutes=15 montage_count=2 ==
+  [16:50:07] rough-cut already done for '881bb850f75b' — reusing existing transcript
+-- analyzing visual content (action/motion detection) --
+  [16:50:07] visual-analysis: FAILED (exit 1) — continuing WITHOUT visual data, transcript-based selection still works. Error was: OpenCV: Couldn't read video stream from file "/Users/Apple/autoclip-pipeline/projects/881bb850f75b/rough-cut/rough_cut.mp4"
+{"available": false}
+-- analyzing audio content (gunfire/impact detection) --
+  [16:50:07] audio-analysis: FAILED (exit 1) — continuing WITHOUT audio transient data. Error was: {"available": false}
+-- selecting best moments (montage_minutes=15) --
+  [16:50:07] build-montage: {"montage_count": 0}
+== no montages built (no transcript, or no highlight/action beats found) ==

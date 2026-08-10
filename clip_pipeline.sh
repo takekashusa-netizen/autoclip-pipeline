@@ -92,6 +92,43 @@ script_path="$(job_dir "$job")/rough-cut/script.json"
 rough_cut_video="$(job_dir "$job")/rough-cut/rough_cut.mp4"
 clips_json="$(job_dir "$job")/rough-cut/clips.json"
 
+# Real bug fixed: job.json saying "rough_cut: done" was trusted blindly —
+# but this pipeline's own cleanup step deletes rough_cut.mp4 (and the raw
+# source) once a job's clips/montages finish, by design, to save disk.
+# Building a SECOND round of clips/montages from the same job later hit
+# exactly this: job.json still said done, but the file was long gone,
+# and everything downstream failed with a confusing OpenCV error instead
+# of a clear one. Now: verify the file actually exists, and if it
+# doesn't but the transcript survived, regenerate it automatically from
+# the raw source — same recovery used manually several times tonight,
+# now built into the pipeline itself instead of requiring intervention.
+if [[ ! -f "$rough_cut_video" ]]; then
+  log "rough-cut: job.json says done, but ${rough_cut_video} is missing (likely cleaned up after an earlier clip/montage run) — regenerating"
+  raw_source="$(job_raw_file "$job")"
+  if [[ -z "$raw_source" || ! -f "$raw_source" ]]; then
+    echo "rough-cut: cannot regenerate — raw source is ALSO gone (${raw_source:-none found}). This job needs a fresh download/re-submit." >&2
+    exit 1
+  fi
+  if [[ ! -f "$script_path" ]]; then
+    echo "rough-cut: cannot regenerate — script.json is also missing, would need full re-transcription. Resetting rough_cut to pending and re-running from scratch." >&2
+    state_mark "$job" rough_cut pending
+    "${PIPELINE_ROOT}/skills/rough-cut/run.sh" "$job" "$format"
+    state_mark "$job" rough_cut done
+  else
+    mkdir -p "$(job_dir "$job")/rough-cut" "$(job_work_dir "$job")/rough-cut"
+    regen_result="$(python3 -c "
+import sys, json
+sys.path.insert(0, '${PIPELINE_ROOT}/skills/rough-cut')
+from cut_engine import render_cut
+script = json.load(open('${script_path}'))
+kept = script.get('kept_segments', [])
+render_cut('${raw_source}', kept, '${rough_cut_video}', '$(job_work_dir "$job")/rough-cut')
+print('regenerated')
+" 2>&1)" || { echo "rough-cut: regeneration failed: ${regen_result}" >&2; exit 1; }
+    log "rough-cut: ${regen_result} -> ${rough_cut_video}"
+  fi
+fi
+
 echo "-- analyzing visual content (action/motion detection) --"
 visual_json="$(job_dir "$job")/rough-cut/visual-analysis.json"
 # Real fix: this used to re-run the expensive (and, on this machine,
