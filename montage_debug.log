@@ -1,0 +1,97 @@
++ set -euo pipefail
++ job=881bb850f75b
++ format=long-form-youtube
++ shift 2
++ clip_length=60
++ clip_count=3
++ bonus_clips=3
++ montage_minutes=0
++ montage_count=3
++ skip_music=false
++ content_type=
++ keep_raw=false
++ args=("$@")
++ i=0
++ [[ 0 -lt 5 ]]
++ case "${args[$i]}" in
++ i=1
++ montage_minutes=15
++ i=2
++ [[ 2 -lt 5 ]]
++ case "${args[$i]}" in
++ i=3
++ montage_count=2
++ i=4
++ [[ 4 -lt 5 ]]
++ case "${args[$i]}" in
++ skip_music=true
++ i=5
++ [[ 5 -lt 5 ]]
++++ dirname ./clip_pipeline.sh
+++ cd .
+++ pwd
++ source /Users/Apple/autoclip-pipeline/lib/common.sh
+++++ dirname /Users/Apple/autoclip-pipeline/lib/common.sh
++++ cd /Users/Apple/autoclip-pipeline/lib
++++ pwd
+++ COMMON_SH_DIR=/Users/Apple/autoclip-pipeline/lib
++++ cd /Users/Apple/autoclip-pipeline/lib/..
++++ pwd
+++ export PIPELINE_ROOT=/Users/Apple/autoclip-pipeline
+++ PIPELINE_ROOT=/Users/Apple/autoclip-pipeline
+++ export -f jobstate_cmd
+++ export -f log
+++ export -f job_dir job_raw_dir job_work_dir job_render_dir
+++ export -f job_raw_file
+++ export -f progress_report
+++ export -f check_disk_space
++ SKILL_DIR=/Users/Apple/autoclip-pipeline/skills/clip-select
++ format_config=/Users/Apple/autoclip-pipeline/formats/long-form-youtube.json
++ [[ ! -f /Users/Apple/autoclip-pipeline/formats/long-form-youtube.json ]]
++ check_disk_space 881bb850f75b
++ local job=881bb850f75b margin=4
++ local raw
+++ job_raw_file 881bb850f75b
+++ local job=881bb850f75b
+++ head -n1
++++ job_raw_dir 881bb850f75b
++++ echo /Users/Apple/autoclip-pipeline/projects/881bb850f75b/raw
+++ find /Users/Apple/autoclip-pipeline/projects/881bb850f75b/raw -maxdepth 1 -type f '!' -name .gitkeep
++ raw=/Users/Apple/autoclip-pipeline/projects/881bb850f75b/raw/source.mp4
++ [[ -z /Users/Apple/autoclip-pipeline/projects/881bb850f75b/raw/source.mp4 ]]
++ local raw_bytes avail_bytes required_bytes
+++ stat -c%s /Users/Apple/autoclip-pipeline/projects/881bb850f75b/raw/source.mp4
+++ stat -f%z /Users/Apple/autoclip-pipeline/projects/881bb850f75b/raw/source.mp4
++ raw_bytes=822083584
+++ df -P /Users/Apple/autoclip-pipeline
+++ awk 'NR==2{print $4*1024}'
++ avail_bytes=877373702144
++ required_bytes=3288334336
++ ((  avail_bytes < required_bytes  ))
++ [[ 15 != \0 ]]
++ echo '== clip_pipeline: job=881bb850f75b format=long-form-youtube montage_minutes=15 montage_count=2 =='
+== clip_pipeline: job=881bb850f75b format=long-form-youtube montage_minutes=15 montage_count=2 ==
+++ job_dir 881bb850f75b
+++ echo /Users/Apple/autoclip-pipeline/projects/881bb850f75b
++ [[ ! -f /Users/Apple/autoclip-pipeline/projects/881bb850f75b/job.json ]]
++ state_step_done 881bb850f75b rough_cut
++ log 'rough-cut already done for '\''881bb850f75b'\'' — reusing existing transcript'
+++ date +%H:%M:%S
++ echo '  [11:40:30] rough-cut already done for '\''881bb850f75b'\'' — reusing existing transcript'
+  [11:40:30] rough-cut already done for '881bb850f75b' — reusing existing transcript
+++ job_dir 881bb850f75b
+++ echo /Users/Apple/autoclip-pipeline/projects/881bb850f75b
++ script_path=/Users/Apple/autoclip-pipeline/projects/881bb850f75b/rough-cut/script.json
+++ job_dir 881bb850f75b
+++ echo /Users/Apple/autoclip-pipeline/projects/881bb850f75b
++ rough_cut_video=/Users/Apple/autoclip-pipeline/projects/881bb850f75b/rough-cut/rough_cut.mp4
+++ job_dir 881bb850f75b
+++ echo /Users/Apple/autoclip-pipeline/projects/881bb850f75b
++ clips_json=/Users/Apple/autoclip-pipeline/projects/881bb850f75b/rough-cut/clips.json
++ echo '-- analyzing visual content (action/motion detection) --'
+-- analyzing visual content (action/motion detection) --
+++ job_dir 881bb850f75b
+++ echo /Users/Apple/autoclip-pipeline/projects/881bb850f75b
++ visual_json=/Users/Apple/autoclip-pipeline/projects/881bb850f75b/rough-cut/visual-analysis.json
++ python3 -c 'import cv2'
+++ python3 /Users/Apple/autoclip-pipeline/lib/visual_analysis.py /Users/Apple/autoclip-pipeline/projects/881bb850f75b/rough-cut/rough_cut.mp4 /Users/Apple/autoclip-pipeline/projects/881bb850f75b/rough-cut/visual-analysis.json --interval 2.0

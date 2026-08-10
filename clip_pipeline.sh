@@ -206,14 +206,42 @@ m = next(m for m in montages if m['id'] == '${montage_id}')
 for s in m['segments']:
     print(f\"{s['start']}\t{s['end']}\")
 ")
+
+    # Real fix: this used to always re-extract every segment from
+    # scratch on every retry, and never cleaned old debris — so a run
+    # that died partway through (e.g. from an external kill, unrelated
+    # to this code) left a mix of THIS run's progress and a DIFFERENT
+    # earlier attempt's leftover files at the same path, silently
+    # confusing later concat/inspection. Now: stale part files beyond
+    # this run's actual segment count get removed, and any part file
+    # that already exists AND passes an integrity check is skipped
+    # instead of re-extracted — so a retry after a kill picks up where
+    # it left off instead of redoing (and re-risking) already-finished
+    # work.
+    expected_count=${#seg_lines[@]}
+    for stale in "${sub_work_dir}"/part_*.mp4; do
+      [[ -e "$stale" ]] || continue
+      stale_idx=$(basename "$stale" .mp4 | sed 's/part_//' | sed 's/^0*//')
+      stale_idx=${stale_idx:-0}
+      if [[ "$stale_idx" -ge "$expected_count" ]]; then
+        log "  removing stale leftover from a different earlier attempt: $(basename "$stale")"
+        rm -f "$stale"
+      fi
+    done
+
     part_files=()
     part_idx=0
     for seg_line in "${seg_lines[@]}"; do
       IFS=$'\t' read -r seg_start seg_end <<< "$seg_line"
       part_file="${sub_work_dir}/part_$(printf '%04d' $part_idx).mp4"
-      ffmpeg -nostdin -y -i "$rough_cut_video" -ss "$seg_start" -to "$seg_end" \
-        -c:v libx264 -preset veryfast -c:a aac \
-        "$part_file" -loglevel error
+      if [[ -f "$part_file" ]] && ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$part_file" >/dev/null 2>&1; then
+        log "  segment ${part_idx}: already extracted and valid, skipping"
+      else
+        [[ -f "$part_file" ]] && rm -f "$part_file"  # remove a truncated/corrupt leftover before retrying it
+        ffmpeg -nostdin -y -i "$rough_cut_video" -ss "$seg_start" -to "$seg_end" \
+          -c:v libx264 -preset veryfast -c:a aac \
+          "$part_file" -loglevel error
+      fi
       part_files+=("$part_file")
       part_idx=$((part_idx + 1))
     done
