@@ -1,0 +1,14 @@
+== clip_pipeline: job=881bb850f75b format=long-form-youtube montage_minutes=15 montage_count=2 ==
+  [11:52:54] rough-cut already done for '881bb850f75b' — reusing existing transcript
+-- analyzing visual content (action/motion detection) --
+  [11:52:54] visual-analysis: reusing existing visual-analysis.json (delete it manually to force a fresh re-analysis)
+-- selecting best moments (montage_minutes=15) --
+  [11:52:54] build-montage: {"montage_count": 1, "segments_per_montage": [21], "durations_sec": [210.0]}
+-- montage01: 21 moments, 210.0s total --
+  [11:52:54]   segment 0: already extracted and valid, skipping
+  [11:52:55]   segment 1: already extracted and valid, skipping
+  [11:52:55]   segment 2: already extracted and valid, skipping
+  [11:52:55]   segment 3: already extracted and valid, skipping
+  [11:52:55]   segment 4: already extracted and valid, skipping
+  [11:52:55]   segment 5: already extracted and valid, skipping
+  [11:52:55]   segment 6: already extracted and valid, skipping

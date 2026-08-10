@@ -1,0 +1,27 @@
+== clip_pipeline: job=881bb850f75b format=long-form-youtube montage_minutes=15 montage_count=2 ==
+  [16:02:53] rough-cut already done for '881bb850f75b' — reusing existing transcript
+-- analyzing visual content (action/motion detection) --
+  [16:02:53] visual-analysis: reusing existing visual-analysis.json (delete it manually to force a fresh re-analysis)
+-- selecting best moments (montage_minutes=15) --
+  [16:02:54] build-montage: {"montage_count": 1, "segments_per_montage": [21], "durations_sec": [210.0]}
+-- montage01: 21 moments, 210.0s total --
+  [16:02:55]   segment 0: already extracted and valid, skipping
+  [16:02:55]   segment 1: already extracted and valid, skipping
+  [16:02:55]   segment 2: already extracted and valid, skipping
+  [16:02:55]   segment 3: already extracted and valid, skipping
+  [16:02:55]   segment 4: already extracted and valid, skipping
+  [16:02:55]   segment 5: already extracted and valid, skipping
+  [16:02:55]   segment 6: already extracted and valid, skipping
+  [16:02:55]   segment 7: already extracted and valid, skipping
+/Users/Apple/autoclip-pipeline/projects/881bb850f75b__montage01/job.json
+== pipeline: job=881bb850f75b__montage01 format=long-form-youtube ==
+-- [1/7] intake --
+  [16:10:19] raw file: /Users/Apple/autoclip-pipeline/projects/881bb850f75b__montage01/raw/source.mp4
+-- [2/7] rough cut --
+  [16:10:19] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: long-form-youtube) --
+  [16:10:20] graphics-plan: reading script from rough-cut (no re-transcription)
+  [16:10:20] graphics-plan: style='glass + zoom' preset='liquid-glass-style' reframe='crop' target=1920x1080
+  [16:10:20] graphics-plan: planning beats
+  [16:10:20] graphics-plan: {"beat_count": 1}
+  [16:10:20] graphics-plan: rendering (reframe + beat cards) via engine stand-in
