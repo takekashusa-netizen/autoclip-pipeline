@@ -94,7 +94,29 @@ clips_json="$(job_dir "$job")/rough-cut/clips.json"
 
 echo "-- analyzing visual content (action/motion detection) --"
 visual_json="$(job_dir "$job")/rough-cut/visual-analysis.json"
-if python3 -c "import cv2" 2>/dev/null; then
+# Real fix: this used to re-run the expensive (and, on this machine,
+# sometimes-interrupted-for-unknown-reasons) visual analysis pass on
+# EVERY retry, even when a valid result already existed on disk from an
+# earlier successful run — wasting the several minutes it takes AND
+# re-risking whatever's killing it, when the answer was already sitting
+# right there. Now: reuse a valid cached result if one exists.
+cached_valid=false
+if [[ -f "$visual_json" ]]; then
+  if python3 -c "
+import json, sys
+try:
+    d = json.load(open('${visual_json}'))
+    sys.exit(0 if d.get('samples') else 1)
+except Exception:
+    sys.exit(1)
+" 2>/dev/null; then
+    cached_valid=true
+  fi
+fi
+
+if [[ "$cached_valid" == true ]]; then
+  log "visual-analysis: reusing existing visual-analysis.json (delete it manually to force a fresh re-analysis)"
+elif python3 -c "import cv2" 2>/dev/null; then
   # Real bug fixed: visual analysis is supposed to be optional/best-effort
   # — but under set -euo pipefail, if visual_analysis.py exited non-zero
   # for ANY reason (a crash, an OOM kill, anything), this assignment's own
