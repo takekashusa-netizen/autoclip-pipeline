@@ -19,11 +19,15 @@ gfx_style="$(format_get "$format" graphics.style)"
 gfx_preset="$(format_get "$format" graphics.preset)"
 reframe="$(format_get "$format" graphics.reframe)"
 [[ -z "$reframe" ]] && reframe="crop"
-# CONTENT_TYPE env overrides the format's default reframe strategy — gaming
-# footage needs letterbox (no crop) so HUD/killfeed/minimap survives, no
-# matter which aspect-ratio format was picked.
+# CONTENT_TYPE env overrides the format's default reframe strategy —
+# gaming needs letterbox (no crop) so HUD/killfeed/minimap survives, and
+# 'interview'/'split' requests dual-speaker split-screen when two-face
+# data is actually available (falls back to normal crop if it isn't —
+# see the two-speaker check below).
 if [[ "${CONTENT_TYPE:-}" == "gaming" ]]; then
   reframe="letterbox"
+elif [[ "${CONTENT_TYPE:-}" == "interview" || "${CONTENT_TYPE:-}" == "split" ]]; then
+  reframe="split"
 fi
 width="$(format_get "$format" fmt.resolution.0)"
 height="$(format_get "$format" fmt.resolution.1)"
@@ -44,7 +48,24 @@ log "graphics-plan: $beat_result"
 # full video's frames is real extra work not every job needs.
 face_track_json=""
 visual_json="$(job_dir "$job")/rough-cut/visual-analysis.json"
-if [[ -f "$visual_json" && "$reframe" == "crop" ]]; then
+if [[ -f "$visual_json" && "$reframe" == "split" ]]; then
+  ft_candidate="${out_dir}/face-track.json"
+  ft_exit=0
+  ft_result="$(python3 "${PIPELINE_ROOT}/lib/face_tracking.py" "$visual_json" "$ft_candidate" --mode split 2>&1)" || ft_exit=$?
+  if [[ $ft_exit -eq 0 ]]; then
+    ft_usable="$(python3 -c "import json; print(json.loads('''$ft_result''').get('usable', False))" 2>/dev/null || echo "False")"
+    if [[ "$ft_usable" == "True" ]]; then
+      log "graphics-plan: two-speaker data usable — rendering split-screen (${ft_result})"
+      face_track_json="$ft_candidate"
+    else
+      log "graphics-plan: not enough dual-face detection for split-screen — falling back to standard center-crop"
+      reframe="crop"
+    fi
+  else
+    log "graphics-plan: split-screen computation failed (exit ${ft_exit}) — falling back to standard center-crop. Error: $(echo "$ft_result" | tail -3)"
+    reframe="crop"
+  fi
+elif [[ -f "$visual_json" && "$reframe" == "crop" ]]; then
   ft_candidate="${out_dir}/face-track.json"
   ft_exit=0
   ft_result="$(python3 "${PIPELINE_ROOT}/lib/face_tracking.py" "$visual_json" "$ft_candidate" 2>&1)" || ft_exit=$?

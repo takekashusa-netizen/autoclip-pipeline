@@ -58,11 +58,90 @@ def has_real_face_data(analysis, min_fraction=0.05):
     return (with_face / len(samples)) >= min_fraction
 
 
+def has_two_speaker_data(analysis, min_fraction=0.15):
+    """Whether enough samples detected 2+ faces at once to justify split
+    mode over single-speaker face-tracking. Two people briefly overlapping
+    in frame once isn't enough — this needs a real, sustained pattern."""
+    samples = analysis.get("samples", [])
+    if not samples:
+        return False
+    with_two = sum(1 for s in samples if len(s.get("all_faces") or []) >= 2)
+    return (with_two / len(samples)) >= min_fraction
+
+
+def compute_two_speaker_segments(analysis, segment_sec=8.0, min_samples=2):
+    """Clusters detected faces into two persistent tracks (by horizontal
+    position — left speaker vs right speaker, the overwhelming majority
+    case for side-by-side podcast/interview setups) and returns per-
+    segment average positions for each track, for a top/bottom split-
+    screen render. Track assignment uses each sample's OWN two faces
+    sorted by x-position, not identity tracking across frames — simple,
+    and correct for the common static two-camera-position setup; a
+    speaker who physically swaps sides mid-video would confuse it, but
+    that's a rare enough case to accept for a first version.
+
+    Returns [{"start":.., "end":.., "track_a": [x,y], "track_b": [x,y]}, ...]
+    track_a is always the left-of-center track, track_b the right."""
+    duration = analysis.get("duration", 0)
+    samples = analysis.get("samples", [])
+    if not duration or not samples:
+        return []
+
+    segments = []
+    t = 0.0
+    while t < duration:
+        seg_end = min(duration, t + segment_sec)
+        in_window = [s for s in samples
+                     if t <= s["time"] < seg_end and len(s.get("all_faces") or []) >= 2]
+
+        if len(in_window) >= min_samples:
+            left_pts, right_pts = [], []
+            for s in in_window:
+                faces_sorted = sorted(s["all_faces"], key=lambda f: f[0])
+                left_pts.append(faces_sorted[0])
+                right_pts.append(faces_sorted[-1])
+            track_a = [round(sum(p[0] for p in left_pts) / len(left_pts), 4),
+                       round(sum(p[1] for p in left_pts) / len(left_pts), 4)]
+            track_b = [round(sum(p[0] for p in right_pts) / len(right_pts), 4),
+                       round(sum(p[1] for p in right_pts) / len(right_pts), 4)]
+        else:
+            # not enough dual-face signal this window — fall back to a
+            # sane static split (left third / right third) rather than
+            # guessing from single-face data
+            track_a, track_b = [0.25, 0.5], [0.75, 0.5]
+
+        segments.append({"start": t, "end": seg_end, "track_a": track_a, "track_b": track_b})
+        t = seg_end
+    return segments
+
+
 def main():
     analysis_path, out_path = sys.argv[1], sys.argv[2]
-    segment_sec = float(sys.argv[3]) if len(sys.argv) > 3 else 8.0
+    mode = "single"
+    segment_sec = 8.0
+    args = sys.argv[3:]
+    i = 0
+    while i < len(args):
+        if args[i] == "--mode":
+            i += 1
+            mode = args[i]
+        else:
+            segment_sec = float(args[i])
+        i += 1
 
     analysis = json.load(open(analysis_path))
+
+    if mode == "split":
+        if not has_two_speaker_data(analysis):
+            json.dump({"segments": [], "note": "insufficient dual-face detection data — not worth split-screen"},
+                       open(out_path, "w"), indent=2)
+            print(json.dumps({"usable": False}))
+            return
+        segments = compute_two_speaker_segments(analysis, segment_sec)
+        json.dump({"segments": segments}, open(out_path, "w"), indent=2)
+        print(json.dumps({"usable": True, "segment_count": len(segments)}))
+        return
+
     if not has_real_face_data(analysis):
         json.dump({"segments": [], "note": "insufficient face detection data — not worth face-tracking crop"},
                    open(out_path, "w"), indent=2)

@@ -127,6 +127,63 @@ def build_face_tracked_video(rough_cut, face_segments, target_w, target_h, work_
     return concat_out
 
 
+def build_split_screen_video(rough_cut, two_speaker_segments, target_w, target_h, work_dir):
+    """Split mode — two speakers, each cropped to follow their own tracked
+    position, stacked top/bottom to fill the target frame. Same per-
+    segment-static-crop-then-concat approach as single-speaker face
+    tracking, just producing two crops per segment and stacking them
+    instead of one."""
+    os.makedirs(work_dir, exist_ok=True)
+    src_w, src_h = ffprobe_dims(rough_cut)
+
+    half_h = target_h // 2
+    # each speaker's crop covers the full source width scaled to target_w,
+    # cropped to whatever source-height slice keeps that aspect for half_h
+    crop_w = src_w
+    crop_h = min(src_h, round(src_w * half_h / target_w))
+
+    part_files = []
+    for i, seg in enumerate(two_speaker_segments):
+        track_files = []
+        for track_key, suffix in [("track_a", "top"), ("track_b", "bottom")]:
+            cy_px = seg[track_key][1] * src_h
+            y = max(0, min(src_h - crop_h, round(cy_px - crop_h / 2)))
+            track_file = os.path.join(work_dir, f"split_{i:04d}_{suffix}.mp4")
+            cmd = [
+                "ffmpeg", "-nostdin", "-y", "-i", rough_cut,
+                "-ss", str(seg["start"]), "-to", str(seg["end"]),
+                "-vf", f"crop={crop_w}:{crop_h}:0:{y},scale={target_w}:{half_h}",
+                "-c:v", "libx264", "-preset", "veryfast", "-c:a", "aac",
+                track_file, "-loglevel", "error",
+            ]
+            subprocess.run(cmd, check=True, capture_output=True, text=True)
+            track_files.append(track_file)
+
+        stacked_file = os.path.join(work_dir, f"stacked_{i:04d}.mp4")
+        subprocess.run(
+            ["ffmpeg", "-nostdin", "-y", "-i", track_files[0], "-i", track_files[1],
+             "-filter_complex", "[0:v][1:v]vstack=inputs=2[v]",
+             "-map", "[v]", "-map", "0:a?",
+             "-c:v", "libx264", "-preset", "veryfast", "-c:a", "aac",
+             stacked_file, "-loglevel", "error"],
+            check=True, capture_output=True, text=True,
+        )
+        part_files.append(stacked_file)
+
+    concat_list = os.path.join(work_dir, "concat.txt")
+    with open(concat_list, "w") as f:
+        for pf in part_files:
+            f.write(f"file '{os.path.abspath(pf)}'\n")
+
+    concat_out = os.path.join(work_dir, "split_screen.mp4")
+    subprocess.run(
+        ["ffmpeg", "-nostdin", "-y", "-f", "concat", "-safe", "0",
+         "-i", concat_list, "-c", "copy", concat_out, "-loglevel", "error"],
+        check=True, capture_output=True, text=True,
+    )
+    return concat_out
+
+
 def main():
     rough_cut, plan_path, width, height, style, out_path = sys.argv[1:7]
     reframe = sys.argv[7] if len(sys.argv) > 7 else "crop"
@@ -137,12 +194,33 @@ def main():
     beats = plan.get("beats", [])
 
     face_segments = []
-    if face_track_path and os.path.exists(face_track_path) and reframe == "crop":
+    two_speaker_segments = []
+    if face_track_path and os.path.exists(face_track_path):
         try:
             data = json.load(open(face_track_path))
-            face_segments = data.get("segments", [])
+            segs = data.get("segments", [])
+            if segs and "track_a" in segs[0]:
+                two_speaker_segments = segs
+            elif reframe == "crop":
+                face_segments = segs
         except Exception:
-            face_segments = []
+            pass
+
+    if reframe == "split" and two_speaker_segments:
+        work_dir = os.path.join(os.path.dirname(out_path), "_split_work")
+        stacked = build_split_screen_video(rough_cut, two_speaker_segments, width, height, work_dir)
+        vf = build_filter(width, height, beats, style, reframe="_already_cropped")
+        drawtext_filters = [f for f in vf.split(",") if f.startswith("drawtext")]
+        cmd = ["ffmpeg", "-nostdin", "-y", "-i", stacked]
+        if drawtext_filters:
+            cmd += ["-vf", ",".join(drawtext_filters)]
+        cmd += ["-c:v", "libx264", "-preset", "veryfast", "-c:a", "aac", out_path]
+        subprocess.run(cmd, check=True, capture_output=True, text=True)
+        import shutil
+        shutil.rmtree(work_dir, ignore_errors=True)
+        print(json.dumps({"beats_rendered": len(beats) if ("card" in style or "hook" in style) else 0,
+                           "split_screen": True, "segments": len(two_speaker_segments)}))
+        return
 
     if face_segments:
         # face-tracking path: crop+scale happens per-segment above, so the

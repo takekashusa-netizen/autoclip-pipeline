@@ -25,3 +25,7 @@
   [16:10:20] graphics-plan: planning beats
   [16:10:20] graphics-plan: {"beat_count": 1}
   [16:10:20] graphics-plan: rendering (reframe + beat cards) via engine stand-in
+/Users/Apple/autoclip-pipeline/skills/graphics-plan/run.sh: line 42: raphics-plan: command not found
+  [16:10:54]   montage01: paused for second-pass review (normal) — approve with: python3 lib/jobstate.py mark 881bb850f75b__montage01 second_pass done && ./run_pipeline.sh 881bb850f75b__montage01 long-form-youtube
+  [16:10:54] cleanup: freed ~1554MB (parent raw source + full rough-cut render) — script.json/edl.json/clips.json kept
+== clip_pipeline done: check outputs/881bb850f75b__clip*.final.mp4 or outputs/881bb850f75b__montage*.final.mp4 ==
