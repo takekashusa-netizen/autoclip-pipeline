@@ -1,0 +1,18 @@
+== clip_pipeline: job=881bb850f75b format=long-form-youtube montage_minutes=15 montage_count=2 ==
+  [16:42:57] rough-cut already done for '881bb850f75b' — reusing existing transcript
+-- analyzing visual content (action/motion detection) --
+  [16:42:58] visual-analysis: FAILED (exit 1) — continuing WITHOUT visual data, transcript-based selection still works. Error was: OpenCV: Couldn't read video stream from file "/Users/Apple/autoclip-pipeline/projects/881bb850f75b/rough-cut/rough_cut.mp4"
+{"available": false}
+-- analyzing audio content (gunfire/impact detection) --
+  [16:42:58] audio-analysis: FAILED (exit 1) — continuing WITHOUT audio transient data. Error was: {"available": false}
+-- selecting best moments (montage_minutes=15) --
+build-montage FAILED (exit 1):     from audio_analysis import transient_beats  # noqa: E402
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/Apple/autoclip-pipeline/skills/clip-select/../../lib/audio_analysis.py", line 19, in <module>
+    import subprocess
+  File "/usr/local/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/lib/python3.12/subprocess.py", line 118, in <module>
+    import select
+  File "/Users/Apple/autoclip-pipeline/skills/clip-select/select.py", line 23, in <module>
+    from audio_analysis import transient_beats  # noqa: E402
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ImportError: cannot import name 'transient_beats' from partially initialized module 'audio_analysis' (most likely due to a circular import) (/Users/Apple/autoclip-pipeline/skills/clip-select/../../lib/audio_analysis.py)
