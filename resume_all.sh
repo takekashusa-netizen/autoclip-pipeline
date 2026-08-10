@@ -113,8 +113,11 @@ except Exception:
   if [[ -n "$diagnosis_category" ]]; then
     diagnosis_reason="$(python3 -c "
 import json
-d = json.load(open('${job_json}'))
-print((d.get('diagnosis') or {}).get('reason', ''))
+try:
+    d = json.load(open('${job_json}'))
+    print((d.get('diagnosis') or {}).get('reason', ''))
+except Exception:
+    print('')
 ")"
     echo "note: ${job}'s last attempt failed — ${diagnosis_reason}"
 
@@ -127,12 +130,19 @@ print((d.get('diagnosis') or {}).get('reason', ''))
     fi
   fi
 
+  # Real bug fixed: this had zero error handling — under set -e, one
+  # malformed job.json (which has genuinely happened tonight) would
+  # silently kill the ENTIRE resume_all.sh run, stopping every other
+  # healthy job in the batch too, not just the bad one.
   format="$(python3 -c "
 import json
-print(json.load(open('${job_json}')).get('format', ''))
+try:
+    print(json.load(open('${job_json}')).get('format', ''))
+except Exception:
+    print('')
 ")"
   if [[ -z "$format" ]]; then
-    echo "skip ${job}: no format recorded in job.json, can't resume automatically"
+    echo "skip ${job}: no format recorded in job.json (or job.json is unreadable/corrupt), can't resume automatically — check projects/${job}/job.json by hand"
     continue
   fi
 

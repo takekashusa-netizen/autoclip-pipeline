@@ -119,17 +119,38 @@ fi
 
 echo "-- selecting best moments (montage_minutes=${montage_minutes}) --"
 if [[ "$montage_minutes" != "0" ]]; then
-  result="$(python3 "${SKILL_DIR}/build_montage.py" "$script_path" "$visual_json" "$montage_minutes" "$montage_count" "$clips_json")"
+  # Same bug class fixed here as visual_analysis.py above — under set -e,
+  # an unhandled crash in build_montage.py (bad JSON, an edge case in the
+  # candidate data, anything) would silently kill the whole script with
+  # zero visible error. Now it surfaces the real error and exits cleanly
+  # instead of vanishing.
+  bm_exit=0
+  result="$(python3 "${SKILL_DIR}/build_montage.py" "$script_path" "$visual_json" "$montage_minutes" "$montage_count" "$clips_json" 2>&1)" || bm_exit=$?
+  if [[ $bm_exit -ne 0 ]]; then
+    echo "build-montage FAILED (exit ${bm_exit}): $(echo "$result" | tail -10)" >&2
+    exit 1
+  fi
   log "build-montage: ${result}"
-  clip_count_actual="$(python3 -c "import json; print(len(json.load(open('${clips_json}'))['montages']))")"
+  clip_count_actual="$(python3 -c "import json; print(len(json.load(open('${clips_json}'))['montages']))" 2>&1)" || {
+    echo "failed reading clips.json after build-montage: ${clip_count_actual}" >&2
+    exit 1
+  }
   if [[ "$clip_count_actual" == "0" ]]; then
     echo "== no montages built (no transcript, or no highlight/action beats found) =="
     exit 1
   fi
 else
-  result="$(python3 "${SKILL_DIR}/select.py" "$script_path" "$clip_length" "$clip_count" "$clips_json" "$bonus_clips" "$visual_json")"
+  sel_exit=0
+  result="$(python3 "${SKILL_DIR}/select.py" "$script_path" "$clip_length" "$clip_count" "$clips_json" "$bonus_clips" "$visual_json" 2>&1)" || sel_exit=$?
+  if [[ $sel_exit -ne 0 ]]; then
+    echo "clip-select FAILED (exit ${sel_exit}): $(echo "$result" | tail -10)" >&2
+    exit 1
+  fi
   log "clip-select: ${result}"
-  clip_count_actual="$(python3 -c "import json; print(len(json.load(open('${clips_json}'))['clips']))")"
+  clip_count_actual="$(python3 -c "import json; print(len(json.load(open('${clips_json}'))['clips']))" 2>&1)" || {
+    echo "failed reading clips.json after clip-select: ${clip_count_actual}" >&2
+    exit 1
+  }
   if [[ "$clip_count_actual" == "0" ]]; then
     echo "== no clips selected (no transcript, or no highlight/hook beats found) =="
     exit 1
@@ -148,18 +169,23 @@ for m in json.load(open('${clips_json}'))['montages']:
 
   for montage_id in "${montage_ids[@]}"; do
     subjob="${job}__${montage_id}"
-    seg_count="$(python3 -c "
+    # combined into one call + real error handling — two unprotected
+    # python3 -c calls here previously, same silent-death risk as
+    # everywhere else in this audit if the montage lookup ever failed
+    montage_info="$(python3 -c "
 import json
-montages = json.load(open('${clips_json}'))['montages']
-m = next(m for m in montages if m['id'] == '${montage_id}')
-print(len(m['segments']))
+try:
+    montages = json.load(open('${clips_json}'))['montages']
+    m = next(m for m in montages if m['id'] == '${montage_id}')
+    print(f\"{len(m['segments'])}\t{m['total_duration']}\")
+except Exception as e:
+    print(f'ERROR\t{e}')
 ")"
-    total_dur="$(python3 -c "
-import json
-montages = json.load(open('${clips_json}'))['montages']
-m = next(m for m in montages if m['id'] == '${montage_id}')
-print(m['total_duration'])
-")"
+    IFS=$'\t' read -r seg_count total_dur <<< "$montage_info"
+    if [[ "$seg_count" == "ERROR" ]]; then
+      echo "failed reading montage '${montage_id}' from clips.json: ${total_dur}" >&2
+      continue
+    fi
     echo "-- ${montage_id}: ${seg_count} moments, ${total_dur}s total --"
 
     sub_raw_dir="$(job_raw_dir "$subjob")"

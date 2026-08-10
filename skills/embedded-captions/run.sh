@@ -32,10 +32,28 @@ mkdir -p "$out_dir"
 corrections="${PIPELINE_ROOT}/presets/caption-corrections.json"
 ass_path="${out_dir}/captions.ass"
 
-result="$(python3 "${SKILL_DIR}/build_ass.py" "$script_path" "$corrections" "$ass_path" "$width" "$height" "$position")"
+bass_exit=0
+result="$(python3 "${SKILL_DIR}/build_ass.py" "$script_path" "$corrections" "$ass_path" "$width" "$height" "$position" 2>&1)" || bass_exit=$?
+if [[ $bass_exit -ne 0 ]]; then
+  echo "build_ass.py FAILED (exit ${bass_exit}): $(echo "$result" | tail -10)" >&2
+  exit 1
+fi
 log "embedded-captions: ${result}"
 
-caption_lines="$(python3 -c "import json; print(json.loads('$result')['caption_lines'])")"
+# Real bug fixed: this used to interpolate $result directly into Python
+# SOURCE CODE as a string literal (json.loads('$result')) — if that JSON
+# ever contained a single quote (very plausible in real caption text),
+# it would break Python's syntax and crash. Passing it as a real argv
+# argument instead of embedding it in source text avoids that entirely,
+# and try/except means a malformed result degrades to "0 captions"
+# instead of crashing the whole step.
+caption_lines="$(python3 -c "
+import json, sys
+try:
+    print(json.loads(sys.argv[1])['caption_lines'])
+except Exception:
+    print('0')
+" "$result")"
 if [[ "$caption_lines" == "0" ]]; then
   log "embedded-captions: no caption lines (no transcript available) — copying graphics_cut.mp4 through unburned"
   cp "$graphics_video" "${out_dir}/captions_cut.mp4"
