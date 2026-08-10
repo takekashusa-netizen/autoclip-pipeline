@@ -40,6 +40,7 @@ bonus_clips=3   # default on — grab up to 3 extra strong-highlight moments
 montage_minutes=0   # 0 = montage mode disabled, use single-window mode
 montage_count=3
 skip_music=false
+auto_approve=false
 content_type=""
 keep_raw=true
 # Default flipped tonight after hitting this exact painful scenario
@@ -60,6 +61,7 @@ while [[ $i -lt ${#args[@]} ]]; do
     --montage-minutes) i=$((i+1)); montage_minutes="${args[$i]}" ;;
     --montage-count) i=$((i+1)); montage_count="${args[$i]}" ;;
     --skip-music)  skip_music=true ;;
+    --auto-approve) auto_approve=true ;;
     --content-type) i=$((i+1)); content_type="${args[$i]}" ;;
     --keep-raw) keep_raw=true ;;
     --delete-raw) keep_raw=false ;;
@@ -389,6 +391,7 @@ json.dump({'job': '${subjob}', 'keep': [[s['start'], s['end']] for s in segs], '
 
     run_args=("${PIPELINE_ROOT}/run_pipeline.sh" "$subjob" "$format")
     [[ "$skip_music" == true ]] && run_args+=(--skip-music)
+    [[ "$auto_approve" == true ]] && run_args+=(--auto-approve)
     [[ -n "$content_type" ]] && run_args+=(--content-type "$content_type")
 
     "${run_args[@]}" || log "  ${montage_id}: paused for second-pass review (normal) — approve with: python3 lib/jobstate.py mark ${subjob} second_pass done && ./run_pipeline.sh ${subjob} ${format}"
@@ -452,6 +455,7 @@ json.dump({'job': '${subjob}', 'keep': [[s['start'], s['end']] for s in segs], '
 
   run_args=("${PIPELINE_ROOT}/run_pipeline.sh" "$subjob" "$format")
   [[ "$skip_music" == true ]] && run_args+=(--skip-music)
+  [[ "$auto_approve" == true ]] && run_args+=(--auto-approve)
   [[ -n "$content_type" ]] && run_args+=(--content-type "$content_type")
 
   "${run_args[@]}" || log "  ${clip_id}: paused for second-pass review (normal) — approve with: python3 lib/jobstate.py mark ${subjob} second_pass done && ./run_pipeline.sh ${subjob} ${format}"
