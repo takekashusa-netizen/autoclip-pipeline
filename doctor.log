@@ -1,2 +1,2 @@
-usage: doctor.py [-h] [--interval INTERVAL] [--once]
-doctor.py: error: unrecognized arguments: --auto-resume --resume-interval 600
+  [17:29:01] doctor: watching + auto-resuming (checks every 60s, resume checks every 120s) — Ctrl+C to stop
+  [17:33:03] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)

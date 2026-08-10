@@ -91,6 +91,28 @@ if [[ ! -f "$(job_dir "$job")/job.json" ]]; then
   state_init "$job" "$format" "${raw_file:-}"
 fi
 
+# Real, urgent bug fixed: clip_pipeline.sh's own top-level processing
+# (the initial "transcribe once" step) never acquired the same .lock
+# file run_pipeline.sh checks — so doctor.py's new --auto-resume feature
+# calling resume_all.sh in parallel saw no lock, assumed the job wasn't
+# running, and launched a SECOND full transcription of the same source
+# simultaneously. This uses the identical lock convention as
+# run_pipeline.sh so ANY invocation path (clip_pipeline.sh directly,
+# resume_all.sh, doctor's auto-resume) correctly detects and refuses to
+# duplicate an already-running job.
+job_lock_file="$(job_dir "$job")/.lock"
+if [[ -f "$job_lock_file" ]]; then
+  existing_pid="$(cat "$job_lock_file" 2>/dev/null || echo "")"
+  if [[ -n "$existing_pid" ]] && kill -0 "$existing_pid" 2>/dev/null; then
+    echo "abort: job '${job}' is already running (pid ${existing_pid}) — refusing to start a duplicate clip_pipeline.sh run" >&2
+    exit 1
+  fi
+  echo "note: found a stale lock (pid ${existing_pid} is not running) — proceeding" >&2
+fi
+echo $$ > "$job_lock_file"
+release_job_lock() { rm -f "$job_lock_file"; }
+trap release_job_lock EXIT
+
 if ! state_step_done "$job" rough_cut >/dev/null 2>&1; then
   echo "-- transcribing full source (once) --"
   "${PIPELINE_ROOT}/skills/rough-cut/run.sh" "$job" "$format"
