@@ -1,0 +1,4 @@
+== clip_pipeline: job=881bb850f75b format=long-form-youtube montage_minutes=15 montage_count=2 ==
+  [16:52:07] rough-cut already done for '881bb850f75b' — reusing existing transcript
+  [16:52:07] rough-cut: job.json says done, but /Users/Apple/autoclip-pipeline/projects/881bb850f75b/rough-cut/rough_cut.mp4 is missing (likely cleaned up after an earlier clip/montage run) — regenerating
+rough-cut: cannot regenerate — raw source is ALSO gone (none found). This job needs a fresh download/re-submit.

@@ -41,7 +41,15 @@ montage_minutes=0   # 0 = montage mode disabled, use single-window mode
 montage_count=3
 skip_music=false
 content_type=""
-keep_raw=false
+keep_raw=true
+# Default flipped tonight after hitting this exact painful scenario
+# twice: the OLD default (false) deleted the raw source + rough_cut.mp4
+# once clips/montages finished, which permanently prevents ever
+# reprocessing that job again (e.g. wanting to try new gunfire-detection
+# features on a video you already clipped once). With 400+GB free disk
+# being normal today, the space savings aren't worth losing that
+# ability. Pass --delete-raw explicitly if you genuinely want the old
+# space-saving behavior for a specific job.
 args=("$@")
 i=0
 while [[ $i -lt ${#args[@]} ]]; do
@@ -54,6 +62,7 @@ while [[ $i -lt ${#args[@]} ]]; do
     --skip-music)  skip_music=true ;;
     --content-type) i=$((i+1)); content_type="${args[$i]}" ;;
     --keep-raw) keep_raw=true ;;
+    --delete-raw) keep_raw=false ;;
   esac
   i=$((i+1))
 done
