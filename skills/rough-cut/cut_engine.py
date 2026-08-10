@@ -25,6 +25,7 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "lib"))
 import progress as progress_mod  # noqa: E402
+from ffmpeg_progress import run_with_progress  # noqa: E402
 
 FILLER_WORDS = {
     "um", "umm", "uh", "uhh", "erm", "hm", "hmm",
@@ -104,11 +105,55 @@ def try_whisperx(audio_path, job=None, duration=None):
     return segments
 
 
-def try_faster_whisper(audio_path, job=None, duration=None):
+def try_faster_whisper(audio_path, job=None, duration=None, work_dir=None):
     try:
         from faster_whisper import WhisperModel
     except ImportError:
         return None
+
+    # Real fix, direct response to a genuine 2-hour loss tonight: a
+    # network-related mid-transcription hang (same CLOSE_WAIT signature
+    # as the earlier model-load hang, but this time deep into a long
+    # file — likely VAD's own lazy-loaded component) meant killing a
+    # stuck process threw away the ENTIRE transcript, since nothing was
+    # ever saved until the very end. Now: partial progress checkpoints
+    # to disk periodically, and a killed/restarted run picks up from the
+    # last checkpoint instead of starting over. Resume is done by
+    # physically trimming the audio with ffmpeg (proven, tested
+    # extensively tonight) rather than relying on faster-whisper's
+    # clip_timestamps parameter, whose exact accepted format I can't
+    # verify without the library installed here — this is high-stakes
+    # enough not to ship an unverified guess.
+    checkpoint_path = os.path.join(work_dir, "transcript_checkpoint.json") if work_dir else None
+    resume_from = 0.0
+    existing_segments = []
+    if checkpoint_path and os.path.exists(checkpoint_path):
+        try:
+            with open(checkpoint_path) as f:
+                cp = json.load(f)
+            existing_segments = cp.get("segments", [])
+            if existing_segments:
+                resume_from = max(s["end"] for s in existing_segments)
+                if job:
+                    progress_mod.report(job, "transcribing", 0,
+                                         f"resuming from checkpoint at {resume_from/60:.0f} min (found {len(existing_segments)} already-transcribed segments)")
+        except Exception:
+            existing_segments = []
+            resume_from = 0.0
+
+    transcribe_audio_path = audio_path
+    if resume_from > 0 and work_dir:
+        trimmed_path = os.path.join(work_dir, "audio_resume.wav")
+        try:
+            subprocess.run(
+                ["ffmpeg", "-nostdin", "-y", "-i", audio_path, "-ss", str(resume_from),
+                 "-c", "copy", trimmed_path, "-loglevel", "error"],
+                check=True, capture_output=True, text=True,
+            )
+            transcribe_audio_path = trimmed_path
+        except subprocess.CalledProcessError:
+            resume_from = 0.0  # trim failed for any reason — fall back to processing the whole file rather than silently losing audio
+
     if job:
         progress_mod.report(job, "transcribing", 0, "loading model")
     cpu_count = os.cpu_count() or 4
@@ -117,29 +162,43 @@ def try_faster_whisper(audio_path, job=None, duration=None):
         cpu_threads=cpu_count,  # was using library default (often just 4)
     ))
     seg_iter, info = model.transcribe(
-        audio_path,
+        transcribe_audio_path,
         vad_filter=True,   # skips silence/dead-air — speed win with no
                             # quality cost, doesn't touch actual speech
     )
     total = duration or getattr(info, "duration", None) or 0
 
-    segments = []
+    segments = list(existing_segments)  # start from whatever survived a previous attempt
     last_report = 0
+    last_checkpoint = 0
     for s in seg_iter:
-        segments.append({"start": s.start, "end": s.end, "text": s.text.strip()})
+        # timestamps from a trimmed resume file are relative to the trim
+        # point, not the original audio — offset them back
+        segments.append({"start": s.start + resume_from, "end": s.end + resume_from,
+                          "text": s.text.strip()})
+        now = __import__("time").time()
         if job and total:
-            now = __import__("time").time()
-            if now - last_report > 2:  # throttle writes to every ~2s, not every segment
-                pct = min(99.0, (s.end / total) * 100)
-                mins_done = s.end / 60
+            if now - last_report > 2:  # throttle progress writes to every ~2s, not every segment
+                pct = min(99.0, ((s.end + resume_from) / total) * 100)
+                mins_done = (s.end + resume_from) / 60
                 mins_total = total / 60
                 progress_mod.report(
                     job, "transcribing", round(pct, 1),
                     f"{mins_done:.0f} of {mins_total:.0f} min transcribed",
                 )
                 last_report = now
+        if checkpoint_path and (now - last_checkpoint > 30):  # checkpoint every ~30s of wall time
+            try:
+                with open(checkpoint_path + ".tmp", "w") as f:
+                    json.dump({"segments": segments}, f)
+                os.replace(checkpoint_path + ".tmp", checkpoint_path)
+            except Exception:
+                pass  # checkpointing is best-effort — never let it break real transcription
+            last_checkpoint = now
     if job:
         progress_mod.report(job, "transcribing", 100, "transcription complete")
+    if checkpoint_path and os.path.exists(checkpoint_path):
+        os.remove(checkpoint_path)  # only needed while a run is genuinely mid-flight
     return segments
 
 
@@ -166,32 +225,22 @@ def build_edl(segments):
     return kept, cut
 
 
-SELECT_BATCH_SIZE = 40  # bounds filter-string length / memory on long transcripts.
-                         # Lowered from 300 after a real failure: ffmpeg on some
-                         # platforms/builds hard-errors on very long select
-                         # boolean expressions well before hitting memory
-                         # limits (observed failure around ~50 terms on one
-                         # macOS ffmpeg build). Combined with the retry-by-
-                         # splitting fallback below, this doesn't need to be
-                         # exactly right for every platform — just small
-                         # enough to rarely trigger the fallback path.
-MIN_RENDER_BATCH = 3    # stop splitting once a batch is this small; if it
-                         # still fails at this size, something else is wrong
-                         # and we should surface the real error
+MIN_RENDER_BATCH = 3    # kept for the self-heal fallback path below
 
 
 def _select_expr(segments):
     return "+".join(f"between(t\\,{s['start']}\\,{s['end']})" for s in segments)
 
 
-def _render_batch(raw_video, segments, out_path):
-    """O(1) filter-graph nodes regardless of segment count — select/aselect
-    evaluate one boolean expression per frame instead of building a trim
-    node per segment (which doesn't scale on long-form video). Self-heals
-    on failure: some ffmpeg builds hard-error on very long select
-    expressions for reasons that don't show up as a clean, parseable error
-    (platform/build-specific internal limits) — rather than guessing the
-    exact threshold, split the batch in half and retry on any failure."""
+def _render_batch_select(raw_video, segments, out_path):
+    """Old approach — kept ONLY as a fallback for the rare case where
+    per-segment seeking (below) somehow fails on a given segment. NOT used
+    as the primary path anymore: measured ~30x slower on a real 1080p
+    H.264 file for a segment near the end of a 120s clip, because select
+    forces ffmpeg to decode the ENTIRE source to reach that point rather
+    than seeking to it. For a multi-hour source with many batches, that
+    meant decoding the full video dozens of times over — the real cause
+    of "rendering_cut" taking far longer than it should have."""
     expr = _select_expr(segments)
     vf = f"select='{expr}',setpts=N/FRAME_RATE/TB"
     af = f"aselect='{expr}',asetpts=N/SR/TB"
@@ -201,20 +250,19 @@ def _render_batch(raw_video, segments, out_path):
            out_path]
 
     if len(segments) <= MIN_RENDER_BATCH:
-        subprocess.run(cmd, check=True)  # base case — let real errors surface
+        subprocess.run(cmd, check=True)
         return
 
     result = subprocess.run(cmd, capture_output=True)
     if result.returncode == 0:
         return
 
-    # failed — split this batch in half and retry each half, then concat
     mid = len(segments) // 2
     left, right = segments[:mid], segments[mid:]
     left_path = out_path + ".left.mp4"
     right_path = out_path + ".right.mp4"
-    _render_batch(raw_video, left, left_path)
-    _render_batch(raw_video, right, right_path)
+    _render_batch_select(raw_video, left, left_path)
+    _render_batch_select(raw_video, right, right_path)
 
     concat_list = out_path + ".concat.txt"
     with open(concat_list, "w") as f:
@@ -229,39 +277,97 @@ def _render_batch(raw_video, segments, out_path):
             os.remove(p)
 
 
-def render_cut(raw_video, kept_segments, out_path, work_dir):
-    """Trim + concat kept segments. Batches into groups of
-    SELECT_BATCH_SIZE, then stream-copy-concats the batches (no re-encode
-    on the concat step, no leftover batch files once done)."""
+def _output_is_valid(path, expected_duration, tolerance=0.5):
+    """Verifies an extracted segment actually has content — ffmpeg can
+    exit 0 while still producing an empty file (observed: 'Output file is
+    empty' when a fixed pre-roll seek margin undershoots/overshoots the
+    source's actual keyframe interval, which varies by encode and isn't
+    knowable in advance)."""
+    if not os.path.exists(path) or os.path.getsize(path) < 100:
+        return False
+    result = subprocess.run(
+        ["ffprobe", "-v", "error", "-show_entries", "format=duration",
+         "-of", "default=noprint_wrappers=1:nokey=1", path],
+        capture_output=True, text=True,
+    )
+    try:
+        actual = float(result.stdout.strip())
+    except ValueError:
+        return False
+    return abs(actual - expected_duration) <= tolerance
+
+
+def _extract_segment(raw_video, start, end, out_path):
+    """Seeks directly to the segment instead of scanning from the start —
+    the actual fix. -ss before -i is a fast keyframe seek; a pre-roll plus
+    a second -ss after -i (frame-accurate within that pre-roll window)
+    keeps cut points accurate without paying the full-scan cost.
+
+    The pre-roll margin isn't a fixed value — a source's keyframe interval
+    varies by encode and can't be known in advance, and a margin smaller
+    than that interval can cause the coarse seek to overshoot the target
+    entirely, silently producing an empty file even though ffmpeg exits 0
+    (a real failure mode hit and fixed here, not theoretical). So: verify
+    the output, and retry with a larger margin if it's not right, before
+    falling back to the slower whole-file select method as a last resort."""
+    duration = end - start
+    for margin in (2.0, 8.0, 20.0, 60.0):
+        coarse = max(0.0, start - margin)
+        fine_offset = start - coarse
+        cmd = ["ffmpeg", "-nostdin", "-y",
+               "-ss", f"{coarse:.3f}", "-i", raw_video,
+               "-ss", f"{fine_offset:.3f}", "-t", f"{duration:.3f}",
+               "-c:v", "libx264", "-preset", "veryfast", "-c:a", "aac",
+               out_path]
+        subprocess.run(cmd, capture_output=True)
+        if _output_is_valid(out_path, duration):
+            return
+
+    # every margin failed — fall back to the old whole-file select approach
+    # for just this one segment (slow, but correct; self-healing beats a
+    # hard failure on what's hopefully a rare edge case)
+    _render_batch_select(raw_video, [{"start": start, "end": end}], out_path)
+
+
+def render_cut(raw_video, kept_segments, out_path, work_dir, job=None):
+    """Extracts each kept segment via direct seek (fast — only decodes
+    that segment's own duration, not the whole source), then concatenates
+    via stream copy (no re-encode on the concat step)."""
     if not kept_segments:
         subprocess.run(["ffmpeg", "-nostdin", "-y", "-i", raw_video, "-c", "copy", out_path], check=True)
         return
 
-    batches = [kept_segments[i:i + SELECT_BATCH_SIZE]
-               for i in range(0, len(kept_segments), SELECT_BATCH_SIZE)]
-
-    if len(batches) == 1:
-        _render_batch(raw_video, batches[0], out_path)
-        return
-
     os.makedirs(work_dir, exist_ok=True)
-    batch_files = []
-    for i, batch in enumerate(batches):
-        bf = os.path.join(work_dir, f"batch_{i:04d}.mp4")
-        _render_batch(raw_video, batch, bf)
-        batch_files.append(bf)
+    total_kept = sum(s["end"] - s["start"] for s in kept_segments)
+    cumulative = 0.0
+    part_files = []
 
-    concat_list = os.path.join(work_dir, "batches.txt")
+    for i, seg in enumerate(kept_segments):
+        part_path = os.path.join(work_dir, f"part_{i:05d}.mp4")
+        _extract_segment(raw_video, seg["start"], seg["end"], part_path)
+        part_files.append(part_path)
+        cumulative += seg["end"] - seg["start"]
+        if job and total_kept:
+            pct = min(99.5, (cumulative / total_kept) * 100)
+            progress_mod.report(
+                job, "rendering_cut", round(pct, 1),
+                f"segment {i+1} of {len(kept_segments)}",
+            )
+
+    concat_list = os.path.join(work_dir, "parts.txt")
     with open(concat_list, "w") as f:
-        for bf in batch_files:
-            f.write(f"file '{bf}'\n")
+        for p in part_files:
+            f.write(f"file '{p}'\n")
     subprocess.run(
         ["ffmpeg", "-nostdin", "-y", "-f", "concat", "-safe", "0", "-i", concat_list,
          "-c", "copy", out_path],
         check=True,
     )
-    for bf in batch_files:
-        os.remove(bf)
+    for p in part_files:
+        os.remove(p)
+    os.remove(concat_list)
+    if job:
+        progress_mod.report(job, "rendering_cut", 100, "render complete")
 
 
 def main():
@@ -271,7 +377,7 @@ def main():
     duration = ffprobe_duration(raw_video)
 
     segments = try_whisperx(audio_path, job=job, duration=duration) \
-        or try_faster_whisper(audio_path, job=job, duration=duration)
+        or try_faster_whisper(audio_path, job=job, duration=duration, work_dir=work_dir)
     transcription_available = segments is not None
     if segments is None:
         segments = [{"start": 0.0, "end": duration, "text": ""}]
@@ -279,7 +385,7 @@ def main():
     kept, cut = build_edl(segments)
 
     progress_mod.report(job, "rendering_cut", None, f"rendering {len(kept)} kept segments")
-    render_cut(raw_video, kept if transcription_available else [], os.path.join(out_dir, "rough_cut.mp4"), work_dir)
+    render_cut(raw_video, kept if transcription_available else [], os.path.join(out_dir, "rough_cut.mp4"), work_dir, job=job)
 
     script_text = " ".join(s["text"] for s in kept if s["text"]).strip()
     script = {
