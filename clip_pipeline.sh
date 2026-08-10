@@ -139,6 +139,38 @@ else
   visual_json=""
 fi
 
+echo "-- analyzing audio content (gunfire/impact detection) --"
+audio_json="$(job_dir "$job")/rough-cut/audio-analysis.json"
+audio_cached_valid=false
+if [[ -f "$audio_json" ]]; then
+  if python3 -c "
+import json, sys
+try:
+    d = json.load(open('${audio_json}'))
+    sys.exit(0 if 'transients' in d else 1)
+except Exception:
+    sys.exit(1)
+" 2>/dev/null; then
+    audio_cached_valid=true
+  fi
+fi
+
+if [[ "$audio_cached_valid" == true ]]; then
+  log "audio-analysis: reusing existing audio-analysis.json (delete it manually to force a fresh re-analysis)"
+else
+  # same crash-resilience pattern as visual analysis above — a broken
+  # audio track or an ffmpeg extraction failure degrades to "no audio
+  # data" instead of taking down the whole run
+  audio_exit=0
+  audio_result="$(python3 "${PIPELINE_ROOT}/lib/audio_analysis.py" "$rough_cut_video" "$audio_json" 2>&1)" || audio_exit=$?
+  if [[ $audio_exit -ne 0 ]]; then
+    log "audio-analysis: FAILED (exit ${audio_exit}) — continuing WITHOUT audio transient data. Error was: $(echo "$audio_result" | tail -5)"
+    audio_json=""
+  else
+    log "audio-analysis: ${audio_result}"
+  fi
+fi
+
 echo "-- selecting best moments (montage_minutes=${montage_minutes}) --"
 if [[ "$montage_minutes" != "0" ]]; then
   # Same bug class fixed here as visual_analysis.py above — under set -e,
@@ -147,7 +179,7 @@ if [[ "$montage_minutes" != "0" ]]; then
   # zero visible error. Now it surfaces the real error and exits cleanly
   # instead of vanishing.
   bm_exit=0
-  result="$(python3 "${SKILL_DIR}/build_montage.py" "$script_path" "$visual_json" "$montage_minutes" "$montage_count" "$clips_json" 2>&1)" || bm_exit=$?
+  result="$(python3 "${SKILL_DIR}/build_montage.py" "$script_path" "$visual_json" "$montage_minutes" "$montage_count" "$clips_json" --audio-path "$audio_json" 2>&1)" || bm_exit=$?
   if [[ $bm_exit -ne 0 ]]; then
     echo "build-montage FAILED (exit ${bm_exit}): $(echo "$result" | tail -10)" >&2
     exit 1
@@ -163,7 +195,7 @@ if [[ "$montage_minutes" != "0" ]]; then
   fi
 else
   sel_exit=0
-  result="$(python3 "${SKILL_DIR}/select.py" "$script_path" "$clip_length" "$clip_count" "$clips_json" "$bonus_clips" "$visual_json" 2>&1)" || sel_exit=$?
+  result="$(python3 "${SKILL_DIR}/select.py" "$script_path" "$clip_length" "$clip_count" "$clips_json" "$bonus_clips" "$visual_json" "$audio_json" 2>&1)" || sel_exit=$?
   if [[ $sel_exit -ne 0 ]]; then
     echo "clip-select FAILED (exit ${sel_exit}): $(echo "$result" | tail -10)" >&2
     exit 1

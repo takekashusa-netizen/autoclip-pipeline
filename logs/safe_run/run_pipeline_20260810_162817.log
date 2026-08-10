@@ -1,0 +1,18 @@
+== pipeline: job=881bb850f75b__montage01 format=long-form-youtube ==
+-- [1/7] intake --
+  [16:28:17] [intake] already done, skipping (use --force to redo)
+-- [2/7] rough cut --
+  [16:28:17] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: long-form-youtube) --
+  [16:28:17] [graphics] already done, skipping (use --force to redo)
+-- [4/7] second pass (manual review) --
+  [16:28:17] [second_pass] already approved, skipping
+-- [5/7] captions (format-specific: long-form-youtube) --
+  [16:28:17] [captions] already done, skipping (use --force to redo)
+-- [6/7] background music (optional) --
+  [16:28:17] [background_music] already done, skipping (use --force to redo)
+-- [7/7] export --
+  [16:28:17] [export] already done, skipping (use --force to redo)
+  [16:28:17] thumbnail-generator: grabbing frame at t=5.0s (hook beat if available)
+  [16:28:18] thumbnail-generator: done -> projects/881bb850f75b__montage01/thumbnail/thumb.jpg
+== done: outputs/881bb850f75b__montage01.final.mp4 ==

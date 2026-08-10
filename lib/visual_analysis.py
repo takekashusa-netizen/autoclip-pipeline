@@ -31,6 +31,21 @@ except ImportError:
     cv2 = None
 
 
+def classify_frame(gray):
+    """Heuristic loading-screen / low-content detector: real gameplay has
+    rich visual detail (edges, texture, varied color) across the whole
+    frame; a loading screen is overwhelmingly a flat/near-flat background
+    with maybe a logo, spinner, or progress bar — low edge density AND
+    low pixel variance. Requiring BOTH conditions (not just one) avoids
+    misflagging a genuinely simple-but-real gameplay frame (e.g. staring
+    at a plain sky) as a loading screen.
+    Returns True if this frame looks like a loading/menu screen."""
+    variance = float(np.var(gray))
+    edges = cv2.Canny(gray, 50, 150)
+    edge_density = float(np.count_nonzero(edges)) / edges.size
+    return variance < 400 and edge_density < 0.02
+
+
 def analyze(video_path, interval_sec=2.0):
     if cv2 is None:
         return None
@@ -99,8 +114,11 @@ def analyze(video_path, interval_sec=2.0):
             motion_score = round(float(np.mean(diff)) / 255.0, 4)
         prev_gray_small = small
 
+        is_loading_screen = classify_frame(gray)
+
         samples.append({"time": round(t, 2), "face_center": face_center,
-                         "all_faces": all_faces, "motion_score": motion_score})
+                         "all_faces": all_faces, "motion_score": motion_score,
+                         "is_loading_screen": is_loading_screen})
         frame_idx += frame_interval
         if duration and t > duration:
             break
