@@ -195,7 +195,7 @@ if [[ "$montage_minutes" != "0" ]]; then
   fi
 else
   sel_exit=0
-  result="$(python3 "${SKILL_DIR}/select.py" "$script_path" "$clip_length" "$clip_count" "$clips_json" "$bonus_clips" "$visual_json" "$audio_json" 2>&1)" || sel_exit=$?
+  result="$(python3 "${SKILL_DIR}/clip_select.py" "$script_path" "$clip_length" "$clip_count" "$clips_json" "$bonus_clips" "$visual_json" "$audio_json" 2>&1)" || sel_exit=$?
   if [[ $sel_exit -ne 0 ]]; then
     echo "clip-select FAILED (exit ${sel_exit}): $(echo "$result" | tail -10)" >&2
     exit 1
