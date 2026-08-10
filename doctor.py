@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-doctor.py [--interval SECONDS] [--once]
+doctor.py [--interval SECONDS] [--once] [--auto-resume] [--resume-interval SECONDS]
 
 Watchdog that periodically checks for the exact problem patterns that cost
 real time tonight, and auto-fixes the ones that are safe to fix
@@ -17,9 +17,16 @@ automatically:
   4. A job whose progress.json hasn't updated in a long time relative to
      its stage — flagged, not killed (could be legitimately slow, like a
      multi-hour ffmpeg render with no incremental progress reporting).
+  5. (--auto-resume) Any job that's paused, failed, or just sitting
+     there unfinished with nothing currently running for it — actually
+     resumed automatically via resume_all.sh, not just flagged. This is
+     "fixing problems at all times," not just watching them happen.
+     Skips jobs with an unrecoverable diagnosis (e.g. "needs login/
+     cookies" — no amount of retrying fixes that, it needs a human to
+     re-auth or provide a new URL).
 
 Run detached, same as everything else tonight:
-  nohup python3 doctor.py > doctor.log 2>&1 &
+  nohup python3 doctor.py --auto-resume > doctor.log 2>&1 &
 """
 import argparse
 import json
@@ -33,6 +40,10 @@ PROJECTS = os.path.join(ROOT, "projects")
 STALL_WARN_SEC = 40 * 60  # warn if progress.json hasn't updated in 40 min
                            # AND the stage is one that normally reports
                            # incremental progress (transcribing)
+UNRECOVERABLE_ERROR_PATTERNS = ["needs login", "needs cookies", "no raw file present"]
+                           # errors where blindly retrying wastes time —
+                           # these need a human (re-auth, new URL), not
+                           # another automatic attempt
 
 
 def log(msg):
@@ -145,6 +156,74 @@ def check_stalled_progress():
                 f"{prog.get('detail','')}) — may be genuinely stalled, check manually")
 
 
+def is_resume_all_running():
+    try:
+        out = subprocess.run(["ps", "-eo", "command"], capture_output=True, text=True, check=True).stdout
+    except Exception:
+        return False
+    return any("resume_all.sh" in line for line in out.splitlines())
+
+
+def has_unrecoverable_error(job):
+    job_json = os.path.join(PROJECTS, job, "job.json")
+    if not os.path.exists(job_json):
+        return False
+    try:
+        with open(job_json) as f:
+            d = json.load(f)
+    except Exception:
+        return False
+    error_text = str(d.get("error") or "")
+    return any(pattern in error_text.lower() for pattern in UNRECOVERABLE_ERROR_PATTERNS)
+
+
+def any_job_needs_resuming():
+    if not os.path.isdir(PROJECTS):
+        return False
+    for job in os.listdir(PROJECTS):
+        job_json = os.path.join(PROJECTS, job, "job.json")
+        if not os.path.exists(job_json):
+            continue
+        if os.path.exists(os.path.join(PROJECTS, job, ".lock")):
+            continue  # already actively running, not stuck
+        try:
+            with open(job_json) as f:
+                d = json.load(f)
+        except Exception:
+            continue
+        if d.get("steps", {}).get("export", {}).get("status") == "done":
+            continue  # already finished
+        if has_unrecoverable_error(job):
+            continue  # retrying won't help — needs a human
+        return True
+    return False
+
+
+def auto_resume(auto_approve=True):
+    """The actual 'fixing problems at all times' part — not just flagging
+    a paused/failed job, but actually calling resume_all.sh to pick it
+    back up. Launched detached (Popen, not run) so this doesn't block
+    doctor's other checks while a resume is in progress, and skipped
+    entirely if a resume_all.sh is already running (avoid launching a
+    second overlapping one — the SAME duplicate-process problem this
+    watchdog exists to prevent elsewhere)."""
+    if is_resume_all_running():
+        return  # already in progress, nothing to do this cycle
+    if not any_job_needs_resuming():
+        return  # nothing to fix right now
+
+    cmd = [os.path.join(ROOT, "resume_all.sh")]
+    if auto_approve:
+        cmd.append("--auto-approve")
+    log(f"doctor: found unfinished job(s) with nothing currently running for them — auto-resuming ({' '.join(cmd)})")
+    log_path = os.path.join(ROOT, "logs", "doctor_auto_resume.log")
+    os.makedirs(os.path.dirname(log_path), exist_ok=True)
+    with open(log_path, "a") as f:
+        f.write(f"\n--- auto-resume triggered at {time.strftime('%H:%M:%S')} ---\n")
+        subprocess.Popen(cmd, stdout=f, stderr=subprocess.STDOUT, cwd=ROOT,
+                          start_new_session=True)  # detach from doctor's own process group
+
+
 def run_checks():
     check_duplicate_processes()
     check_stale_locks()
@@ -156,11 +235,25 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("--interval", type=int, default=120)
     p.add_argument("--once", action="store_true")
+    p.add_argument("--auto-resume", action="store_true",
+                    help="actually resume paused/unfinished jobs automatically, not just flag them")
+    p.add_argument("--resume-interval", type=int, default=600,
+                    help="how often (seconds) to check for jobs needing resume — less frequent than --interval since a resume itself takes real time")
+    p.add_argument("--no-auto-approve", action="store_true",
+                    help="don't pass --auto-approve to resume_all.sh — auto-resumed jobs will still pause for manual second-pass review")
     args = p.parse_args()
 
-    log(f"doctor: watching (checks every {args.interval}s) — Ctrl+C to stop")
+    mode = "watching + auto-resuming" if args.auto_resume else "watching only"
+    log(f"doctor: {mode} (checks every {args.interval}s"
+        + (f", resume checks every {args.resume_interval}s" if args.auto_resume else "")
+        + ") — Ctrl+C to stop")
+
+    last_resume_check = 0.0
     while True:
         run_checks()
+        if args.auto_resume and (time.time() - last_resume_check) >= args.resume_interval:
+            auto_resume(auto_approve=not args.no_auto_approve)
+            last_resume_check = time.time()
         if args.once:
             break
         time.sleep(args.interval)
