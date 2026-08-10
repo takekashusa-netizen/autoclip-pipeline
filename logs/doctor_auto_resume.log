@@ -22,3 +22,4 @@ note: new881's last attempt failed — This error doesn't match a known pattern 
   [17:33:05] [intake] already done, skipping (use --force to redo)
 -- [2/7] rough cut --
   [17:33:06] rough-cut: extracting audio from source.mp4
+  [17:35:05] rough-cut: transcribing + building EDL
