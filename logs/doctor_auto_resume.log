@@ -5658,3 +5658,33 @@ skip 55ffc8ca0948: no raw file present (download never completed) — re-submit 
 skip new881: managed by clip_pipeline.sh (multi-clip job) — resume with ./clip_pipeline.sh directly, not run_pipeline.sh
 
 == resume_all summary: 4 jobs found, 0 resumed, 2 already done, 0 locked/running, 1 missing raw file ==
+
+--- auto-resume triggered at 10:33:27 ---
+skip 55ffc8ca0948: no raw file present (download never completed) — re-submit this one manually
+skip new881: managed by clip_pipeline.sh (multi-clip job) — resume with ./clip_pipeline.sh directly, not run_pipeline.sh
+
+== resume_all summary: 4 jobs found, 0 resumed, 2 already done, 0 locked/running, 1 missing raw file ==
+
+--- auto-resume triggered at 10:35:27 ---
+skip 55ffc8ca0948: no raw file present (download never completed) — re-submit this one manually
+skip new881: managed by clip_pipeline.sh (multi-clip job) — resume with ./clip_pipeline.sh directly, not run_pipeline.sh
+
+== resume_all summary: 4 jobs found, 0 resumed, 2 already done, 0 locked/running, 1 missing raw file ==
+
+--- auto-resume triggered at 10:37:27 ---
+skip 55ffc8ca0948: no raw file present (download never completed) — re-submit this one manually
+skip new881: managed by clip_pipeline.sh (multi-clip job) — resume with ./clip_pipeline.sh directly, not run_pipeline.sh
+
+== resume_all summary: 4 jobs found, 0 resumed, 2 already done, 0 locked/running, 1 missing raw file ==
+
+--- auto-resume triggered at 10:39:27 ---
+skip 55ffc8ca0948: no raw file present (download never completed) — re-submit this one manually
+skip new881: managed by clip_pipeline.sh (multi-clip job) — resume with ./clip_pipeline.sh directly, not run_pipeline.sh
+
+== resume_all summary: 4 jobs found, 0 resumed, 2 already done, 0 locked/running, 1 missing raw file ==
+
+--- auto-resume triggered at 10:41:28 ---
+skip 55ffc8ca0948: no raw file present (download never completed) — re-submit this one manually
+skip new881: managed by clip_pipeline.sh (multi-clip job) — resume with ./clip_pipeline.sh directly, not run_pipeline.sh
+
+== resume_all summary: 4 jobs found, 0 resumed, 2 already done, 0 locked/running, 1 missing raw file ==

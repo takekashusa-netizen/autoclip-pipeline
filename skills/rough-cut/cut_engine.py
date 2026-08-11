@@ -25,7 +25,6 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "lib"))
 import progress as progress_mod  # noqa: E402
-from ffmpeg_progress import run_with_progress  # noqa: E402
 
 FILLER_WORDS = {
     "um", "umm", "uh", "uhh", "erm", "hm", "hmm",

@@ -1,0 +1,5 @@
+== clip_pipeline: job=new881 format=short-tiktok-raw clip_length=60s clip_count=8 ==
+-- transcribing full source (once) --
+  [10:33:02] rough-cut: extracting audio from source.mp4
+  [10:33:20] rough-cut: transcribing + building EDL
+  [10:33:21] rough-cut: FAILED — This error doesn't match a known pattern yet.
