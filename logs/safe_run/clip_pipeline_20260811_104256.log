@@ -1,0 +1,4 @@
+== clip_pipeline: job=new881 format=short-tiktok-raw clip_length=60s clip_count=8 ==
+-- transcribing full source (once) --
+  [10:42:57] rough-cut: extracting audio from source.mp4
+  [10:43:16] rough-cut: transcribing + building EDL

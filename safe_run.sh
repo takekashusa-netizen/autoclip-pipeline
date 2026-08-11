@@ -40,6 +40,25 @@ script_name="$(basename "$1" | sed 's/\.[^.]*$//')"
 timestamp="$(date +%Y%m%d_%H%M%S)"
 log_file="${ROOT}/logs/safe_run/${script_name}_${timestamp}.log"
 
+# Automated preflight check before every launch — the direct fix for
+# tonight's pattern of launching a job only to have it die 20 seconds in
+# from something checkable in advance (a dead import, a stale lock).
+# Real runtime verification, not assumptions; auto-fixes what's safely
+# fixable (stale locks) and refuses to launch with a clear reason for
+# anything it can't. job_id is best-effort extracted from the first
+# script argument that looks like one (not a flag, not a path) — if we
+# can't tell, the lock check is simply skipped, everything else still runs.
+job_id_guess=""
+for arg in "${@:2}"; do
+  [[ "$arg" == --* ]] && continue
+  job_id_guess="$arg"
+  break
+done
+if ! python3 "${ROOT}/preflight.py" "$job_id_guess"; then
+  echo "safe_run.sh: preflight check failed — refusing to launch. Fix the problem(s) above and retry." >&2
+  exit 1
+fi
+
 # graceful degradation if caffeinate isn't available (macOS-only) — still
 # get the interrupt/terminal-close protection from nohup+disown either
 # way, just without sleep-prevention on non-macOS systems
