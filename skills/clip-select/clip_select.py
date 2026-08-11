@@ -92,6 +92,34 @@ def candidate_windows(kept_segments, clip_length, duration, visual_analysis=None
     return candidates
 
 
+def engagement_score(candidate, duration_sec=None):
+    """A 0-100 heuristic engagement estimate, in the spirit of what
+    'virality score' tools show — but honest about what it actually is:
+    a weighted composite of signals we can actually measure (tag
+    priority, word pace, text energy markers), NOT a trained model
+    calibrated against real retention/engagement data. Treat it as a
+    relative ranking aid between your own clips, not a prediction of
+    real-world performance.
+    """
+    tags_component = min(60, (candidate["score"] / 4.0) * 60)  # 0-60 from tag priority
+
+    text = candidate.get("text", "")
+    words = text.split()
+    word_count = len(words)
+
+    pace_component = 0.0
+    if duration_sec and duration_sec > 0 and word_count > 0:
+        wps = word_count / duration_sec  # words per second — faster/punchier delivery
+        pace_component = min(20, wps * 8)  # ~2.5 wps (conversational) -> ~20, caps there
+
+    energy_markers = ["!", "?", "no way", "insane", "crazy", "clutch", "wow", "omg"]
+    energy_hits = sum(1 for m in energy_markers if m in text.lower())
+    energy_component = min(20, energy_hits * 7)
+
+    total = tags_component + pace_component + energy_component
+    return round(max(0, min(100, total)))
+
+
 HIGHLIGHT_SCORE = 3  # score() value when "highlight" tag is present — see PRIORITY
 
 def pick_non_overlapping(candidates, count, bonus_cap=None):
@@ -171,7 +199,8 @@ def main():
 
     clips = [
         {"id": f"clip{i+1:02d}", "start": c["start"], "end": c["end"],
-         "score": c["score"], "bonus": c.get("bonus", False), "preview": c["text"][:80]}
+         "score": c["score"], "bonus": c.get("bonus", False), "preview": c["text"][:80],
+         "engagement_score": engagement_score(c, duration_sec=c["end"] - c["start"])}
         for i, c in enumerate(picked)
     ]
     bonus_count = sum(1 for c in clips if c["bonus"])

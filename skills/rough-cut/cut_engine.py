@@ -164,6 +164,9 @@ def try_faster_whisper(audio_path, job=None, duration=None, work_dir=None):
         transcribe_audio_path,
         vad_filter=True,   # skips silence/dead-air — speed win with no
                             # quality cost, doesn't touch actual speech
+        word_timestamps=True,  # per-word timing, for karaoke-style
+                                # animated captions instead of whole-
+                                # segment burn-in
     )
     total = duration or getattr(info, "duration", None) or 0
 
@@ -173,8 +176,12 @@ def try_faster_whisper(audio_path, job=None, duration=None, work_dir=None):
     for s in seg_iter:
         # timestamps from a trimmed resume file are relative to the trim
         # point, not the original audio — offset them back
+        words = []
+        if getattr(s, "words", None):
+            words = [{"start": w.start + resume_from, "end": w.end + resume_from,
+                      "word": w.word} for w in s.words]
         segments.append({"start": s.start + resume_from, "end": s.end + resume_from,
-                          "text": s.text.strip()})
+                          "text": s.text.strip(), "words": words})
         now = __import__("time").time()
         if job and total:
             if now - last_report > 2:  # throttle progress writes to every ~2s, not every segment

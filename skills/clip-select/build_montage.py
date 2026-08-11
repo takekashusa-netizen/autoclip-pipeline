@@ -145,11 +145,35 @@ def build_montages(candidates, montage_seconds, montage_count):
         segments.sort(key=lambda s: s["start"])  # chronological order within the montage
         montages.append({
             "id": f"montage{m_idx+1:02d}",
-            "segments": [{"start": s["start"], "end": s["end"], "text": s["text"], "score": s["score"]}
+            "segments": [{"start": s["start"], "end": s["end"], "text": s["text"], "score": s["score"],
+                          "engagement_score": engagement_score(s, duration_sec=s["end"] - s["start"])}
                          for s in segments],
             "total_duration": round(total, 2),
         })
     return montages
+
+
+def engagement_score(candidate, duration_sec=None):
+    """Same heuristic as clip_select.py's version, kept in sync — a
+    0-100 composite of tag priority, word pace, and text energy markers.
+    Not a trained model; a relative ranking aid between your own clips."""
+    tags_component = min(60, (candidate["score"] / 4.0) * 60)
+
+    text = candidate.get("text", "")
+    words = text.split()
+    word_count = len(words)
+
+    pace_component = 0.0
+    if duration_sec and duration_sec > 0 and word_count > 0:
+        wps = word_count / duration_sec
+        pace_component = min(20, wps * 8)
+
+    energy_markers = ["!", "?", "no way", "insane", "crazy", "clutch", "wow", "omg"]
+    energy_hits = sum(1 for m in energy_markers if m in text.lower())
+    energy_component = min(20, energy_hits * 7)
+
+    total = tags_component + pace_component + energy_component
+    return round(max(0, min(100, total)))
 
 
 def main():
