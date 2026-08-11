@@ -90,6 +90,15 @@ if [[ ! -f "$(job_dir "$job")/job.json" ]]; then
   raw_file="$(job_raw_file "$job")"
   state_init "$job" "$format" "${raw_file:-}"
 fi
+# Real bug fixed: doctor.py's auto-resume (via resume_all.sh) treated
+# every unfinished job.json the same way and called run_pipeline.sh
+# directly on it — WRONG for a job meant to go through clip_pipeline.sh's
+# multi-clip flow (transcribe once, split into N clip subjobs). This
+# actually happened tonight: it silently started re-processing a
+# multi-clip job as if it were a single normal video. This marker lets
+# resume_all.sh recognize and skip clip_pipeline-managed jobs, leaving
+# them to clip_pipeline.sh's own (already correct) locking/resumability.
+state_set "$job" "managed_by" "\"clip_pipeline\""
 
 # Real, urgent bug fixed: clip_pipeline.sh's own top-level processing
 # (the initial "transcribe once" step) never acquired the same .lock

@@ -86,6 +86,19 @@ for job_dir in "${ROOT}"/projects/*/; do
     continue
   fi
 
+  managed_by="$(python3 -c "
+import json
+try:
+    d = json.load(open('${job_json}'))
+    print(d.get('managed_by', ''))
+except Exception:
+    print('')
+")"
+  if [[ "$managed_by" == "clip_pipeline" ]]; then
+    echo "skip ${job}: managed by clip_pipeline.sh (multi-clip job) — resume with ./clip_pipeline.sh directly, not run_pipeline.sh"
+    continue
+  fi
+
   export_status="$(python3 -c "
 import json
 try:
