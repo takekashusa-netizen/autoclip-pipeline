@@ -1,0 +1,2 @@
+== clip_pipeline: job=new881 format=short-tiktok-raw clip_length=60s clip_count=8 ==
+abort: job 'new881' is already running (pid 44188) — refusing to start a duplicate clip_pipeline.sh run
