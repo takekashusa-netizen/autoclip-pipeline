@@ -198,8 +198,17 @@ def try_faster_whisper(audio_path, job=None, duration=None, work_dir=None):
                 with open(checkpoint_path + ".tmp", "w") as f:
                     json.dump({"segments": segments}, f)
                 os.replace(checkpoint_path + ".tmp", checkpoint_path)
-            except Exception:
-                pass  # checkpointing is best-effort — never let it break real transcription
+            except Exception as e:
+                # Real bug fixed: this used to swallow ALL checkpoint
+                # write failures completely silently — a 150-minute real
+                # run hit a stall with ZERO checkpoint data saved, and
+                # there was no error anywhere to explain why. Still
+                # best-effort (a checkpoint failure must never break real
+                # transcription), but now it's visible via progress.json
+                # instead of vanishing without a trace.
+                if job:
+                    progress_mod.report(job, "transcribing", None,
+                                         f"WARNING: checkpoint write failed ({type(e).__name__}: {e}) — progress since last successful checkpoint is NOT protected")
             last_checkpoint = now
     if job:
         progress_mod.report(job, "transcribing", 100, "transcription complete")
@@ -379,6 +388,16 @@ def render_cut(raw_video, kept_segments, out_path, work_dir, job=None):
 def main():
     job, raw_video, audio_path, out_dir, work_dir = sys.argv[1:6]
     os.makedirs(out_dir, exist_ok=True)
+    # Real, critical bug fixed: work_dir was never created before
+    # transcription started — only render_cut() created it, AFTER
+    # transcription finished. This meant every checkpoint write attempt
+    # during a multi-hour transcription failed silently (caught by the
+    # deliberately-permissive except-and-continue around checkpointing),
+    # so the whole point of checkpointing — surviving a mid-transcription
+    # stall — never actually worked. Confirmed directly: a real 150-minute
+    # run hit the exact same network stall as before and had ZERO
+    # checkpoint data to show for it.
+    os.makedirs(work_dir, exist_ok=True)
 
     duration = ffprobe_duration(raw_video)
 
