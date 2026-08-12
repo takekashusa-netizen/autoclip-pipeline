@@ -33,10 +33,14 @@ import json
 import os
 import re
 import subprocess
+import sys
 import time
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "lib"))
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 PROJECTS = os.path.join(ROOT, "projects")
+OUTPUTS = os.path.join(ROOT, "outputs")
 STALL_WARN_SEC = 40 * 60  # warn if progress.json hasn't updated in 40 min
                            # AND the stage is one that normally reports
                            # incremental progress (transcribing)
@@ -224,6 +228,103 @@ def auto_resume(auto_approve=True):
                           start_new_session=True)  # detach from doctor's own process group
 
 
+def find_clip_metadata(job_name):
+    """For a finished clip/montage subjob, finds the real hook text and
+    engagement score from the PARENT job's clips.json — job.json itself
+    doesn't carry this, it lives where clip_select.py/build_montage.py
+    originally wrote it. Returns None if no match (e.g. a job that
+    predates engagement scoring, or isn't a clip/montage subjob at all —
+    those aren't auto-published, only real generated content is)."""
+    if "__" not in job_name:
+        return None
+    parent, sub_id = job_name.split("__", 1)
+    clips_json_path = os.path.join(PROJECTS, parent, "rough-cut", "clips.json")
+    if not os.path.exists(clips_json_path):
+        return None
+    try:
+        with open(clips_json_path) as f:
+            data = json.load(f)
+    except Exception:
+        return None
+
+    for c in data.get("clips", []):
+        if c.get("id") == sub_id:
+            return {"text": c.get("preview", ""), "engagement_score": c.get("engagement_score"),
+                    "has_impact": "gunfire" in (c.get("preview") or "").lower(), "source_title": parent}
+    for m in data.get("montages", []):
+        if m.get("id") == sub_id:
+            segs = m.get("segments", [])
+            text = segs[0]["text"] if segs else ""
+            scores = [s.get("engagement_score", 0) for s in segs]
+            avg_score = round(sum(scores) / len(scores)) if scores else None
+            return {"text": text, "engagement_score": avg_score,
+                    "has_impact": "gunfire" in text.lower(), "source_title": parent}
+    return None
+
+
+def find_output_video(job_name):
+    path = os.path.join(OUTPUTS, f"{job_name}.final.mp4")
+    return path if os.path.exists(path) else None
+
+
+def publish_pending_jobs(content_type="gaming", privacy="private"):
+    """The actual merge: doctor already watches every job for completion
+    (via auto-resume's own export-status checks) — this extends that
+    same watch loop to also auto-publish anything that JUST finished and
+    hasn't been published yet, using real title/description generated
+    from the clip's own transcript data. Marks each job with
+    'youtube_video_id' in job.json once published, so it's never
+    re-uploaded on a later doctor cycle. Stays private by default —
+    doctor auto-publishing PUBLIC videos with zero human review would be
+    a real, bad outcome; private lets you review in YouTube Studio."""
+    try:
+        from youtube_publish import generate_title, generate_description, generate_tags, upload_video
+    except ImportError as e:
+        log(f"doctor: auto-publish unavailable — {e}")
+        return
+
+    if not os.path.isdir(PROJECTS):
+        return
+    for job_name in os.listdir(PROJECTS):
+        job_json_path = os.path.join(PROJECTS, job_name, "job.json")
+        if not os.path.exists(job_json_path):
+            continue
+        try:
+            with open(job_json_path) as f:
+                job_data = json.load(f)
+        except Exception:
+            continue
+
+        if job_data.get("steps", {}).get("export", {}).get("status") != "done":
+            continue
+        if job_data.get("youtube_video_id"):
+            continue  # already published, never re-upload
+
+        video_path = find_output_video(job_name)
+        if not video_path:
+            continue
+        clip_meta = find_clip_metadata(job_name)
+        if not clip_meta:
+            continue  # not a recognized clip/montage output — don't guess at a title for it
+
+        title = generate_title(clip_meta, content_type)
+        description = generate_description(clip_meta, source_title=clip_meta.get("source_title"))
+        tags = generate_tags(clip_meta, content_type)
+
+        log(f"doctor: auto-publishing {job_name} -> \"{title}\"")
+        try:
+            result = upload_video(video_path, title, description, tags, privacy_status=privacy)
+        except Exception as e:
+            log(f"doctor: auto-publish FAILED for {job_name}: {e}")
+            continue
+
+        job_data["youtube_video_id"] = result.get("video_id")
+        job_data["youtube_url"] = result.get("url")
+        with open(job_json_path, "w") as f:
+            json.dump(job_data, f, indent=2)
+        log(f"doctor: published {job_name} -> {result.get('url')}")
+
+
 def run_checks():
     check_duplicate_processes()
     check_stale_locks()
@@ -241,19 +342,34 @@ def main():
                     help="how often (seconds) to check for jobs needing resume — less frequent than --interval since a resume itself takes real time")
     p.add_argument("--no-auto-approve", action="store_true",
                     help="don't pass --auto-approve to resume_all.sh — auto-resumed jobs will still pause for manual second-pass review")
+    p.add_argument("--auto-publish", action="store_true",
+                    help="automatically upload newly-finished clips/montages to YouTube as PRIVATE — requires youtube_client_secret.json set up first")
+    p.add_argument("--publish-interval", type=int, default=300,
+                    help="how often (seconds) to check for newly-finished jobs to publish")
+    p.add_argument("--publish-privacy", default="private", choices=["private", "unlisted", "public"],
+                    help="YouTube privacy status for auto-published videos (default: private — review before making anything public)")
+    p.add_argument("--content-type", default="gaming",
+                    help="content type used for title/tag generation on auto-published videos")
     args = p.parse_args()
 
-    mode = "watching + auto-resuming" if args.auto_resume else "watching only"
-    log(f"doctor: {mode} (checks every {args.interval}s"
-        + (f", resume checks every {args.resume_interval}s" if args.auto_resume else "")
-        + ") — Ctrl+C to stop")
+    modes = []
+    if args.auto_resume:
+        modes.append("auto-resuming")
+    if args.auto_publish:
+        modes.append(f"auto-publishing ({args.publish_privacy})")
+    mode = "watching + " + " + ".join(modes) if modes else "watching only"
+    log(f"doctor: {mode} (checks every {args.interval}s) — Ctrl+C to stop")
 
     last_resume_check = 0.0
+    last_publish_check = 0.0
     while True:
         run_checks()
         if args.auto_resume and (time.time() - last_resume_check) >= args.resume_interval:
             auto_resume(auto_approve=not args.no_auto_approve)
             last_resume_check = time.time()
+        if args.auto_publish and (time.time() - last_publish_check) >= args.publish_interval:
+            publish_pending_jobs(content_type=args.content_type, privacy=args.publish_privacy)
+            last_publish_check = time.time()
         if args.once:
             break
         time.sleep(args.interval)

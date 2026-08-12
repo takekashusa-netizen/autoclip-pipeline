@@ -121,6 +121,154 @@ def tool_list_finished_clips(args):
     return {"clips": clips}
 
 
+def tool_publish_to_youtube(args):
+    """Merges doctor.py's auto-publish logic into the MCP server — same
+    underlying functions, callable on-demand from Claude Desktop instead
+    of only on doctor's watch cycle. Stays private by default, same
+    safety reasoning as doctor.py: a human should review before making
+    anything public."""
+    job = args["job"]
+    content_type = args.get("content_type", "gaming")
+    privacy = args.get("privacy", "private")
+
+    sys.path.insert(0, os.path.join(ROOT, "lib"))
+    try:
+        import doctor as doctor_mod
+        from youtube_publish import generate_title, generate_description, generate_tags, upload_video
+    except ImportError as e:
+        return {"error": f"publish libraries unavailable: {e}"}
+
+    video_path = doctor_mod.find_output_video(job)
+    if not video_path:
+        return {"error": f"no finished output found for job '{job}' — check it's actually done first"}
+    clip_meta = doctor_mod.find_clip_metadata(job)
+    if not clip_meta:
+        return {"error": f"no clip/montage metadata found for '{job}' — not a recognized clip or montage subjob"}
+
+    title = generate_title(clip_meta, content_type)
+    description = generate_description(clip_meta, source_title=clip_meta.get("source_title"))
+    tags = generate_tags(clip_meta, content_type)
+
+    try:
+        result = upload_video(video_path, title, description, tags, privacy_status=privacy)
+    except Exception as e:
+        return {"error": f"upload failed: {e}"}
+
+    job_json_path = os.path.join(ROOT, "projects", job, "job.json")
+    if os.path.exists(job_json_path):
+        with open(job_json_path) as f:
+            job_data = json.load(f)
+        job_data["youtube_video_id"] = result.get("video_id")
+        job_data["youtube_url"] = result.get("url")
+        with open(job_json_path, "w") as f:
+            json.dump(job_data, f, indent=2)
+
+    return {"job": job, "title": title, "video_id": result.get("video_id"), "url": result.get("url")}
+
+
+def _script_for_job(job):
+    path = os.path.join(ROOT, "projects", job, "rough-cut", "script.json")
+    if not os.path.exists(path):
+        return None
+    with open(path) as f:
+        return json.load(f)
+
+
+def tool_search_video_content(args):
+    """Real, honest scope: keyword/substring search across the actual
+    transcript, not semantic/AI understanding (that would need a live
+    embeddings or LLM call this environment doesn't have configured).
+    Case-insensitive substring match against each segment's text,
+    returns matching segments with real timestamps."""
+    job = args["job"]
+    query = args["query"].lower()
+    script = _script_for_job(job)
+    if script is None:
+        return {"error": f"no transcript found for job '{job}' — check it's finished rough-cut"}
+    matches = [
+        {"start": s["start"], "end": s["end"], "text": s["text"]}
+        for s in script.get("kept_segments", [])
+        if query in s["text"].lower()
+    ]
+    return {"job": job, "query": args["query"], "match_count": len(matches), "matches": matches}
+
+
+def tool_get_key_moments(args):
+    """Real key-moment extraction using what this pipeline actually
+    detects: transcript hooks/highlights (beat_planner's classify),
+    visual motion spikes, and audio gunfire/impact transients — the
+    same three signals clip selection uses, exposed directly instead
+    of only through the clipping pipeline."""
+    job = args["job"]
+    script = _script_for_job(job)
+    if script is None:
+        return {"error": f"no transcript found for job '{job}' — check it's finished rough-cut"}
+
+    sys.path.insert(0, os.path.join(ROOT, "skills", "graphics-plan"))
+    sys.path.insert(0, os.path.join(ROOT, "lib"))
+    from beat_planner import classify  # noqa: E402
+
+    moments = []
+    for i, seg in enumerate(script.get("kept_segments", [])):
+        tags = classify(seg, i, is_first=(i == 0))
+        if tags:
+            moments.append({"start": seg["start"], "end": seg["end"], "text": seg["text"], "tags": tags})
+
+    visual_path = os.path.join(ROOT, "projects", job, "rough-cut", "visual-analysis.json")
+    if os.path.exists(visual_path):
+        try:
+            from visual_analysis import motion_beats
+            with open(visual_path) as f:
+                va = json.load(f)
+            if "samples" in va:
+                for beat in motion_beats(va):
+                    moments.append({"start": beat["start"], "end": beat["end"], "text": beat["text"], "tags": beat["tags"]})
+        except Exception:
+            pass
+
+    audio_path = os.path.join(ROOT, "projects", job, "rough-cut", "audio-analysis.json")
+    if os.path.exists(audio_path):
+        try:
+            from audio_analysis import transient_beats
+            with open(audio_path) as f:
+                aa = json.load(f)
+            if "transients" in aa:
+                for beat in transient_beats(aa):
+                    moments.append({"start": beat["start"], "end": beat["end"], "text": beat["text"], "tags": beat["tags"]})
+        except Exception:
+            pass
+
+    moments.sort(key=lambda m: m["start"])
+    return {"job": job, "moment_count": len(moments), "moments": moments}
+
+
+def tool_summarize_video(args):
+    """Real, honest scope: an EXTRACTIVE summary (the actual highest-
+    signal real lines from the transcript, concatenated), not an
+    abstractive AI-generated summary — that would need a live LLM API
+    call this environment doesn't have wired up. Still genuinely useful
+    for a fast overview of what's actually in the video."""
+    job = args["job"]
+    script = _script_for_job(job)
+    if script is None:
+        return {"error": f"no transcript found for job '{job}' — check it's finished rough-cut"}
+
+    key_moments_result = tool_get_key_moments({"job": job})
+    if "error" in key_moments_result:
+        return key_moments_result
+    moments = key_moments_result["moments"]
+
+    total_duration = script.get("source_duration_sec", 0)
+    highlight_lines = [m["text"] for m in moments if m["text"]][:15]  # cap — a real summary, not a full re-dump
+    return {
+        "job": job,
+        "duration_sec": total_duration,
+        "segment_count": len(script.get("kept_segments", [])),
+        "key_moment_count": len(moments),
+        "extractive_summary": highlight_lines,
+    }
+
+
 TOOLS = {
     "submit_clip_job": {
         "description": "Downloads a video/livestream from a URL (YouTube, Twitch, etc.) and clips it into short highlight videos. Runs in the background — use get_job_status to check progress.",
@@ -168,6 +316,49 @@ TOOLS = {
             "properties": {"job": {"type": "string", "description": "Optional job id filter"}},
         },
         "fn": tool_list_finished_clips,
+    },
+    "publish_to_youtube": {
+        "description": "Uploads a finished clip or montage to YouTube with an auto-generated SEO title/description drawn from its real transcript content. Defaults to private (review in YouTube Studio before making public) — pass privacy='public' explicitly to skip that. Requires youtube_client_secret.json already set up.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "job": {"type": "string", "description": "Job id of the finished clip/montage subjob (e.g. 'new881__clip01')"},
+                "content_type": {"type": "string", "description": "Used for title/tag generation, e.g. 'gaming'", "default": "gaming"},
+                "privacy": {"type": "string", "description": "private, unlisted, or public", "default": "private"},
+            },
+            "required": ["job"],
+        },
+        "fn": tool_publish_to_youtube,
+    },
+    "search_video_content": {
+        "description": "Searches a job's transcript for a keyword/phrase — real substring match against actual spoken text, returns matching lines with timestamps. Not semantic/AI search.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "job": {"type": "string", "description": "Job id"},
+                "query": {"type": "string", "description": "Text to search for"},
+            },
+            "required": ["job", "query"],
+        },
+        "fn": tool_search_video_content,
+    },
+    "get_key_moments": {
+        "description": "Extracts key moments from a job's video — transcript hooks/highlights, visual motion spikes, and audio gunfire/impact transients, each with real timestamps.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {"job": {"type": "string", "description": "Job id"}},
+            "required": ["job"],
+        },
+        "fn": tool_get_key_moments,
+    },
+    "summarize_video": {
+        "description": "Extractive summary of a job's video — real duration, segment count, and the highest-signal actual transcript lines. Not an AI-generated abstractive summary.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {"job": {"type": "string", "description": "Job id"}},
+            "required": ["job"],
+        },
+        "fn": tool_summarize_video,
     },
 }
 

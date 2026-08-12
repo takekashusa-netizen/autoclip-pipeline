@@ -1,0 +1,53 @@
+== clip_pipeline: job=new881 format=long-form-youtube montage_minutes=12 montage_count=5 ==
+  [10:28:13] rough-cut already done for 'new881' — reusing existing transcript
+-- analyzing visual content (action/motion detection) --
+  [10:28:13] visual-analysis: reusing existing visual-analysis.json (delete it manually to force a fresh re-analysis)
+-- analyzing audio content (gunfire/impact detection) --
+  [10:28:14] audio-analysis: reusing existing audio-analysis.json (delete it manually to force a fresh re-analysis)
+-- selecting best moments (montage_minutes=12) --
+  [10:28:14] build-montage: {"montage_count": 5, "segments_per_montage": [72, 72, 72, 61, 43], "durations_sec": [718.6, 720.0, 720.0, 719.88, 414.17]}
+-- montage01: 72 moments, 718.6s total --
+== pipeline: job=new881__montage01 format=long-form-youtube ==
+-- [1/7] intake --
+  [10:54:00] [intake] already done, skipping (use --force to redo)
+-- [2/7] rough cut --
+  [10:54:00] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: long-form-youtube) --
+  [10:54:00] [graphics] already done, skipping (use --force to redo)
+-- [4/7] second pass (manual review) --
+  [10:54:00] [second_pass] already approved, skipping
+-- [5/7] captions (format-specific: long-form-youtube) --
+  [10:54:00] [captions] already done, skipping (use --force to redo)
+-- [6/7] background music — skipped --
+-- [7/7] export --
+  [10:54:00] [export] already done, skipping (use --force to redo)
+  [10:54:01] thumbnail-generator: grabbing frame at t=4.3s (hook beat if available)
+  [10:54:01] thumbnail-generator: done -> projects/new881__montage01/thumbnail/thumb.jpg
+== done: outputs/new881__montage01.final.mp4 ==
+-- montage02: 72 moments, 720.0s total --
+/Users/Apple/autoclip-pipeline/projects/new881__montage02/job.json
+== pipeline: job=new881__montage02 format=long-form-youtube ==
+-- [1/7] intake --
+  [12:06:48] raw file: /Users/Apple/autoclip-pipeline/projects/new881__montage02/raw/source.mp4
+-- [2/7] rough cut --
+  [12:06:48] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: long-form-youtube) --
+  [12:06:49] graphics-plan: reading script from rough-cut (no re-transcription)
+  [12:06:49] graphics-plan: style='glass + zoom' preset='liquid-glass-style' reframe='letterbox' target=1920x1080
+  [12:06:49] graphics-plan: planning beats
+  [12:06:49] graphics-plan: {"beat_count": 1}
+  [12:06:49] graphics-plan: rendering (reframe + beat cards) via engine stand-in
+  [12:08:54] graphics-plan: {"beats_rendered": 0, "face_tracked": false}
+  [12:08:55] graphics-plan: done -> projects/new881__montage02/graphics/{graphics-plan.json,graphics_cut.mp4}
+-- [4/7] second pass (manual review) --
+  [12:08:55] [second_pass] --auto-approve set, skipping manual review
+-- [5/7] captions (format-specific: long-form-youtube) --
+  [12:08:56] embedded-captions: format 'long-form-youtube' has captions disabled (e.g. long-form relies on YT CC) — skipping
+-- [6/7] background music — skipped --
+-- [7/7] export --
+  [12:09:03] finalize: promoted graphics_cut.mp4 -> outputs/new881__montage02.final.mp4
+  [12:09:03] prune: removed 2 intermediate render(s) + scratch work dir for job 'new881__montage02'
+  [12:09:04] thumbnail-generator: grabbing frame at t=5.0s (hook beat if available)
+  [12:09:04] thumbnail-generator: done -> projects/new881__montage02/thumbnail/thumb.jpg
+== done: outputs/new881__montage02.final.mp4 ==
+-- montage03: 72 moments, 720.0s total --

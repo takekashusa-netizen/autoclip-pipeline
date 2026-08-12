@@ -113,19 +113,24 @@ def main():
     sys.exit(1)
 
 
-def upload_video(video_path, title, description, tags):
+def upload_video(video_path, title, description, tags, privacy_status="private"):
+    """privacy_status defaults to 'private' — a deliberate safety default.
+    Auto-publishing PUBLIC videos with zero human review is a real, bad
+    outcome; private lets a human review in YouTube Studio before it
+    goes live. Raises (doesn't sys.exit) on failure — this needs to be
+    safely callable from doctor.py's watch loop without taking down the
+    whole watchdog process if one upload has a problem."""
     try:
         from google_auth_oauthlib.flow import InstalledAppFlow
         from google.auth.transport.requests import Request
         from googleapiclient.discovery import build
         from googleapiclient.http import MediaFileUpload
         import pickle
-    except ImportError:
-        print(json.dumps({
-            "error": "YouTube upload libraries not installed. Run: "
-                     "pip install google-auth-oauthlib google-api-python-client --break-system-packages"
-        }))
-        sys.exit(1)
+    except ImportError as e:
+        raise RuntimeError(
+            "YouTube upload libraries not installed. Run: "
+            "pip install google-auth-oauthlib google-api-python-client --break-system-packages"
+        ) from e
 
     SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
     TOKEN_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "youtube_token.pickle")
@@ -140,11 +145,10 @@ def upload_video(video_path, title, description, tags):
             creds.refresh(Request())
         else:
             if not os.path.exists(CLIENT_SECRETS_PATH):
-                print(json.dumps({
-                    "error": f"No OAuth client secrets found at {CLIENT_SECRETS_PATH}. "
-                             f"See setup instructions to create one in Google Cloud Console."
-                }))
-                sys.exit(1)
+                raise RuntimeError(
+                    f"No OAuth client secrets found at {CLIENT_SECRETS_PATH}. "
+                    f"See setup instructions to create one in Google Cloud Console."
+                )
             flow = InstalledAppFlow.from_client_secrets_file(CLIENT_SECRETS_PATH, SCOPES)
             creds = flow.run_local_server(port=0)  # opens a real browser window for one-time consent
         with open(TOKEN_PATH, "wb") as f:
@@ -153,14 +157,16 @@ def upload_video(video_path, title, description, tags):
     youtube = build("youtube", "v3", credentials=creds)
     body = {
         "snippet": {"title": title, "description": description, "tags": tags, "categoryId": "20"},  # 20 = Gaming
-        "status": {"privacyStatus": "private"},  # real safety default — never auto-publish public without review
+        "status": {"privacyStatus": privacy_status},  # real safety default — never auto-publish public without review
     }
     media = MediaFileUpload(video_path, chunksize=-1, resumable=True)
     request = youtube.videos().insert(part="snippet,status", body=body, media_body=media)
     response = None
     while response is None:
         status, response = request.next_chunk()
-    print(json.dumps({"video_id": response.get("id"), "url": f"https://youtu.be/{response.get('id')}"}))
+    result = {"video_id": response.get("id"), "url": f"https://youtu.be/{response.get('id')}"}
+    print(json.dumps(result))
+    return result
 
 
 if __name__ == "__main__":
