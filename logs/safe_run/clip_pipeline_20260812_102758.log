@@ -77,3 +77,38 @@
   [13:47:37] thumbnail-generator: done -> projects/new881__montage03/thumbnail/thumb.jpg
 == done: outputs/new881__montage03.final.mp4 ==
 -- montage04: 61 moments, 719.88s total --
+/Users/Apple/autoclip-pipeline/projects/new881__montage04/job.json
+== pipeline: job=new881__montage04 format=long-form-youtube ==
+-- [1/7] intake --
+  [15:09:15] raw file: /Users/Apple/autoclip-pipeline/projects/new881__montage04/raw/source.mp4
+-- [2/7] rough cut --
+  [15:09:15] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: long-form-youtube) --
+  [15:09:15] graphics-plan: reading script from rough-cut (no re-transcription)
+  [15:09:15] graphics-plan: style='glass + zoom' preset='liquid-glass-style' reframe='letterbox' target=1920x1080
+  [15:09:15] graphics-plan: planning beats
+  [15:09:16] graphics-plan: {"beat_count": 46}
+  [15:09:16] graphics-plan: rendering (reframe + beat cards) via engine stand-in
+  [15:09:46] graphics-plan: {"beats_rendered": 0, "face_tracked": false}
+  [15:09:46] graphics-plan: done -> projects/new881__montage04/graphics/{graphics-plan.json,graphics_cut.mp4}
+-- [4/7] second pass (manual review) --
+  [15:09:46] [second_pass] --auto-approve set, skipping manual review
+-- [5/7] captions (format-specific: long-form-youtube) --
+  [15:09:46] embedded-captions: format 'long-form-youtube' has captions disabled (e.g. long-form relies on YT CC) — skipping
+-- [6/7] background music — skipped --
+-- [7/7] export --
+  [15:09:47] finalize: promoted graphics_cut.mp4 -> outputs/new881__montage04.final.mp4
+  [15:09:47] prune: removed 2 intermediate render(s) + scratch work dir for job 'new881__montage04'
+  [15:09:48] thumbnail-generator: grabbing frame at t=166.28999999999996s (hook beat if available)
+[mjpeg @ 0x7fee07009440] Non full-range YUV is non-standard, set strict_std_compliance to at most unofficial to use it.
+[mjpeg @ 0x7fee007087c0] ff_frame_thread_encoder_init failed
+[vost#0:0/mjpeg @ 0x7fee00708000] [enc:mjpeg @ 0x7fee00708740] Error while opening encoder - maybe incorrect parameters such as bit_rate, rate, width or height.
+[vf#0:0 @ 0x7fee0080a000] Error sending frames to consumers: Invalid argument
+[vf#0:0 @ 0x7fee0080a000] Task finished with error code: -22 (Invalid argument)
+[vf#0:0 @ 0x7fee0080a000] Terminating thread with return code -22 (Invalid argument)
+[vost#0:0/mjpeg @ 0x7fee00708000] [enc:mjpeg @ 0x7fee00708740] Could not open encoder before EOF
+[vost#0:0/mjpeg @ 0x7fee00708000] Task finished with error code: -22 (Invalid argument)
+[vost#0:0/mjpeg @ 0x7fee00708000] Terminating thread with return code -22 (Invalid argument)
+[out#0/image2 @ 0x7fee00706b00] Nothing was written into output file, because at least one of its streams received no packets.
+== done: outputs/new881__montage04.final.mp4 ==
+-- montage05: 43 moments, 414.17s total --

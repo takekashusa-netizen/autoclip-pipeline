@@ -1,0 +1,5 @@
+== clip_pipeline: job=new882 format=short-tiktok-raw clip_length=60s clip_count=10 ==
+/Users/Apple/autoclip-pipeline/projects/new882/job.json
+-- transcribing full source (once) --
+  [14:33:09] rough-cut: extracting audio from source.mp4
+  [14:36:56] rough-cut: transcribing + building EDL
