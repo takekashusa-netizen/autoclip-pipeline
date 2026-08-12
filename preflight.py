@@ -34,7 +34,7 @@ CORE_MODULES = [
     ("skills/clip-select", "clip_select"), ("skills/clip-select", "build_montage"),
 ]
 
-REQUIRED_PACKAGES = ["faster_whisper", "fastapi", "cv2", "yt_dlp"]
+REQUIRED_PACKAGES = ["faster_whisper", "fastapi", "cv2", "yt_dlp", "PIL"]
 
 
 def check_real_imports():
