@@ -1,0 +1,277 @@
+== clip_pipeline: job=new881 format=short-tiktok-raw clip_length=60s clip_count=8 ==
+  [00:48:17] rough-cut already done for 'new881' — reusing existing transcript
+-- analyzing visual content (action/motion detection) --
+  [00:48:17] visual-analysis: reusing existing visual-analysis.json (delete it manually to force a fresh re-analysis)
+-- analyzing audio content (gunfire/impact detection) --
+  [00:48:17] audio-analysis: reusing existing audio-analysis.json (delete it manually to force a fresh re-analysis)
+-- selecting best moments (montage_minutes=0) --
+  [00:48:17] clip-select: {"clip_count": 11, "bonus_count": 3}
+-- clip01 [requested]: 0.0s-60.0s (score=4) "(gunfire/impact detected)" --
+== pipeline: job=new881__clip01 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [00:48:26] [intake] already done, skipping (use --force to redo)
+-- [2/7] rough cut --
+  [00:48:26] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [00:48:26] graphics-plan: reading script from rough-cut (no re-transcription)
+  [00:48:26] graphics-plan: style='hook card -> raw' preset='tiktok-raw-style' reframe='letterbox' target=1080x1920
+  [00:48:26] graphics-plan: planning beats
+  [00:48:26] graphics-plan: {"beat_count": 2}
+  [00:48:26] graphics-plan: rendering (reframe + beat cards) via engine stand-in
+  [00:48:39] graphics-plan: {"beats_rendered": 2, "face_tracked": false}
+  [00:48:39] graphics-plan: done -> projects/new881__clip01/graphics/{graphics-plan.json,graphics_cut.mp4}
+-- [4/7] second pass (manual review) --
+  [00:48:39] [second_pass] --auto-approve set, skipping manual review
+-- [5/7] captions (format-specific: short-tiktok-raw) --
+  [00:48:40] embedded-captions: reusing rough-cut's word timings (no re-transcription)
+  [00:48:40] embedded-captions: position='low, under face' target=1080x1920
+  [00:48:40] embedded-captions: {"caption_lines": 3, "word_level_lines": 0}
+  [00:48:40] embedded-captions: burning in on-beat
+[AVFilterGraph @ 0x7f97e0f16280] No option name near '/Users/Apple/autoclip-pipeline/projects/new881__clip01/captions/captions.ass'
+[AVFilterGraph @ 0x7f97e0f16280] Error parsing a filter description around: 
+[AVFilterGraph @ 0x7f97e0f16280] Error parsing filterchain 'ass=/Users/Apple/autoclip-pipeline/projects/new881__clip01/captions/captions.ass' around: 
+Error opening output file /Users/Apple/autoclip-pipeline/projects/new881__clip01/captions/captions_cut.mp4.
+Error opening output files: Invalid argument
+  [00:48:40]   clip01: paused for second-pass review (normal) — approve with: python3 lib/jobstate.py mark new881__clip01 second_pass done && ./run_pipeline.sh new881__clip01 short-tiktok-raw
+-- clip02 [requested]: 80.28s-140.28s (score=4) "(gunfire/impact detected)" --
+== pipeline: job=new881__clip02 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [00:48:56] [intake] already done, skipping (use --force to redo)
+-- [2/7] rough cut --
+  [00:48:56] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [00:48:56] graphics-plan: reading script from rough-cut (no re-transcription)
+  [00:48:56] graphics-plan: style='hook card -> raw' preset='tiktok-raw-style' reframe='letterbox' target=1080x1920
+  [00:48:56] graphics-plan: planning beats
+  [00:48:56] graphics-plan: {"beat_count": 1}
+  [00:48:56] graphics-plan: rendering (reframe + beat cards) via engine stand-in
+  [00:49:05] graphics-plan: {"beats_rendered": 1, "face_tracked": false}
+  [00:49:05] graphics-plan: done -> projects/new881__clip02/graphics/{graphics-plan.json,graphics_cut.mp4}
+-- [4/7] second pass (manual review) --
+  [00:49:05] [second_pass] --auto-approve set, skipping manual review
+-- [5/7] captions (format-specific: short-tiktok-raw) --
+  [00:49:06] embedded-captions: reusing rough-cut's word timings (no re-transcription)
+  [00:49:06] embedded-captions: position='low, under face' target=1080x1920
+  [00:49:06] embedded-captions: {"caption_lines": 5, "word_level_lines": 0}
+  [00:49:06] embedded-captions: burning in on-beat
+[AVFilterGraph @ 0x7fd3890070c0] No option name near '/Users/Apple/autoclip-pipeline/projects/new881__clip02/captions/captions.ass'
+[AVFilterGraph @ 0x7fd3890070c0] Error parsing a filter description around: 
+[AVFilterGraph @ 0x7fd3890070c0] Error parsing filterchain 'ass=/Users/Apple/autoclip-pipeline/projects/new881__clip02/captions/captions.ass' around: 
+Error opening output file /Users/Apple/autoclip-pipeline/projects/new881__clip02/captions/captions_cut.mp4.
+Error opening output files: Invalid argument
+  [00:49:06]   clip02: paused for second-pass review (normal) — approve with: python3 lib/jobstate.py mark new881__clip02 second_pass done && ./run_pipeline.sh new881__clip02 short-tiktok-raw
+-- clip03 [requested]: 153.34s-213.34s (score=4) "(gunfire/impact detected)" --
+== pipeline: job=new881__clip03 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [00:49:22] [intake] already done, skipping (use --force to redo)
+-- [2/7] rough cut --
+  [00:49:22] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [00:49:22] graphics-plan: reading script from rough-cut (no re-transcription)
+  [00:49:22] graphics-plan: style='hook card -> raw' preset='tiktok-raw-style' reframe='letterbox' target=1080x1920
+  [00:49:22] graphics-plan: planning beats
+  [00:49:22] graphics-plan: {"beat_count": 1}
+  [00:49:22] graphics-plan: rendering (reframe + beat cards) via engine stand-in
+  [00:49:30] graphics-plan: {"beats_rendered": 1, "face_tracked": false}
+  [00:49:30] graphics-plan: done -> projects/new881__clip03/graphics/{graphics-plan.json,graphics_cut.mp4}
+-- [4/7] second pass (manual review) --
+  [00:49:30] [second_pass] --auto-approve set, skipping manual review
+-- [5/7] captions (format-specific: short-tiktok-raw) --
+  [00:49:30] embedded-captions: reusing rough-cut's word timings (no re-transcription)
+  [00:49:30] embedded-captions: position='low, under face' target=1080x1920
+  [00:49:30] embedded-captions: {"caption_lines": 2, "word_level_lines": 0}
+  [00:49:30] embedded-captions: burning in on-beat
+[AVFilterGraph @ 0x7fcab4f17000] No option name near '/Users/Apple/autoclip-pipeline/projects/new881__clip03/captions/captions.ass'
+[AVFilterGraph @ 0x7fcab4f17000] Error parsing a filter description around: 
+[AVFilterGraph @ 0x7fcab4f17000] Error parsing filterchain 'ass=/Users/Apple/autoclip-pipeline/projects/new881__clip03/captions/captions.ass' around: 
+Error opening output file /Users/Apple/autoclip-pipeline/projects/new881__clip03/captions/captions_cut.mp4.
+Error opening output files: Invalid argument
+  [00:49:30]   clip03: paused for second-pass review (normal) — approve with: python3 lib/jobstate.py mark new881__clip03 second_pass done && ./run_pipeline.sh new881__clip03 short-tiktok-raw
+-- clip04 [requested]: 224.36s-284.36s (score=4) "(gunfire/impact detected)" --
+== pipeline: job=new881__clip04 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [00:49:48] [intake] already done, skipping (use --force to redo)
+-- [2/7] rough cut --
+  [00:49:48] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [00:49:49] graphics-plan: reading script from rough-cut (no re-transcription)
+  [00:49:49] graphics-plan: style='hook card -> raw' preset='tiktok-raw-style' reframe='letterbox' target=1080x1920
+  [00:49:49] graphics-plan: planning beats
+  [00:49:49] graphics-plan: {"beat_count": 1}
+  [00:49:49] graphics-plan: rendering (reframe + beat cards) via engine stand-in
+  [00:49:58] graphics-plan: {"beats_rendered": 1, "face_tracked": false}
+  [00:49:58] graphics-plan: done -> projects/new881__clip04/graphics/{graphics-plan.json,graphics_cut.mp4}
+-- [4/7] second pass (manual review) --
+  [00:49:58] [second_pass] --auto-approve set, skipping manual review
+-- [5/7] captions (format-specific: short-tiktok-raw) --
+  [00:49:58] embedded-captions: reusing rough-cut's word timings (no re-transcription)
+  [00:49:58] embedded-captions: position='low, under face' target=1080x1920
+  [00:49:58] embedded-captions: {"caption_lines": 1, "word_level_lines": 0}
+  [00:49:58] embedded-captions: burning in on-beat
+[AVFilterGraph @ 0x7fb3d971aa00] No option name near '/Users/Apple/autoclip-pipeline/projects/new881__clip04/captions/captions.ass'
+[AVFilterGraph @ 0x7fb3d971aa00] Error parsing a filter description around: 
+[AVFilterGraph @ 0x7fb3d971aa00] Error parsing filterchain 'ass=/Users/Apple/autoclip-pipeline/projects/new881__clip04/captions/captions.ass' around: 
+Error opening output file /Users/Apple/autoclip-pipeline/projects/new881__clip04/captions/captions_cut.mp4.
+Error opening output files: Invalid argument
+  [00:49:58]   clip04: paused for second-pass review (normal) — approve with: python3 lib/jobstate.py mark new881__clip04 second_pass done && ./run_pipeline.sh new881__clip04 short-tiktok-raw
+-- clip05 [requested]: 284.5s-344.5s (score=4) "(gunfire/impact detected)" --
+== pipeline: job=new881__clip05 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [00:50:18] [intake] already done, skipping (use --force to redo)
+-- [2/7] rough cut --
+  [00:50:18] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [00:50:18] graphics-plan: reading script from rough-cut (no re-transcription)
+  [00:50:18] graphics-plan: style='hook card -> raw' preset='tiktok-raw-style' reframe='letterbox' target=1080x1920
+  [00:50:18] graphics-plan: planning beats
+  [00:50:18] graphics-plan: {"beat_count": 1}
+  [00:50:18] graphics-plan: rendering (reframe + beat cards) via engine stand-in
+  [00:50:26] graphics-plan: {"beats_rendered": 1, "face_tracked": false}
+  [00:50:26] graphics-plan: done -> projects/new881__clip05/graphics/{graphics-plan.json,graphics_cut.mp4}
+-- [4/7] second pass (manual review) --
+  [00:50:27] [second_pass] --auto-approve set, skipping manual review
+-- [5/7] captions (format-specific: short-tiktok-raw) --
+  [00:50:27] embedded-captions: reusing rough-cut's word timings (no re-transcription)
+  [00:50:27] embedded-captions: position='low, under face' target=1080x1920
+  [00:50:27] embedded-captions: {"caption_lines": 5, "word_level_lines": 0}
+  [00:50:27] embedded-captions: burning in on-beat
+[AVFilterGraph @ 0x7fac87f1a080] No option name near '/Users/Apple/autoclip-pipeline/projects/new881__clip05/captions/captions.ass'
+[AVFilterGraph @ 0x7fac87f1a080] Error parsing a filter description around: 
+[AVFilterGraph @ 0x7fac87f1a080] Error parsing filterchain 'ass=/Users/Apple/autoclip-pipeline/projects/new881__clip05/captions/captions.ass' around: 
+Error opening output file /Users/Apple/autoclip-pipeline/projects/new881__clip05/captions/captions_cut.mp4.
+Error opening output files: Invalid argument
+  [00:50:27]   clip05: paused for second-pass review (normal) — approve with: python3 lib/jobstate.py mark new881__clip05 second_pass done && ./run_pipeline.sh new881__clip05 short-tiktok-raw
+-- clip06 [requested]: 348.6s-408.6s (score=4) "(gunfire/impact detected)" --
+== pipeline: job=new881__clip06 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [00:50:47] [intake] already done, skipping (use --force to redo)
+-- [2/7] rough cut --
+  [00:50:47] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [00:50:47] graphics-plan: reading script from rough-cut (no re-transcription)
+  [00:50:47] graphics-plan: style='hook card -> raw' preset='tiktok-raw-style' reframe='letterbox' target=1080x1920
+  [00:50:47] graphics-plan: planning beats
+  [00:50:47] graphics-plan: {"beat_count": 1}
+  [00:50:47] graphics-plan: rendering (reframe + beat cards) via engine stand-in
+  [00:50:55] graphics-plan: {"beats_rendered": 1, "face_tracked": false}
+  [00:50:55] graphics-plan: done -> projects/new881__clip06/graphics/{graphics-plan.json,graphics_cut.mp4}
+-- [4/7] second pass (manual review) --
+  [00:50:55] [second_pass] --auto-approve set, skipping manual review
+-- [5/7] captions (format-specific: short-tiktok-raw) --
+  [00:50:56] embedded-captions: reusing rough-cut's word timings (no re-transcription)
+  [00:50:56] embedded-captions: position='low, under face' target=1080x1920
+  [00:50:56] embedded-captions: {"caption_lines": 2, "word_level_lines": 0}
+  [00:50:56] embedded-captions: burning in on-beat
+[AVFilterGraph @ 0x7f9a77806c40] No option name near '/Users/Apple/autoclip-pipeline/projects/new881__clip06/captions/captions.ass'
+[AVFilterGraph @ 0x7f9a77806c40] Error parsing a filter description around: 
+[AVFilterGraph @ 0x7f9a77806c40] Error parsing filterchain 'ass=/Users/Apple/autoclip-pipeline/projects/new881__clip06/captions/captions.ass' around: 
+Error opening output file /Users/Apple/autoclip-pipeline/projects/new881__clip06/captions/captions_cut.mp4.
+Error opening output files: Invalid argument
+  [00:50:56]   clip06: paused for second-pass review (normal) — approve with: python3 lib/jobstate.py mark new881__clip06 second_pass done && ./run_pipeline.sh new881__clip06 short-tiktok-raw
+-- clip07 [requested]: 412.42s-472.42s (score=4) "(gunfire/impact detected)" --
+== pipeline: job=new881__clip07 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [00:51:19] [intake] already done, skipping (use --force to redo)
+-- [2/7] rough cut --
+  [00:51:19] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [00:51:19] graphics-plan: reading script from rough-cut (no re-transcription)
+  [00:51:19] graphics-plan: style='hook card -> raw' preset='tiktok-raw-style' reframe='letterbox' target=1080x1920
+  [00:51:19] graphics-plan: planning beats
+  [00:51:19] graphics-plan: {"beat_count": 2}
+  [00:51:19] graphics-plan: rendering (reframe + beat cards) via engine stand-in
+  [00:51:28] graphics-plan: {"beats_rendered": 2, "face_tracked": false}
+  [00:51:28] graphics-plan: done -> projects/new881__clip07/graphics/{graphics-plan.json,graphics_cut.mp4}
+-- [4/7] second pass (manual review) --
+  [00:51:28] [second_pass] --auto-approve set, skipping manual review
+-- [5/7] captions (format-specific: short-tiktok-raw) --
+  [00:51:29] embedded-captions: reusing rough-cut's word timings (no re-transcription)
+  [00:51:29] embedded-captions: position='low, under face' target=1080x1920
+  [00:51:29] embedded-captions: {"caption_lines": 4, "word_level_lines": 0}
+  [00:51:29] embedded-captions: burning in on-beat
+[AVFilterGraph @ 0x7f8e64013500] No option name near '/Users/Apple/autoclip-pipeline/projects/new881__clip07/captions/captions.ass'
+[AVFilterGraph @ 0x7f8e64013500] Error parsing a filter description around: 
+[AVFilterGraph @ 0x7f8e64013500] Error parsing filterchain 'ass=/Users/Apple/autoclip-pipeline/projects/new881__clip07/captions/captions.ass' around: 
+Error opening output file /Users/Apple/autoclip-pipeline/projects/new881__clip07/captions/captions_cut.mp4.
+Error opening output files: Invalid argument
+  [00:51:29]   clip07: paused for second-pass review (normal) — approve with: python3 lib/jobstate.py mark new881__clip07 second_pass done && ./run_pipeline.sh new881__clip07 short-tiktok-raw
+-- clip08 [requested]: 480.74s-540.74s (score=4) "(gunfire/impact detected)" --
+== pipeline: job=new881__clip08 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [00:51:56] [intake] already done, skipping (use --force to redo)
+-- [2/7] rough cut --
+  [00:51:56] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [00:51:56] graphics-plan: reading script from rough-cut (no re-transcription)
+  [00:51:56] graphics-plan: style='hook card -> raw' preset='tiktok-raw-style' reframe='letterbox' target=1080x1920
+  [00:51:56] graphics-plan: planning beats
+  [00:51:56] graphics-plan: {"beat_count": 1}
+  [00:51:56] graphics-plan: rendering (reframe + beat cards) via engine stand-in
+  [00:52:06] graphics-plan: {"beats_rendered": 1, "face_tracked": false}
+  [00:52:06] graphics-plan: done -> projects/new881__clip08/graphics/{graphics-plan.json,graphics_cut.mp4}
+-- [4/7] second pass (manual review) --
+  [00:52:06] [second_pass] --auto-approve set, skipping manual review
+-- [5/7] captions (format-specific: short-tiktok-raw) --
+  [00:52:06] embedded-captions: reusing rough-cut's word timings (no re-transcription)
+  [00:52:06] embedded-captions: position='low, under face' target=1080x1920
+  [00:52:06] embedded-captions: {"caption_lines": 1, "word_level_lines": 0}
+  [00:52:06] embedded-captions: burning in on-beat
+[AVFilterGraph @ 0x7fc242107200] No option name near '/Users/Apple/autoclip-pipeline/projects/new881__clip08/captions/captions.ass'
+[AVFilterGraph @ 0x7fc242107200] Error parsing a filter description around: 
+[AVFilterGraph @ 0x7fc242107200] Error parsing filterchain 'ass=/Users/Apple/autoclip-pipeline/projects/new881__clip08/captions/captions.ass' around: 
+Error opening output file /Users/Apple/autoclip-pipeline/projects/new881__clip08/captions/captions_cut.mp4.
+Error opening output files: Invalid argument
+  [00:52:07]   clip08: paused for second-pass review (normal) — approve with: python3 lib/jobstate.py mark new881__clip08 second_pass done && ./run_pipeline.sh new881__clip08 short-tiktok-raw
+-- clip09 [bonus]: 548.94s-608.94s (score=4) "(gunfire/impact detected)" --
+== pipeline: job=new881__clip09 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [00:52:36] [intake] already done, skipping (use --force to redo)
+-- [2/7] rough cut --
+  [00:52:36] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [00:52:36] [graphics] already done, skipping (use --force to redo)
+-- [4/7] second pass (manual review) --
+  [00:52:36] [second_pass] already approved, skipping
+-- [5/7] captions (format-specific: short-tiktok-raw) --
+  [00:52:36] [captions] already done, skipping (use --force to redo)
+-- [6/7] background music — skipped --
+-- [7/7] export --
+  [00:52:36] [export] already done, skipping (use --force to redo)
+  [00:52:36] thumbnail-generator: format 'short-tiktok-raw' policy is 'skip' — nothing to do
+== done: outputs/new881__clip09.final.mp4 ==
+-- clip10 [bonus]: 613.24s-673.24s (score=4) "(gunfire/impact detected)" --
+== pipeline: job=new881__clip10 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [00:53:02] [intake] already done, skipping (use --force to redo)
+-- [2/7] rough cut --
+  [00:53:02] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [00:53:02] [graphics] already done, skipping (use --force to redo)
+-- [4/7] second pass (manual review) --
+  [00:53:02] [second_pass] already approved, skipping
+-- [5/7] captions (format-specific: short-tiktok-raw) --
+  [00:53:02] [captions] already done, skipping (use --force to redo)
+-- [6/7] background music — skipped --
+-- [7/7] export --
+  [00:53:02] [export] already done, skipping (use --force to redo)
+  [00:53:02] thumbnail-generator: format 'short-tiktok-raw' policy is 'skip' — nothing to do
+== done: outputs/new881__clip10.final.mp4 ==
+-- clip11 [bonus]: 676.04s-736.04s (score=4) "(gunfire/impact detected)" --
+== pipeline: job=new881__clip11 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [00:53:28] [intake] already done, skipping (use --force to redo)
+-- [2/7] rough cut --
+  [00:53:28] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [00:53:28] [graphics] already done, skipping (use --force to redo)
+-- [4/7] second pass (manual review) --
+  [00:53:28] [second_pass] already approved, skipping
+-- [5/7] captions (format-specific: short-tiktok-raw) --
+  [00:53:28] [captions] already done, skipping (use --force to redo)
+-- [6/7] background music — skipped --
+-- [7/7] export --
+  [00:53:28] [export] already done, skipping (use --force to redo)
+  [00:53:29] thumbnail-generator: format 'short-tiktok-raw' policy is 'skip' — nothing to do
+== done: outputs/new881__clip11.final.mp4 ==
+  [00:53:29] cleanup: --keep-raw set, leaving parent raw source and rough-cut render in place
+== clip_pipeline done: check outputs/new881__clip*.final.mp4 or outputs/new881__montage*.final.mp4 ==

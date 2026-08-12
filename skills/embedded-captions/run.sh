@@ -30,37 +30,21 @@ log "embedded-captions: position='${position}' target=${width}x${height}"
 out_dir="$(job_dir "$job")/captions"
 mkdir -p "$out_dir"
 corrections="${PIPELINE_ROOT}/presets/caption-corrections.json"
-ass_path="${out_dir}/captions.ass"
 
-bass_exit=0
-result="$(python3 "${SKILL_DIR}/build_ass.py" "$script_path" "$corrections" "$ass_path" "$width" "$height" "$position" 2>&1)" || bass_exit=$?
-if [[ $bass_exit -ne 0 ]]; then
-  echo "build_ass.py FAILED (exit ${bass_exit}): $(echo "$result" | tail -10)" >&2
+# Real, permanent fix: this used to burn captions via ffmpeg's `ass=`
+# filter — confirmed on the production machine that this ffmpeg build
+# has neither `ass`, `subtitles`, nor `drawtext` compiled in at all
+# (same missing-optional-library class of issue as the earlier drawtext
+# fix, just a different filter). Now uses the same PIL+overlay approach
+# that already fixed beat-card captions, extended to the full
+# transcript — no dependency on any of those optional ffmpeg filters.
+overlay_exit=0
+result="$(python3 "${PIPELINE_ROOT}/lib/caption_overlay.py" "$graphics_video" "$script_path" "$corrections" "${out_dir}/captions_cut.mp4" "$width" "$height" "$position" 2>&1)" || overlay_exit=$?
+if [[ $overlay_exit -ne 0 ]]; then
+  echo "caption_overlay.py FAILED (exit ${overlay_exit}): $(echo "$result" | tail -10)" >&2
   exit 1
 fi
 log "embedded-captions: ${result}"
 
-# Real bug fixed: this used to interpolate $result directly into Python
-# SOURCE CODE as a string literal (json.loads('$result')) — if that JSON
-# ever contained a single quote (very plausible in real caption text),
-# it would break Python's syntax and crash. Passing it as a real argv
-# argument instead of embedding it in source text avoids that entirely,
-# and try/except means a malformed result degrades to "0 captions"
-# instead of crashing the whole step.
-caption_lines="$(python3 -c "
-import json, sys
-try:
-    print(json.loads(sys.argv[1])['caption_lines'])
-except Exception:
-    print('0')
-" "$result")"
-if [[ "$caption_lines" == "0" ]]; then
-  log "embedded-captions: no caption lines (no transcript available) — copying graphics_cut.mp4 through unburned"
-  cp "$graphics_video" "${out_dir}/captions_cut.mp4"
-else
-  log "embedded-captions: burning in on-beat"
-  ffmpeg -nostdin -y -i "$graphics_video" -vf "ass=${ass_path}" -c:a copy "${out_dir}/captions_cut.mp4" -loglevel error
-fi
-
 state_set "$job" "artifacts.captions_video" "\"projects/${job}/captions/captions_cut.mp4\""
-log "embedded-captions: done -> projects/${job}/captions/{captions.ass,captions_cut.mp4}"
+log "embedded-captions: done -> projects/${job}/captions/captions_cut.mp4"
