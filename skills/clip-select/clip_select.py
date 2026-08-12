@@ -29,20 +29,36 @@ def score(tags):
     return max((PRIORITY.get(t, 0) for t in tags), default=0)
 
 
-def is_mostly_loading_screen(start, end, visual_analysis, threshold=0.6):
+def is_mostly_loading_screen(start, end, visual_analysis, threshold=0.6, motion_threshold=0.015):
     """Excludes a candidate whose time window is predominantly loading-
-    screen/menu content — see build_montage.py's version of this, same
-    logic, kept in sync."""
+    screen/menu/lobby content. Two independent signals, either one is
+    enough to exclude:
+      1. Per-frame flat/low-detail classification (classify_frame) —
+         catches genuine loading screens (flat background, spinner).
+      2. Sustained low motion across the WHOLE window — catches lobby/
+         menu screens that DON'T look flat (character models, UI,
+         real detail) but have far less actual motion than real
+         gameplay, since nothing is actually happening on screen yet.
+         A single calm moment in real gameplay won't trigger this
+         (needs the AVERAGE across the full window to stay low, not
+         just one still frame), so a brief pause doesn't false-positive.
+    """
     if not visual_analysis:
         return False
     samples = [s for s in visual_analysis.get("samples", []) if start <= s["time"] < end]
     if not samples:
         return False
+
     loading_count = sum(1 for s in samples if s.get("is_loading_screen"))
-    return (loading_count / len(samples)) >= threshold
+    if (loading_count / len(samples)) >= threshold:
+        return True
+
+    motion_scores = [s.get("motion_score", 0) for s in samples]
+    avg_motion = sum(motion_scores) / len(motion_scores)
+    return avg_motion < motion_threshold
 
 
-def candidate_windows(kept_segments, clip_length, duration, visual_analysis=None, audio_analysis=None):
+def candidate_windows(kept_segments, clip_length, duration, visual_analysis=None, audio_analysis=None, lead_in_sec=4.0):
     """One candidate window per tagged beat, centered on that beat,
     clamped to source bounds. Transcript-based beats (highlight/hook/etc)
     plus, when visual_analysis is provided, motion-based 'action' beats —
@@ -52,7 +68,13 @@ def candidate_windows(kept_segments, clip_length, duration, visual_analysis=None
     Plus, when audio_analysis is provided, sharp-attack audio transients
     (gunfire/explosions/impacts) — a distinct signal from visual motion
     or transcript hype words. Any candidate landing mostly on a loading
-    screen is dropped regardless of source."""
+    screen is dropped regardless of source.
+
+    Action/impact beats get a fixed lead-in (default 4s, within the
+    3-5s range asked for) BEFORE the actual moment, rather than
+    centering the whole clip on it — a gunshot/action spike is more
+    watchable with a beat of buildup before it than with the moment
+    landing dead-center and half the clip spent on the aftermath."""
     candidates = []
     for i, seg in enumerate(kept_segments):
         tags = classify(seg, i, is_first=(i == 0))
@@ -67,12 +89,15 @@ def candidate_windows(kept_segments, clip_length, duration, visual_analysis=None
             continue
         candidates.append({"start": start, "end": end, "score": s, "text": seg["text"]})
 
+    def lead_in_window(moment_start):
+        start = max(0.0, moment_start - lead_in_sec)
+        end = min(duration, start + clip_length)
+        start = max(0.0, end - clip_length)
+        return start, end
+
     if visual_analysis:
         for beat in motion_beats(visual_analysis):
-            mid = (beat["start"] + beat["end"]) / 2
-            start = max(0.0, mid - clip_length / 2)
-            end = min(duration, start + clip_length)
-            start = max(0.0, end - clip_length)
+            start, end = lead_in_window(beat["start"])
             if is_mostly_loading_screen(start, end, visual_analysis):
                 continue
             candidates.append({"start": start, "end": end, "score": score(beat["tags"]),
@@ -80,10 +105,7 @@ def candidate_windows(kept_segments, clip_length, duration, visual_analysis=None
 
     if audio_analysis:
         for beat in transient_beats(audio_analysis):
-            mid = (beat["start"] + beat["end"]) / 2
-            start = max(0.0, mid - clip_length / 2)
-            end = min(duration, start + clip_length)
-            start = max(0.0, end - clip_length)
+            start, end = lead_in_window(beat["start"])
             if is_mostly_loading_screen(start, end, visual_analysis):
                 continue
             candidates.append({"start": start, "end": end, "score": score(beat["tags"]),

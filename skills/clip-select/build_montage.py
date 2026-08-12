@@ -46,23 +46,31 @@ SAFETY_MARGIN_SEC = 2.0  # never extract right up to the literal end of a
                           # class.
 
 
-def is_mostly_loading_screen(start, end, visual_analysis, threshold=0.6):
+def is_mostly_loading_screen(start, end, visual_analysis, threshold=0.6, motion_threshold=0.015):
     """Excludes a candidate whose time window is predominantly loading-
-    screen/menu content — a highlight-scored transcript line or a motion
-    spike that happens to land during a loading screen (rare, but does
-    happen right as a match starts) shouldn't get selected as a clip
-    just because of what's on screen at that exact moment being flat
-    and static, not real gameplay."""
+    screen/menu/lobby content. Kept in sync with clip_select.py's
+    version — two independent signals, either one is enough to exclude:
+    per-frame flat/low-detail classification (catches true loading
+    screens), and sustained low motion across the WHOLE window (catches
+    lobby/menu screens with real visual detail but nothing actually
+    happening — a single calm real-gameplay frame won't trigger this,
+    only a genuinely quiet window average)."""
     if not visual_analysis:
         return False
     samples = [s for s in visual_analysis.get("samples", []) if start <= s["time"] < end]
     if not samples:
         return False
+
     loading_count = sum(1 for s in samples if s.get("is_loading_screen"))
-    return (loading_count / len(samples)) >= threshold
+    if (loading_count / len(samples)) >= threshold:
+        return True
+
+    motion_scores = [s.get("motion_score", 0) for s in samples]
+    avg_motion = sum(motion_scores) / len(motion_scores)
+    return avg_motion < motion_threshold
 
 
-def collect_candidates(kept_segments, visual_analysis, padding, duration, audio_analysis=None):
+def collect_candidates(kept_segments, visual_analysis, padding, duration, audio_analysis=None, lead_in_sec=4.0):
     """Each candidate is the beat's OWN interval (not a fixed-length window
     around it) — for a montage, we want the actual moment, padded a
     little for context, not an arbitrary clip_length slice.
@@ -70,7 +78,13 @@ def collect_candidates(kept_segments, visual_analysis, padding, duration, audio_
     duration may be 0/missing from script.json (a real gap that existed in
     the silent-audio/no-audio fallback paths) — when that happens, fall
     back to visual_analysis's own duration (computed independently via
-    OpenCV's frame_count/fps) rather than skipping clamping altogether."""
+    OpenCV's frame_count/fps) rather than skipping clamping altogether.
+
+    Action/impact beats (motion spikes, audio transients) use a fixed
+    lead-in (default 4s) BEFORE the moment instead of the small
+    symmetric `padding` used for transcript segments — a gunshot/action
+    spike plays better with a beat of buildup before it than centered
+    dead-on with half the clip spent on the aftermath."""
     effective_duration = duration or (visual_analysis or {}).get("duration") or 0
     safe_end_limit = max(0.0, effective_duration - SAFETY_MARGIN_SEC) if effective_duration else None
 
@@ -95,7 +109,7 @@ def collect_candidates(kept_segments, visual_analysis, padding, duration, audio_
 
     if visual_analysis:
         for beat in motion_beats(visual_analysis):
-            start = max(0.0, beat["start"] - padding)
+            start = max(0.0, beat["start"] - lead_in_sec)
             end = clamp_end(beat["end"] + padding)
             if end <= start:
                 continue
@@ -106,7 +120,7 @@ def collect_candidates(kept_segments, visual_analysis, padding, duration, audio_
 
     if audio_analysis:
         for beat in transient_beats(audio_analysis):
-            start = max(0.0, beat["start"] - padding)
+            start = max(0.0, beat["start"] - lead_in_sec)
             end = clamp_end(beat["end"] + padding)
             if end <= start:
                 continue
