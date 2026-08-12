@@ -83,6 +83,42 @@ def _load_with_timeout(loader_fn, timeout_sec=MODEL_LOAD_TIMEOUT_SEC):
     return result["value"]
 
 
+def _first_item_with_timeout(iterator, timeout_sec):
+    """Same timeout-detection pattern as _load_with_timeout, applied to
+    pulling the FIRST item out of a lazy generator — this is where the
+    real gap was tonight. faster-whisper's transcribe() returns instantly
+    (it's lazy), so a stall during VAD's full-file scan or other setup
+    work happens the moment we try to iterate, which is BEFORE the
+    per-segment checkpoint loop ever starts. Confirmed via real evidence
+    tonight: a 129-minute stuck run had genuinely zero checkpoints,
+    because it never got past fetching item #1."""
+    import threading
+    result = {}
+    sentinel = object()
+
+    def _run():
+        try:
+            result["value"] = next(iterator, sentinel)
+        except Exception as e:
+            result["error"] = e
+
+    t = threading.Thread(target=_run, daemon=True)
+    t.start()
+    t.join(timeout_sec)
+    if t.is_alive():
+        raise TimeoutError(
+            f"first segment stalled past {timeout_sec}s with no progress — "
+            f"this happens during VAD/setup, BEFORE any transcript data "
+            f"exists, so nothing is recoverable from this attempt; likely "
+            f"the same network hang pattern seen repeatedly tonight "
+            f"(confirmed via CLOSE_WAIT TCP connections + OpenMP worker "
+            f"threads parked at a barrier, real evidence, not a guess)"
+        )
+    if "error" in result:
+        raise result["error"]
+    return result["value"], sentinel
+
+
 def try_whisperx(audio_path, job=None, duration=None):
     try:
         import whisperx  # noqa: F401
@@ -171,9 +207,10 @@ def try_faster_whisper(audio_path, job=None, duration=None, work_dir=None):
     total = duration or getattr(info, "duration", None) or 0
 
     segments = list(existing_segments)  # start from whatever survived a previous attempt
-    last_report = 0
-    last_checkpoint = 0
-    for s in seg_iter:
+    last_report = [0]
+    last_checkpoint = [0]
+
+    def process_segment(s):
         # timestamps from a trimmed resume file are relative to the trim
         # point, not the original audio — offset them back
         words = []
@@ -184,7 +221,7 @@ def try_faster_whisper(audio_path, job=None, duration=None, work_dir=None):
                           "text": s.text.strip(), "words": words})
         now = __import__("time").time()
         if job and total:
-            if now - last_report > 2:  # throttle progress writes to every ~2s, not every segment
+            if now - last_report[0] > 2:  # throttle progress writes to every ~2s, not every segment
                 pct = min(99.0, ((s.end + resume_from) / total) * 100)
                 mins_done = (s.end + resume_from) / 60
                 mins_total = total / 60
@@ -192,8 +229,8 @@ def try_faster_whisper(audio_path, job=None, duration=None, work_dir=None):
                     job, "transcribing", round(pct, 1),
                     f"{mins_done:.0f} of {mins_total:.0f} min transcribed",
                 )
-                last_report = now
-        if checkpoint_path and (now - last_checkpoint > 30):  # checkpoint every ~30s of wall time
+                last_report[0] = now
+        if checkpoint_path and (now - last_checkpoint[0] > 30):  # checkpoint every ~30s of wall time
             try:
                 with open(checkpoint_path + ".tmp", "w") as f:
                     json.dump({"segments": segments}, f)
@@ -209,7 +246,23 @@ def try_faster_whisper(audio_path, job=None, duration=None, work_dir=None):
                 if job:
                     progress_mod.report(job, "transcribing", None,
                                          f"WARNING: checkpoint write failed ({type(e).__name__}: {e}) — progress since last successful checkpoint is NOT protected")
-            last_checkpoint = now
+            last_checkpoint[0] = now
+
+    # Real, critical gap closed: a hang during VAD's full-file scan (or
+    # any other setup work) happens the moment we try to pull the FIRST
+    # item from this lazy generator — BEFORE the per-segment checkpoint
+    # loop below ever runs even once. Confirmed with real evidence
+    # tonight: a 129-minute stuck run had genuinely zero checkpoints,
+    # because it never got past this exact point. This wraps ONLY the
+    # first fetch in a timeout (subsequent segments are typically much
+    # faster once the initial setup succeeds, and are already protected
+    # by the per-segment checkpointing below).
+    first_segment_timeout = int(os.environ.get("PIPELINE_FIRST_SEGMENT_TIMEOUT_SEC", 600))
+    first_item, sentinel = _first_item_with_timeout(seg_iter, first_segment_timeout)
+    if first_item is not sentinel:
+        process_segment(first_item)
+    for s in seg_iter:
+        process_segment(s)
     if job:
         progress_mod.report(job, "transcribing", 100, "transcription complete")
     if checkpoint_path and os.path.exists(checkpoint_path):
