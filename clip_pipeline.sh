@@ -411,9 +411,12 @@ for s in m['segments']:
         log "  segment ${part_idx}: already extracted and valid, skipping"
       else
         [[ -f "$part_file" ]] && rm -f "$part_file"  # remove a truncated/corrupt leftover before retrying it
-        ffmpeg -nostdin -y -i "$rough_cut_video" -ss "$seg_start" -to "$seg_end" \
+        if ! timeout 120 ffmpeg -nostdin -y -i "$rough_cut_video" -ss "$seg_start" -to "$seg_end" \
           -c:v libx264 -preset veryfast -c:a aac \
-          "$part_file" -loglevel error
+          "$part_file" -loglevel error; then
+          echo "montage segment ${part_idx} extraction timed out or failed (120s) — likely a corrupted region at ${seg_start}s" >&2
+          exit 1
+        fi
       fi
       part_files+=("$part_file")
       part_idx=$((part_idx + 1))
@@ -424,8 +427,11 @@ for s in m['segments']:
     for pf in "${part_files[@]}"; do
       echo "file '${pf}'" >> "$concat_list"
     done
-    ffmpeg -nostdin -y -f concat -safe 0 -i "$concat_list" -c copy \
-      "${sub_raw_dir}/source.mp4" -loglevel error
+    if ! timeout 120 ffmpeg -nostdin -y -f concat -safe 0 -i "$concat_list" -c copy \
+      "${sub_raw_dir}/source.mp4" -loglevel error; then
+      echo "montage concat timed out or failed (120s)" >&2
+      exit 1
+    fi
     cp "${sub_raw_dir}/source.mp4" "${sub_rough_dir}/rough_cut.mp4"
     rm -rf "$sub_work_dir"
 
@@ -492,9 +498,12 @@ for line in "${clip_lines[@]}"; do
 
   # frame-accurate extraction (re-encode; -ss before -i would be fast but
   # can misalign on a GOP boundary and clip the wrong moment)
-  ffmpeg -nostdin -y -i "$rough_cut_video" -ss "$start" -to "$end" \
+  if ! timeout 120 ffmpeg -nostdin -y -i "$rough_cut_video" -ss "$start" -to "$end" \
     -c:v libx264 -preset veryfast -c:a aac \
-    "${sub_raw_dir}/source.mp4" -loglevel error
+    "${sub_raw_dir}/source.mp4" -loglevel error; then
+    echo "clip extraction timed out or failed (120s) for ${subjob} — likely a corrupted region at ${start}s" >&2
+    exit 1
+  fi
   cp "${sub_raw_dir}/source.mp4" "${sub_rough_dir}/rough_cut.mp4"
 
   # reuse the parent transcript's overlapping segments instead of
