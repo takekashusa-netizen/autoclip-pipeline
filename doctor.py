@@ -60,7 +60,7 @@ def get_run_pipeline_processes():
     try:
         out = subprocess.run(
             ["ps", "-eo", "pid,lstart,command"],
-            capture_output=True, text=True, check=True,
+            capture_output=True, text=True, check=True, timeout=15,
         ).stdout
     except Exception as e:
         log(f"doctor: couldn't run ps — {e}")
@@ -92,7 +92,7 @@ def check_duplicate_processes():
                 # kill the whole process group's children too — a bare
                 # kill on the bash wrapper can leave its ffmpeg/python
                 # children orphaned and still running
-                subprocess.run(["pkill", "-9", "-P", str(pid)], check=False)
+                subprocess.run(["pkill", "-9", "-P", str(pid)], check=False, timeout=15)
                 os.kill(pid, 9)
                 log(f"doctor: killed duplicate pid {pid} for job '{job}'")
             except ProcessLookupError:
@@ -162,7 +162,7 @@ def check_stalled_progress():
 
 def is_resume_all_running():
     try:
-        out = subprocess.run(["ps", "-eo", "command"], capture_output=True, text=True, check=True).stdout
+        out = subprocess.run(["ps", "-eo", "command"], capture_output=True, text=True, check=True, timeout=15).stdout
     except Exception:
         return False
     return any("resume_all.sh" in line for line in out.splitlines())

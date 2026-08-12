@@ -26,8 +26,12 @@ import sys
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
 
-def _run(cmd):
-    return subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+def _run(cmd, timeout_sec=30):
+    try:
+        return subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True, timeout=timeout_sec)
+    except subprocess.TimeoutExpired:
+        import types
+        return types.SimpleNamespace(returncode=1, stdout="", stderr=f"command timed out after {timeout_sec}s")
 
 
 def _jobstate(*args):

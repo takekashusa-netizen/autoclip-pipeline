@@ -55,8 +55,15 @@ def run_ffmpeg(cmd):
     traceback shown to the user (and even in our own logs) never included
     WHY ffmpeg actually failed, only that it did. This surfaces the real
     error text before re-raising, so a failure is actually diagnosable
-    instead of a black box."""
-    result = subprocess.run(cmd, capture_output=True, text=True)
+    instead of a black box.
+
+    Real bug fixed: also had no timeout — same corrupted-source hang
+    class found twice elsewhere tonight; every real video/PNG-overlay
+    render this handles was equally exposed to hanging forever."""
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=180)
+    except subprocess.TimeoutExpired as e:
+        raise RuntimeError("ffmpeg timed out after 180s — likely a corrupted/truncated region of the source") from e
     if result.returncode != 0:
         print(f"ffmpeg FAILED (exit {result.returncode}). Real stderr:\n{result.stderr}", file=sys.stderr)
         raise subprocess.CalledProcessError(result.returncode, cmd, output=result.stdout, stderr=result.stderr)
@@ -174,12 +181,15 @@ def render_with_caption_overlays(input_path, beats, width, height, style, refram
     return len(beats)
 
 
-def ffprobe_dims(video_path):
-    out = subprocess.run(
-        ["ffprobe", "-v", "error", "-select_streams", "v:0",
-         "-show_entries", "stream=width,height", "-of", "csv=p=0", video_path],
-        capture_output=True, text=True, check=True,
-    ).stdout.strip()
+def ffprobe_dims(video_path, timeout_sec=30):
+    try:
+        out = subprocess.run(
+            ["ffprobe", "-v", "error", "-select_streams", "v:0",
+             "-show_entries", "stream=width,height", "-of", "csv=p=0", video_path],
+            capture_output=True, text=True, check=True, timeout=timeout_sec,
+        ).stdout.strip()
+    except subprocess.TimeoutExpired as e:
+        raise RuntimeError(f"ffprobe timed out after {timeout_sec}s reading dimensions") from e
     w, h = out.split(",")
     return int(w), int(h)
 
@@ -224,10 +234,9 @@ def build_face_tracked_video(rough_cut, face_segments, target_w, target_h, work_
             f.write(f"file '{os.path.abspath(pf)}'\n")
 
     concat_out = os.path.join(work_dir, "face_tracked.mp4")
-    subprocess.run(
+    run_ffmpeg(
         ["ffmpeg", "-nostdin", "-y", "-f", "concat", "-safe", "0",
-         "-i", concat_list, "-c", "copy", concat_out, "-loglevel", "error"],
-        check=True, capture_output=True, text=True,
+         "-i", concat_list, "-c", "copy", concat_out, "-loglevel", "error"]
     )
     return concat_out
 
@@ -265,13 +274,12 @@ def build_split_screen_video(rough_cut, two_speaker_segments, target_w, target_h
             track_files.append(track_file)
 
         stacked_file = os.path.join(work_dir, f"stacked_{i:04d}.mp4")
-        subprocess.run(
+        run_ffmpeg(
             ["ffmpeg", "-nostdin", "-y", "-i", track_files[0], "-i", track_files[1],
              "-filter_complex", "[0:v][1:v]vstack=inputs=2[v]",
              "-map", "[v]", "-map", "0:a?",
              "-c:v", "libx264", "-preset", "veryfast", "-c:a", "aac",
-             stacked_file, "-loglevel", "error"],
-            check=True, capture_output=True, text=True,
+             stacked_file, "-loglevel", "error"]
         )
         part_files.append(stacked_file)
 
@@ -281,10 +289,9 @@ def build_split_screen_video(rough_cut, two_speaker_segments, target_w, target_h
             f.write(f"file '{os.path.abspath(pf)}'\n")
 
     concat_out = os.path.join(work_dir, "split_screen.mp4")
-    subprocess.run(
+    run_ffmpeg(
         ["ffmpeg", "-nostdin", "-y", "-f", "concat", "-safe", "0",
-         "-i", concat_list, "-c", "copy", concat_out, "-loglevel", "error"],
-        check=True, capture_output=True, text=True,
+         "-i", concat_list, "-c", "copy", concat_out, "-loglevel", "error"]
     )
     return concat_out
 

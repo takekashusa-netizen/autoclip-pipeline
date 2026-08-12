@@ -13,8 +13,15 @@ import subprocess
 import sys
 
 
-def run_ffmpeg(cmd):
-    result = subprocess.run(cmd, capture_output=True, text=True)
+def run_ffmpeg(cmd, timeout_sec=180):
+    """Real bug fixed: no timeout — same corrupted-source hang class
+    found twice tonight in different code paths; this new feature's
+    single-continuous-cut extraction was equally exposed."""
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout_sec)
+    except subprocess.TimeoutExpired as e:
+        raise RuntimeError(f"ffmpeg timed out after {timeout_sec}s — "
+                            f"likely a corrupted/truncated region of the source") from e
     if result.returncode != 0:
         print(f"ffmpeg FAILED (exit {result.returncode}). Real stderr:\n{result.stderr}", file=sys.stderr)
         raise subprocess.CalledProcessError(result.returncode, cmd, output=result.stdout, stderr=result.stderr)

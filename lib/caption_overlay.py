@@ -126,8 +126,16 @@ def render_caption_image(text, width, height, position, font_file):
     return img
 
 
-def run_ffmpeg(cmd):
-    result = subprocess.run(cmd, capture_output=True, text=True)
+def run_ffmpeg(cmd, timeout_sec=180):
+    """Real bug fixed: no timeout — the same class of hang that cost
+    real time twice tonight (a corrupted/truncated region of the
+    source making ffmpeg hang forever) could happen on any real video
+    content this touches, and this had zero protection against it."""
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout_sec)
+    except subprocess.TimeoutExpired as e:
+        raise RuntimeError(f"ffmpeg timed out after {timeout_sec}s — "
+                            f"likely a corrupted/truncated region of the source") from e
     if result.returncode != 0:
         print(f"ffmpeg FAILED (exit {result.returncode}). Real stderr:\n{result.stderr}", file=sys.stderr)
         raise subprocess.CalledProcessError(result.returncode, cmd, output=result.stdout, stderr=result.stderr)

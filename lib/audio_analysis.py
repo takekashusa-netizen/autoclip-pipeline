@@ -22,14 +22,23 @@ import sys
 import numpy as np
 
 
-def extract_pcm(video_path, sample_rate=16000):
+def extract_pcm(video_path, sample_rate=16000, timeout_sec=180):
     """Returns a 1-D float32 numpy array of mono PCM samples, via ffmpeg
-    piped raw output — no temp file needed."""
+    piped raw output — no temp file needed.
+
+    Real bug fixed: no timeout — the same corrupted-source-tail hang
+    that cost real time twice tonight (in a different call, but the
+    identical shape of bug) could happen here too, since this reads the
+    full audio track and would hang forever if ffmpeg gets stuck."""
     cmd = [
         "ffmpeg", "-nostdin", "-v", "error", "-i", video_path,
         "-f", "f32le", "-ac", "1", "-ar", str(sample_rate), "-",
     ]
-    result = subprocess.run(cmd, capture_output=True, check=True)
+    try:
+        result = subprocess.run(cmd, capture_output=True, check=True, timeout=timeout_sec)
+    except subprocess.TimeoutExpired as e:
+        raise RuntimeError(f"audio extraction timed out after {timeout_sec}s — "
+                            f"likely a corrupted/truncated region of the source") from e
     audio = np.frombuffer(result.stdout, dtype=np.float32)
     return audio, sample_rate
 

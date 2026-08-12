@@ -47,8 +47,13 @@ sys.path.insert(0, 'lib')
 sys.path.insert(0, 'skills/graphics-plan')
 import {mod_name}
 """
-        result = subprocess.run([sys.executable, "-c", script], cwd=ROOT,
-                                 capture_output=True, text=True)
+        try:
+            result = subprocess.run([sys.executable, "-c", script], cwd=ROOT,
+                                     capture_output=True, text=True, timeout=30)
+        except subprocess.TimeoutExpired:
+            problems.append(f"{rel_dir}/{mod_name}.py import timed out after 30s — "
+                             f"something at module load time is hanging, not just failing")
+            continue
         if result.returncode != 0:
             last_line = result.stderr.strip().splitlines()[-1] if result.stderr.strip() else "unknown error"
             problems.append(f"{rel_dir}/{mod_name}.py fails to import: {last_line}")
@@ -58,8 +63,12 @@ import {mod_name}
 def check_dependencies():
     problems = []
     for pkg in REQUIRED_PACKAGES:
-        result = subprocess.run([sys.executable, "-c", f"import {pkg}"],
-                                 capture_output=True, text=True)
+        try:
+            result = subprocess.run([sys.executable, "-c", f"import {pkg}"],
+                                     capture_output=True, text=True, timeout=30)
+        except subprocess.TimeoutExpired:
+            problems.append(f"importing '{pkg}' timed out after 30s — something is hanging at import time")
+            continue
         if result.returncode != 0:
             problems.append(f"required package '{pkg}' not importable in this venv — "
                              f"check you're in the right venv and it's installed")

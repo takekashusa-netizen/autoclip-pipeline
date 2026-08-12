@@ -19,12 +19,12 @@ import sys
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
 
-def ffprobe_duration(path):
+def ffprobe_duration(path, timeout_sec=30):
     try:
         out = subprocess.run(
             ["ffprobe", "-v", "error", "-show_entries", "format=duration",
              "-of", "default=noprint_wrappers=1:nokey=1", path],
-            capture_output=True, text=True, check=True,
+            capture_output=True, text=True, check=True, timeout=timeout_sec,
         ).stdout.strip()
         return float(out)
     except Exception:

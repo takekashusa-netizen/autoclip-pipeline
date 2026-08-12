@@ -35,12 +35,15 @@ FILLER_WORDS = {
 MIN_SEGMENT_SEC = 0.15  # drop segments shorter than this after filler-stripping
 
 
-def ffprobe_duration(path):
-    out = subprocess.run(
-        ["ffprobe", "-v", "error", "-show_entries", "format=duration",
-         "-of", "default=noprint_wrappers=1:nokey=1", path],
-        capture_output=True, text=True, check=True,
-    )
+def ffprobe_duration(path, timeout_sec=30):
+    try:
+        out = subprocess.run(
+            ["ffprobe", "-v", "error", "-show_entries", "format=duration",
+             "-of", "default=noprint_wrappers=1:nokey=1", path],
+            capture_output=True, text=True, check=True, timeout=timeout_sec,
+        )
+    except subprocess.TimeoutExpired as e:
+        raise RuntimeError(f"ffprobe timed out after {timeout_sec}s reading duration") from e
     return float(out.stdout.strip())
 
 
@@ -183,11 +186,11 @@ def try_faster_whisper(audio_path, job=None, duration=None, work_dir=None):
             subprocess.run(
                 ["ffmpeg", "-nostdin", "-y", "-i", audio_path, "-ss", str(resume_from),
                  "-c", "copy", trimmed_path, "-loglevel", "error"],
-                check=True, capture_output=True, text=True,
+                check=True, capture_output=True, text=True, timeout=120,
             )
             transcribe_audio_path = trimmed_path
-        except subprocess.CalledProcessError:
-            resume_from = 0.0  # trim failed for any reason — fall back to processing the whole file rather than silently losing audio
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
+            resume_from = 0.0  # trim failed OR hung — fall back to processing the whole file rather than silently losing audio
 
     if job:
         progress_mod.report(job, "transcribing", 0, "loading model")
@@ -300,7 +303,7 @@ def _select_expr(segments):
     return "+".join(f"between(t\\,{s['start']}\\,{s['end']})" for s in segments)
 
 
-def _render_batch_select(raw_video, segments, out_path):
+def _render_batch_select(raw_video, segments, out_path, timeout_sec=180):
     """Old approach — kept ONLY as a fallback for the rare case where
     per-segment seeking (below) somehow fails on a given segment. NOT used
     as the primary path anymore: measured ~30x slower on a real 1080p
@@ -308,7 +311,15 @@ def _render_batch_select(raw_video, segments, out_path):
     forces ffmpeg to decode the ENTIRE source to reach that point rather
     than seeking to it. For a multi-hour source with many batches, that
     meant decoding the full video dozens of times over — the real cause
-    of "rendering_cut" taking far longer than it should have."""
+    of "rendering_cut" taking far longer than it should have.
+
+    Real bug fixed: this had zero timeout protection on either subprocess
+    call, and is recursive — a genuinely bad segment (the corrupted-tail
+    class of issue seen elsewhere tonight) could hang here even AFTER
+    _extract_segment's own timeout gave up and fell through to this exact
+    function, defeating the whole point of that fix. A timeout at every
+    level here, with a clear error once there's no smaller batch left to
+    fall back to, instead of hanging or recursing forever."""
     expr = _select_expr(segments)
     vf = f"select='{expr}',setpts=N/FRAME_RATE/TB"
     af = f"aselect='{expr}',asetpts=N/SR/TB"
@@ -318,28 +329,43 @@ def _render_batch_select(raw_video, segments, out_path):
            out_path]
 
     if len(segments) <= MIN_RENDER_BATCH:
-        subprocess.run(cmd, check=True)
+        try:
+            subprocess.run(cmd, check=True, timeout=timeout_sec)
+        except subprocess.TimeoutExpired:
+            raise RuntimeError(
+                f"segment extraction genuinely stuck (timed out after {timeout_sec}s) with no "
+                f"smaller fallback left to try — likely a corrupted/truncated region of the "
+                f"source at this timestamp, not a transient issue"
+            )
         return
 
-    result = subprocess.run(cmd, capture_output=True)
-    if result.returncode == 0:
+    try:
+        result = subprocess.run(cmd, capture_output=True, timeout=timeout_sec)
+        succeeded = (result.returncode == 0)
+    except subprocess.TimeoutExpired:
+        succeeded = False
+
+    if succeeded:
         return
 
     mid = len(segments) // 2
     left, right = segments[:mid], segments[mid:]
     left_path = out_path + ".left.mp4"
     right_path = out_path + ".right.mp4"
-    _render_batch_select(raw_video, left, left_path)
-    _render_batch_select(raw_video, right, right_path)
+    _render_batch_select(raw_video, left, left_path, timeout_sec=timeout_sec)
+    _render_batch_select(raw_video, right, right_path, timeout_sec=timeout_sec)
 
     concat_list = out_path + ".concat.txt"
     with open(concat_list, "w") as f:
         f.write(f"file '{left_path}'\nfile '{right_path}'\n")
-    subprocess.run(
-        ["ffmpeg", "-nostdin", "-y", "-f", "concat", "-safe", "0", "-i", concat_list,
-         "-c", "copy", out_path],
-        check=True,
-    )
+    try:
+        subprocess.run(
+            ["ffmpeg", "-nostdin", "-y", "-f", "concat", "-safe", "0", "-i", concat_list,
+             "-c", "copy", out_path],
+            check=True, timeout=60,
+        )
+    except subprocess.TimeoutExpired as e:
+        raise RuntimeError("concat of already-extracted parts timed out — unexpected, these are just stream copies") from e
     for p in (left_path, right_path, concat_list):
         if os.path.exists(p):
             os.remove(p)
@@ -353,11 +379,14 @@ def _output_is_valid(path, expected_duration, tolerance=0.5):
     knowable in advance)."""
     if not os.path.exists(path) or os.path.getsize(path) < 100:
         return False
-    result = subprocess.run(
-        ["ffprobe", "-v", "error", "-show_entries", "format=duration",
-         "-of", "default=noprint_wrappers=1:nokey=1", path],
-        capture_output=True, text=True,
-    )
+    try:
+        result = subprocess.run(
+            ["ffprobe", "-v", "error", "-show_entries", "format=duration",
+             "-of", "default=noprint_wrappers=1:nokey=1", path],
+            capture_output=True, text=True, timeout=30,
+        )
+    except subprocess.TimeoutExpired:
+        return False  # can't even verify it — treat as invalid, caller will retry/fallback
     try:
         actual = float(result.stdout.strip())
     except ValueError:
@@ -365,7 +394,7 @@ def _output_is_valid(path, expected_duration, tolerance=0.5):
     return abs(actual - expected_duration) <= tolerance
 
 
-def _extract_segment(raw_video, start, end, out_path):
+def _extract_segment(raw_video, start, end, out_path, timeout_sec=120):
     """Seeks directly to the segment instead of scanning from the start —
     the actual fix. -ss before -i is a fast keyframe seek; a pre-roll plus
     a second -ss after -i (frame-accurate within that pre-roll window)
@@ -377,7 +406,18 @@ def _extract_segment(raw_video, start, end, out_path):
     entirely, silently producing an empty file even though ffmpeg exits 0
     (a real failure mode hit and fixed here, not theoretical). So: verify
     the output, and retry with a larger margin if it's not right, before
-    falling back to the slower whole-file select method as a last resort."""
+    falling back to the slower whole-file select method as a last resort.
+
+    Real bug fixed: none of these subprocess.run() calls ever had a
+    timeout — confirmed directly on a real stuck job (part_00036.mp4,
+    48 bytes, main thread parked in a forked-subprocess read for over an
+    hour) that this hangs forever with zero protection when ffmpeg gets
+    stuck seeking into a corrupted/truncated region of the source — the
+    same corrupted-tail class of issue diagnosed and fixed elsewhere
+    tonight for a different video, just never patched here. A timeout
+    per attempt means a bad segment now fails fast and falls through to
+    the next margin (or the whole-file fallback) instead of hanging the
+    entire job indefinitely."""
     duration = end - start
     for margin in (2.0, 8.0, 20.0, 60.0):
         coarse = max(0.0, start - margin)
@@ -387,7 +427,10 @@ def _extract_segment(raw_video, start, end, out_path):
                "-ss", f"{fine_offset:.3f}", "-t", f"{duration:.3f}",
                "-c:v", "libx264", "-preset", "veryfast", "-c:a", "aac",
                out_path]
-        subprocess.run(cmd, capture_output=True)
+        try:
+            subprocess.run(cmd, capture_output=True, timeout=timeout_sec)
+        except subprocess.TimeoutExpired:
+            continue  # this margin hung — try the next one instead of waiting forever
         if _output_is_valid(out_path, duration):
             return
 
@@ -402,7 +445,12 @@ def render_cut(raw_video, kept_segments, out_path, work_dir, job=None):
     that segment's own duration, not the whole source), then concatenates
     via stream copy (no re-encode on the concat step)."""
     if not kept_segments:
-        subprocess.run(["ffmpeg", "-nostdin", "-y", "-i", raw_video, "-c", "copy", out_path], check=True)
+        try:
+            subprocess.run(["ffmpeg", "-nostdin", "-y", "-i", raw_video, "-c", "copy", out_path],
+                            check=True, timeout=300)
+        except subprocess.TimeoutExpired as e:
+            raise RuntimeError("whole-file copy timed out after 300s — "
+                                "likely a corrupted/truncated source") from e
         return
 
     os.makedirs(work_dir, exist_ok=True)
@@ -426,11 +474,15 @@ def render_cut(raw_video, kept_segments, out_path, work_dir, job=None):
     with open(concat_list, "w") as f:
         for p in part_files:
             f.write(f"file '{p}'\n")
-    subprocess.run(
-        ["ffmpeg", "-nostdin", "-y", "-f", "concat", "-safe", "0", "-i", concat_list,
-         "-c", "copy", out_path],
-        check=True,
-    )
+    try:
+        subprocess.run(
+            ["ffmpeg", "-nostdin", "-y", "-f", "concat", "-safe", "0", "-i", concat_list,
+             "-c", "copy", out_path],
+            check=True, timeout=120,
+        )
+    except subprocess.TimeoutExpired as e:
+        raise RuntimeError("final concat of already-extracted parts timed out after 120s — "
+                            "unexpected, these are just stream copies") from e
     for p in part_files:
         os.remove(p)
     os.remove(concat_list)
