@@ -51,3 +51,29 @@
   [12:09:04] thumbnail-generator: done -> projects/new881__montage02/thumbnail/thumb.jpg
 == done: outputs/new881__montage02.final.mp4 ==
 -- montage03: 72 moments, 720.0s total --
+/Users/Apple/autoclip-pipeline/projects/new881__montage03/job.json
+== pipeline: job=new881__montage03 format=long-form-youtube ==
+-- [1/7] intake --
+  [13:45:36] raw file: /Users/Apple/autoclip-pipeline/projects/new881__montage03/raw/source.mp4
+-- [2/7] rough cut --
+  [13:45:36] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: long-form-youtube) --
+  [13:45:36] graphics-plan: reading script from rough-cut (no re-transcription)
+  [13:45:36] graphics-plan: style='glass + zoom' preset='liquid-glass-style' reframe='letterbox' target=1920x1080
+  [13:45:36] graphics-plan: planning beats
+  [13:45:36] graphics-plan: {"beat_count": 1}
+  [13:45:36] graphics-plan: rendering (reframe + beat cards) via engine stand-in
+  [13:47:26] graphics-plan: {"beats_rendered": 0, "face_tracked": false}
+  [13:47:27] graphics-plan: done -> projects/new881__montage03/graphics/{graphics-plan.json,graphics_cut.mp4}
+-- [4/7] second pass (manual review) --
+  [13:47:27] [second_pass] --auto-approve set, skipping manual review
+-- [5/7] captions (format-specific: long-form-youtube) --
+  [13:47:27] embedded-captions: format 'long-form-youtube' has captions disabled (e.g. long-form relies on YT CC) — skipping
+-- [6/7] background music — skipped --
+-- [7/7] export --
+  [13:47:36] finalize: promoted graphics_cut.mp4 -> outputs/new881__montage03.final.mp4
+  [13:47:36] prune: removed 2 intermediate render(s) + scratch work dir for job 'new881__montage03'
+  [13:47:36] thumbnail-generator: grabbing frame at t=5.0s (hook beat if available)
+  [13:47:37] thumbnail-generator: done -> projects/new881__montage03/thumbnail/thumb.jpg
+== done: outputs/new881__montage03.final.mp4 ==
+-- montage04: 61 moments, 719.88s total --

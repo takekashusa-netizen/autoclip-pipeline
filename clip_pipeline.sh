@@ -39,6 +39,8 @@ bonus_clips=3   # default on — grab up to 3 extra strong-highlight moments
                 # beyond clip_count if the source has more worth clipping
 montage_minutes=0   # 0 = montage mode disabled, use single-window mode
 montage_count=3
+best_windows_minutes=0   # 0 = best-windows mode disabled
+best_windows_count=3
 skip_music=false
 auto_approve=false
 content_type=""
@@ -61,6 +63,9 @@ while [[ $i -lt ${#args[@]} ]]; do
     --montage-minutes) i=$((i+1)); montage_minutes="${args[$i]}" ;;
     --montage) montage_minutes=12 ;;
     --montage-count) i=$((i+1)); montage_count="${args[$i]}" ;;
+    --best-windows-minutes) i=$((i+1)); best_windows_minutes="${args[$i]}" ;;
+    --best-windows) best_windows_minutes=12 ;;
+    --best-windows-count) i=$((i+1)); best_windows_count="${args[$i]}" ;;
     --skip-music)  skip_music=true ;;
     --auto-approve) auto_approve=true ;;
     --content-type) i=$((i+1)); content_type="${args[$i]}" ;;
@@ -83,6 +88,8 @@ check_disk_space "$job" || exit 1
 
 if [[ "$montage_minutes" != "0" ]]; then
   echo "== clip_pipeline: job=${job} format=${format} montage_minutes=${montage_minutes} montage_count=${montage_count} =="
+elif [[ "$best_windows_minutes" != "0" ]]; then
+  echo "== clip_pipeline: job=${job} format=${format} best_windows_minutes=${best_windows_minutes} best_windows_count=${best_windows_count} (continuous, non-overlapping) =="
 else
   echo "== clip_pipeline: job=${job} format=${format} clip_length=${clip_length}s clip_count=${clip_count} =="
 fi
@@ -249,6 +256,38 @@ else
   else
     log "audio-analysis: ${audio_result}"
   fi
+fi
+
+if [[ "$best_windows_minutes" != "0" ]]; then
+  # Genuinely different mode from montage: montage stitches many small
+  # scored fragments together (jump cuts between disconnected moments).
+  # This finds the best CONTINUOUS, non-overlapping N-minute stretches
+  # and extracts each as ONE single ffmpeg cut — real unbroken footage,
+  # no skipping around, straight into its own file in a dedicated folder.
+  bw_out_dir="$(job_dir "$job")/best-windows"
+  mkdir -p "$bw_out_dir"
+  windows_json="${bw_out_dir}/windows.json"
+  source_duration="$(python3 -c "import json; d=json.load(open('${script_path}')); print(d.get('source_duration_sec', 0))" 2>/dev/null || echo 0)"
+
+  bw_exit=0
+  result="$(python3 "${SKILL_DIR}/best_windows.py" "$script_path" "$visual_json" "$audio_json" "$source_duration" "$best_windows_minutes" "$best_windows_count" "$windows_json" 2>&1)" || bw_exit=$?
+  if [[ $bw_exit -ne 0 ]]; then
+    echo "best-windows FAILED (exit ${bw_exit}): $(echo "$result" | tail -10)" >&2
+    exit 1
+  fi
+  log "best-windows: ${result}"
+
+  final_out_dir="${PIPELINE_ROOT}/outputs/${job}_best_windows"
+  mkdir -p "$final_out_dir"
+  ext_exit=0
+  ext_result="$(python3 "${SKILL_DIR}/extract_best_windows.py" "$rough_cut_video" "$windows_json" "$final_out_dir" "$job" 2>&1)" || ext_exit=$?
+  if [[ $ext_exit -ne 0 ]]; then
+    echo "extract-best-windows FAILED (exit ${ext_exit}): $(echo "$ext_result" | tail -10)" >&2
+    exit 1
+  fi
+  log "extract-best-windows: ${ext_result}"
+  echo "== best-windows done: check ${final_out_dir}/ for real, continuous, non-overlapping clips =="
+  exit 0
 fi
 
 echo "-- selecting best moments (montage_minutes=${montage_minutes}) --"
