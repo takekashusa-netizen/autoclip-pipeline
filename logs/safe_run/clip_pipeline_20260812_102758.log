@@ -112,3 +112,6 @@
 [out#0/image2 @ 0x7fee00706b00] Nothing was written into output file, because at least one of its streams received no packets.
 == done: outputs/new881__montage04.final.mp4 ==
 -- montage05: 43 moments, 414.17s total --
+[out#0/mp4 @ 0x7fbb24804580] Output file does not contain any stream
+Error opening output file /Users/Apple/autoclip-pipeline/projects/new881__montage05/raw/source.mp4.
+Error opening output files: Invalid argument

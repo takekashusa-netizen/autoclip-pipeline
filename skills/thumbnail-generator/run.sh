@@ -50,7 +50,7 @@ mkdir -p "$out_dir"
 out_path="${out_dir}/thumb.jpg"
 
 log "thumbnail-generator: grabbing frame at t=${grab_time}s (hook beat if available)"
-if ! timeout 30 ffmpeg -nostdin -y -ss "$grab_time" -i "$video" -frames:v 1 -q:v 2 "$out_path" -loglevel error; then
+if ! run_with_timeout 30 ffmpeg -nostdin -y -ss "$grab_time" -i "$video" -frames:v 1 -q:v 2 "$out_path" -loglevel error; then
   echo "thumbnail-generator: grab timed out or failed (30s) — likely a corrupted region near t=${grab_time}s" >&2
   exit 1
 fi

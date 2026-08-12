@@ -66,6 +66,29 @@ check_disk_space() {
 }
 export -f check_disk_space
 
+# Portable timeout — macOS's stock bash has no `timeout` command at all
+# (that's GNU coreutils, not BSD userland); using it directly caused a
+# real failure tonight ("timeout: command not found"), silently treated
+# as a genuine timeout by the same code path meant to catch actual
+# hangs. This works on any bash without extra dependencies: run the
+# command in the background, race it against a sleep-then-kill watcher,
+# return the real command's exit code (or the kill's, if it timed out).
+#
+# Usage: run_with_timeout 120 ffmpeg -nostdin -y -i in.mp4 out.mp4
+run_with_timeout() {
+  local timeout_sec="$1"; shift
+  "$@" &
+  local cmd_pid=$!
+  ( sleep "$timeout_sec" 2>/dev/null; kill -9 "$cmd_pid" 2>/dev/null ) &
+  local watcher_pid=$!
+  local exit_code=0
+  wait "$cmd_pid" 2>/dev/null || exit_code=$?
+  kill "$watcher_pid" 2>/dev/null
+  wait "$watcher_pid" 2>/dev/null
+  return "$exit_code"
+}
+export -f run_with_timeout
+
 # Load a format config value, e.g. format_get short-tiktok-raw captions.preset
 format_get() {
   local format="$1" path="$2"
