@@ -1,0 +1,1125 @@
+== clip_pipeline: job=new881 format=short-tiktok-raw clip_length=60s clip_count=8 ==
+  [23:22:51] rough-cut already done for 'new881' — reusing existing transcript
+  [23:22:51] rough-cut: job.json says done, but /Users/Apple/autoclip-pipeline/projects/new881/rough-cut/rough_cut.mp4 is missing (likely cleaned up after an earlier clip/montage run) — regenerating
+rough-cut: cannot regenerate — script.json is also missing, would need full re-transcription. Resetting rough_cut to pending and re-running from scratch.
+  [23:22:51] rough-cut: extracting audio from source.mp4
+  [23:23:56] rough-cut: transcribing + building EDL
+  [23:47:49] rough-cut: ffmpeg version 8.1.2 Copyright (c) 2000-2026 the FFmpeg developers
+  built with Apple clang version 16.0.0 (clang-1600.0.26.6)
+  configuration: --prefix=/usr/local/Cellar/ffmpeg/8.1.2_1 --enable-shared --enable-pthreads --enable-version3 --cc=clang --host-cflags= --host-ldflags= --enable-ffplay --enable-gpl --enable-libsvtav1 --enable-libopus --enable-libx264 --enable-libmp3lame --enable-libdav1d --enable-libvmaf --enable-libvpx --enable-libx265 --enable-openssl --enable-videotoolbox --enable-audiotoolbox
+  libavutil      60. 26.102 / 60. 26.102
+  libavcodec     62. 28.102 / 62. 28.102
+  libavformat    62. 12.102 / 62. 12.102
+  libavdevice    62.  3.102 / 62.  3.102
+  libavfilter    11. 14.102 / 11. 14.102
+  libswscale      9.  5.102 /  9.  5.102
+  libswresample   6.  3.102 /  6.  3.102
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93358210c0] Auto-inserting h264_mp4toannexb bitstream filter
+Input #0, concat, from '/Users/Apple/autoclip-pipeline/projects/new881/work/rough-cut/parts.txt':
+  Duration: N/A, start: -0.021333, bitrate: 1189 kb/s
+  Stream #0:0(und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(progressive), 1920x1080, 1061 kb/s, 29.97 fps, 29.97 tbr, 30k tbn, start 0.033000
+    Metadata:
+      handler_name    : VideoHandler
+      encoder         : Lavc62.28.102 libx264
+  Stream #0:1(und): Audio: aac (LC) (mp4a / 0x6134706D), 48000 Hz, stereo, fltp, 128 kb/s, start -0.021333
+    Metadata:
+      handler_name    : SoundHandler
+Stream mapping:
+  Stream #0:0 -> #0:0 (copy)
+  Stream #0:1 -> #0:1 (copy)
+Output #0, mp4, to '/Users/Apple/autoclip-pipeline/projects/new881/rough-cut/rough_cut.mp4':
+  Metadata:
+    encoder         : Lavf62.12.102
+  Stream #0:0(und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(progressive), 1920x1080, q=2-31, 1061 kb/s, 29.97 fps, 29.97 tbr, 30k tbn
+    Metadata:
+      handler_name    : VideoHandler
+      encoder         : Lavc62.28.102 libx264
+  Stream #0:1(und): Audio: aac (LC) (mp4a / 0x6134706D), 48000 Hz, stereo, fltp, 128 kb/s
+    Metadata:
+      handler_name    : SoundHandler
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335836280] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 144384, current: 144126; changing to 144385. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335839e00] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 2 times
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 1141917, current: 1141906; changing to 1141918. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335839e00] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a04380] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a19580] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 2721069, current: 2721066; changing to 2721070. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336905ac0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 2754858, current: 2754682; changing to 2754859. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a04640] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933583a640] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 2849501, current: 2849158; changing to 2849502. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933583a640] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a069c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 3300902, current: 3300774; changing to 3300903. This may result in incorrect timestamps in the output file.
+frame= 2529 fps=0.0 q=-1.0 size=   43776KiB time=00:01:24.67 bitrate=4235.4kbits/s speed= 168x elapsed=0:00:00.50    frame= 3794 fps=3752 q=-1.0 size=   74496KiB time=00:02:06.87 bitrate=4809.9kbits/s speed= 125x elapsed=0:00:01.01    frame= 5530 fps=3641 q=-1.0 size=  110336KiB time=00:03:04.79 bitrate=4891.1kbits/s speed= 122x elapsed=0:00:01.51    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f07e80] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f1bcc0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 10462331, current: 10461528; changing to 10462332. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335831c40] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 11099480, current: 11098965; changing to 11099481. This may result in incorrect timestamps in the output file.
+frame= 6934 fps=3427 q=-1.0 size=  135936KiB time=00:03:51.68 bitrate=4806.5kbits/s speed= 115x elapsed=0:00:02.02    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f06cc0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 11132757, current: 11132581; changing to 11132758. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f13040] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 12188325, current: 12188018; changing to 12188326. This may result in incorrect timestamps in the output file.
+frame= 8223 fps=3252 q=-1.0 size=  160512KiB time=00:04:34.72 bitrate=4786.3kbits/s speed= 109x elapsed=0:00:02.52    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a0f480] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93358214c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f06c00] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 15097141, current: 15096523; changing to 15097142. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a08480] Auto-inserting h264_mp4toannexb bitstream filter
+frame= 9739 fps=3215 q=-1.0 size=  190208KiB time=00:05:25.30 bitrate=4789.9kbits/s speed= 107x elapsed=0:00:03.02    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f13680] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933691acc0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f13900] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 17177318, current: 17177002; changing to 17177319. This may result in incorrect timestamps in the output file.
+frame=10761 fps=3049 q=-1.0 size=  203776KiB time=00:05:59.41 bitrate=4644.6kbits/s speed= 102x elapsed=0:00:03.52    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a08cc0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933691acc0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336906500] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 18588222, current: 18587994; changing to 18588223. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93358231c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933691acc0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a19580] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 19299563, current: 19299069; changing to 19299564. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933691acc0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f079c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93358231c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f07f40] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93369049c0] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 1 times
+frame=13244 fps=3286 q=-1.0 size=  237312KiB time=00:07:22.42 bitrate=4394.1kbits/s speed= 110x elapsed=0:00:04.02    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336919300] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a19580] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93369049c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 21299571, current: 21299334; changing to 21299572. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93358231c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336907ac0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a09400] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93358214c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a1a240] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 22421288, current: 22420437; changing to 22421289. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a1ab00] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f06700] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f06c00] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 22553589, current: 22553334; changing to 22553590. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a17980] Auto-inserting h264_mp4toannexb bitstream filter
+frame=14644 fps=3232 q=-1.0 size=  273152KiB time=00:08:09.40 bitrate=4572.2kbits/s speed= 108x elapsed=0:00:04.53    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a0a440] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f07e40] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 23986813, current: 23986731; changing to 23986814. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93369049c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 24023595, current: 24023550; changing to 24023596. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a0a0c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 24429054, current: 24428738; changing to 24429055. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a05e80] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 24456386, current: 24455947; changing to 24456387. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335838ac0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 24537867, current: 24537611; changing to 24537868. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93369069c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335838ac0] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 1 times
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 25172266, current: 25171834; changing to 25172267. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93369049c0] Auto-inserting h264_mp4toannexb bitstream filter
+frame=15945 fps=3169 q=-1.0 size=  303872KiB time=00:08:52.97 bitrate=4670.6kbits/s speed= 106x elapsed=0:00:05.03    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a05e80] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a09a00] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335838ac0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a05e80] Auto-inserting h264_mp4toannexb bitstream filter
+frame=16845 fps=3040 q=-1.0 size=  327424KiB time=00:09:23.00 bitrate=4764.2kbits/s speed= 102x elapsed=0:00:05.54    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336d053c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 27104994, current: 27104965; changing to 27104995. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336d04b40] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a09a00] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335838ac0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93369049c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 28392690, current: 28392594; changing to 28392691. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a19a80] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a05e80] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93358382c0] Auto-inserting h264_mp4toannexb bitstream filter
+frame=18179 fps=3008 q=-1.0 size=  360192KiB time=00:10:07.64 bitrate=4855.9kbits/s speed= 101x elapsed=0:00:06.04    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f1cf00] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336919640] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 29915875, current: 29915688; changing to 29915876. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93358382c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933583c200] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 1 times
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93369170c0] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 1 times
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 31114458, current: 31113649; changing to 31114459. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933583c200] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f07e00] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336917500] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93358231c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f079c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 32861456, current: 32860960; changing to 32861457. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335831c40] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933691a200] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 35048755, current: 35048728; changing to 35048756. This may result in incorrect timestamps in the output file.
+frame=22090 fps=3376 q=-1.0 size=  393216KiB time=00:12:18.30 bitrate=4363.0kbits/s speed= 113x elapsed=0:00:06.54    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335820f40] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933583de80] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f079c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f1cf00] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336917500] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 41059734, current: 41059480; changing to 41059735. This may result in incorrect timestamps in the output file.
+frame=27137 fps=3852 q=-1.0 size=  420096KiB time=00:15:06.74 bitrate=3795.4kbits/s speed= 129x elapsed=0:00:07.04    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a08140] Auto-inserting h264_mp4toannexb bitstream filter
+frame=29353 fps=3888 q=-1.0 size=  451328KiB time=00:16:20.78 bitrate=3769.7kbits/s speed= 130x elapsed=0:00:07.54    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933583de80] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93358231c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 47304259, current: 47304101; changing to 47304260. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93358231c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 47349157, current: 47348945; changing to 47349158. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336914300] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 47445201, current: 47445024; changing to 47445202. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933582b880] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336917500] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93358231c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336e05140] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 48130851, current: 48130456; changing to 48130852. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336e05140] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933582b780] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335836380] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93358231c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 48611536, current: 48610901; changing to 48611537. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93358231c0] Auto-inserting h264_mp4toannexb bitstream filter
+frame=30326 fps=3767 q=-1.0 size=  474880KiB time=00:16:53.48 bitrate=3838.5kbits/s speed= 126x elapsed=0:00:08.04    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93369170c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933583fac0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336917500] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 1 times
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 49365355, current: 49365202; changing to 49365356. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a1a240] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 49404114, current: 49403640; changing to 49404115. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a1a5c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335841780] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335820f40] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335841780] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93369141c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a1a240] Auto-inserting h264_mp4toannexb bitstream filter
+frame=31825 fps=3722 q=-1.0 size=  511232KiB time=00:17:43.63 bitrate=3937.5kbits/s speed= 124x elapsed=0:00:08.54    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336917500] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f079c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f13980] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 1 times
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a1a5c0] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 1 times
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933582b780] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 52384133, current: 52384109; changing to 52384134. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f13980] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 52446573, current: 52446571; changing to 52446574. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933582b780] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335840640] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 52702970, current: 52702810; changing to 52702971. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f1a280] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a1a5c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f13980] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 52914440, current: 52914203; changing to 52914441. This may result in incorrect timestamps in the output file.
+frame=33062 fps=3653 q=-1.0 size=  540416KiB time=00:18:25.06 bitrate=4006.2kbits/s speed= 122x elapsed=0:00:09.05    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f13980] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 53228571, current: 53228117; changing to 53228572. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f13980] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335840640] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336d06dc0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 53854781, current: 53854307; changing to 53854782. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335840640] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 53936227, current: 53935971; changing to 53936228. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335840640] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f1a280] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335822680] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 54508437, current: 54507707; changing to 54508438. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335840640] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 54676667, current: 54675875; changing to 54676668. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335840640] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336919640] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a1a5c0] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 1 times
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336914140] Auto-inserting h264_mp4toannexb bitstream filter
+frame=34338 fps=3593 q=-1.0 size=  570368KiB time=00:19:07.77 bitrate=4070.9kbits/s speed= 120x elapsed=0:00:09.55    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a09a00] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 55095717, current: 55095459; changing to 55095718. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a1a5c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f13980] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 55562298, current: 55561525; changing to 55562299. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a1a5c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 56183093, current: 56182928; changing to 56183094. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335822680] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335840640] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a06500] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a09340] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336917500] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 56940669, current: 56940432; changing to 56940670. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f13980] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a1a5c0] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 1 times
+frame=35804 fps=3557 q=-1.0 size=  604160KiB time=00:19:56.85 bitrate=4135.2kbits/s speed= 119x elapsed=0:00:10.06    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f1a280] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336d06dc0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f13980] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335828200] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f13980] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a09340] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335840640] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 58638403, current: 58638073; changing to 58638404. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f13980] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 58653433, current: 58652488; changing to 58653434. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335840640] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f08480] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335840640] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 59183288, current: 59182558; changing to 59183289. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a09340] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335820f40] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f08480] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a09340] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 59372301, current: 59371494; changing to 59372302. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335840640] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a09340] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f13980] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 59736777, current: 59736624; changing to 59736778. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a1eb40] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a09340] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 61119043, current: 61118805; changing to 61119044. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336919640] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336917500] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 62053169, current: 62052520; changing to 62053170. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335840640] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 2 times
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 62832533, current: 62832499; changing to 62832534. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336917500] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335840640] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336917500] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335828200] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 2 times
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 64347888, current: 64347525; changing to 64347889. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335828200] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f13980] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a09340] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 64959305, current: 64959301; changing to 64959306. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336d19c80] Auto-inserting h264_mp4toannexb bitstream filter
+frame=40746 fps=3853 q=-1.0 size=  638720KiB time=00:22:42.38 bitrate=3840.6kbits/s speed= 129x elapsed=0:00:10.57    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f22a80] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f1a280] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 65837381, current: 65836942; changing to 65837382. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f1a280] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336914b80] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f13980] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 66636443, current: 66636105; changing to 66636444. This may result in incorrect timestamps in the output file.
+frame=41566 fps=3753 q=-1.0 size=  657152KiB time=00:23:09.77 bitrate=3873.6kbits/s speed= 125x elapsed=0:00:11.07    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336914b80] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f13980] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 66767683, current: 66767401; changing to 66767684. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f13980] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335828200] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 67539496, current: 67539373; changing to 67539497. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a1eb40] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335840640] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336914d40] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a09a00] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f22a80] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f13980] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 68573022, current: 68572382; changing to 68573023. This may result in incorrect timestamps in the output file.
+frame=43041 fps=3718 q=-1.0 size=  691968KiB time=00:23:59.15 bitrate=3938.9kbits/s speed= 124x elapsed=0:00:11.57    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336911180] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 69269726, current: 69269078; changing to 69269727. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f1e640] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f13980] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335840640] Auto-inserting h264_mp4toannexb bitstream filter
+frame=43453 fps=3597 q=-1.0 size=  701440KiB time=00:24:13.00 bitrate=3954.7kbits/s speed= 120x elapsed=0:00:12.07    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f13980] Auto-inserting h264_mp4toannexb bitstream filter
+frame=43982 fps=3494 q=-1.0 size=  713728KiB time=00:24:30.68 bitrate=3975.6kbits/s speed= 117x elapsed=0:00:12.58    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335821b40] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 5 times
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336919700] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f13980] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336914b80] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335821b40] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f09980] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 72411453, current: 72411277; changing to 72411454. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a09340] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335821b40] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336913d40] Auto-inserting h264_mp4toannexb bitstream filter
+frame=45415 fps=3468 q=-1.0 size=  747264KiB time=00:25:18.76 bitrate=4030.6kbits/s speed= 116x elapsed=0:00:13.09    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a1a5c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93358382c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 73521301, current: 73521115; changing to 73521302. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336919640] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336913d40] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f09980] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 73734513, current: 73734075; changing to 73734514. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93358382c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335840640] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f1e640] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 73867393, current: 73866973; changing to 73867394. This may result in incorrect timestamps in the output file.
+frame=46056 fps=3387 q=-1.0 size=  762624KiB time=00:25:40.31 bitrate=4055.9kbits/s speed= 113x elapsed=0:00:13.59    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a09a00] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 74288861, current: 74288193; changing to 74288862. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f09980] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336921d80] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 74549598, current: 74549254; changing to 74549599. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335842300] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 1 times
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93358382c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 74988158, current: 74988057; changing to 74988159. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f13980] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 1 times
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a22180] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f124c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 76240958, current: 76240491; changing to 76240959. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336913d40] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335836600] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 76389494, current: 76389422; changing to 76389495. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f13980] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336913d40] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 76482561, current: 76482280; changing to 76482562. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a1a5c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93358382c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f18400] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93358382c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f13980] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 77039857, current: 77039619; changing to 77039858. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335842300] Auto-inserting h264_mp4toannexb bitstream filter
+frame=48105 fps=3411 q=-1.0 size=  786176KiB time=00:26:48.98 bitrate=4002.7kbits/s speed= 114x elapsed=0:00:14.10    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933691a100] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933582b800] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 77787801, current: 77787513; changing to 77787802. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f18400] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a1a5c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336913d40] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 77997859, current: 77997305; changing to 77997860. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f13980] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 78655737, current: 78655563; changing to 78655738. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f13980] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336913d40] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 1 times
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 79128460, current: 79128017; changing to 79128461. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f13980] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 79176145, current: 79176065; changing to 79176146. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f13980] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933582b800] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a0e840] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f16700] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 79551200, current: 79550787; changing to 79551201. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933582b800] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a1a5c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335841040] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 81658572, current: 81658475; changing to 81658573. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336913d40] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336906bc0] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 1 times
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f13980] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 1 times
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a06500] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93358382c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 83229848, current: 83229609; changing to 83229849. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a1a5c0] Auto-inserting h264_mp4toannexb bitstream filter
+frame=51975 fps=3559 q=-1.0 size=  821504KiB time=00:28:58.30 bitrate=3871.4kbits/s speed= 119x elapsed=0:00:14.60    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335841d40] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 2 times
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 83620411, current: 83620364; changing to 83620412. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f13980] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933582c5c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 83735707, current: 83735662; changing to 83735708. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a06500] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 83831918, current: 83831758; changing to 83831919. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f0fa00] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a1ad80] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 84040451, current: 84039948; changing to 84040452. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336d04840] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f13980] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 84408476, current: 84408270; changing to 84408477. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335833780] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 1 times
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 86263240, current: 86262905; changing to 86263241. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a1a5c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933582c5c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 86428265, current: 86427845; changing to 86428266. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933582c5c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 86782149, current: 86781797; changing to 86782150. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a1a5c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335841d40] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 86875093, current: 86874654; changing to 86875094. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a06500] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 87646750, current: 87646625; changing to 87646751. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336923880] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335841d40] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933582c5c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 87999264, current: 87998942; changing to 87999265. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933582c5c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 88043998, current: 88043787; changing to 88043999. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336e1a380] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 88225035, current: 88224747; changing to 88225036. This may result in incorrect timestamps in the output file.
+frame=54964 fps=3639 q=-1.0 size=  851712KiB time=00:30:38.47 bitrate=3795.1kbits/s speed= 122x elapsed=0:00:15.10    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335824400] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933583b3c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336923340] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933582c5c0] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 1 times
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a1ad80] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336912440] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f124c0] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 1 times
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a06500] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933584f1c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 89457174, current: 89456307; changing to 89457175. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336923880] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 90617523, current: 90617467; changing to 90617524. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93369233c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f124c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 90785960, current: 90785617; changing to 90785961. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f124c0] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 1 times
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336906bc0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93369233c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 91256804, current: 91256438; changing to 91256805. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93369233c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 91295350, current: 91294859; changing to 91295351. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93369233c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336923340] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 1 times
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 91444281, current: 91443790; changing to 91444282. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933584e2c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 91554382, current: 91554283; changing to 91554383. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336906bc0] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 1 times
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 91812304, current: 91812123; changing to 91812305. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f23480] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f124c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335849180] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 92165014, current: 92164440; changing to 92165015. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f1ac00] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a06500] Auto-inserting h264_mp4toannexb bitstream filter
+frame=57926 fps=3712 q=-1.0 size=  877312KiB time=00:32:17.69 bitrate=3709.0kbits/s speed= 124x elapsed=0:00:15.60    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a06500] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336923340] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 93031107, current: 93030852; changing to 93031108. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a06500] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933582c5c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f23480] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 93260748, current: 93259863; changing to 93260749. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336906bc0] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 1 times
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933583b3c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f22a80] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933582c5c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 94251438, current: 94251201; changing to 94251439. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933582c5c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 94261441, current: 94260801; changing to 94261442. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336906bc0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 94299713, current: 94299222; changing to 94299714. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f16a40] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 95011926, current: 95011916; changing to 95011927. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335852340] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 95085644, current: 95085572; changing to 95085645. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933582c5c0] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 1 times
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f1ac00] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a06500] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933583b3c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336906bc0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f0db40] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336915b80] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933690e940] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f22a80] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 96123742, current: 96123303; changing to 96123743. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336912280] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f22a80] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 97086246, current: 97085830; changing to 97086247. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933583c880] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 97258886, current: 97258785; changing to 97258887. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933583e000] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 2 times
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336906bc0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f0db40] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a06500] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933583b3c0] Auto-inserting h264_mp4toannexb bitstream filter
+frame=61146 fps=3797 q=-1.0 size=  908288KiB time=00:34:05.76 bitrate=3637.1kbits/s speed= 127x elapsed=0:00:16.10    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f24080] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933584b040] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336917dc0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93358547c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a06500] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933583b3c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 98729169, current: 98728983; changing to 98729170. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a1cb80] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336906bc0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93358547c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 99137580, current: 99137326; changing to 99137581. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336906bc0] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 1 times
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 99725342, current: 99725105; changing to 99725343. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f10640] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 99749681, current: 99749129; changing to 99749682. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335828e00] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f16a40] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336917dc0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a06500] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 100208785, current: 100208753; changing to 100208786. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f20300] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93358547c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f23540] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93358547c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 101125249, current: 101124833; changing to 101125250. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335847dc0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93358547c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 101402673, current: 101401884; changing to 101402674. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f20300] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 101946652, current: 101946428; changing to 101946653. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f2f400] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336912280] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f20300] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 103181670, current: 103181244; changing to 103181671. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335847640] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a06500] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93358476c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 103417153, current: 103416662; changing to 103417154. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93358476c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a1cb80] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335847780] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 103647382, current: 103647258; changing to 103647383. This may result in incorrect timestamps in the output file.
+frame=64610 fps=3891 q=-1.0 size=  941312KiB time=00:36:01.77 bitrate=3567.1kbits/s speed= 130x elapsed=0:00:16.60    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336917dc0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 103768090, current: 103767361; changing to 103768091. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335847dc0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f23540] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a06500] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f23540] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336921100] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f23540] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 104814890, current: 104814740; changing to 104814891. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335852dc0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335825a00] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335837040] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f23540] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f2f400] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335856fc0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 106608841, current: 106608497; changing to 106608842. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335837040] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336917dc0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f23540] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 1 times
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336912280] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335847dc0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336921100] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f23540] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 109256521, current: 109255836; changing to 109256522. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335856fc0] Auto-inserting h264_mp4toannexb bitstream filter
+frame=68742 fps=4017 q=-1.0 size=  983808KiB time=00:38:20.20 bitrate=3503.8kbits/s speed= 134x elapsed=0:00:17.11    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335837040] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f24840] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336921100] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 112116446, current: 112116238; changing to 112116447. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a06500] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335856fc0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335837040] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335847dc0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336921140] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f23540] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 113833342, current: 113833060; changing to 113833343. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933692c280] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a06500] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335856fc0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 114187575, current: 114186978; changing to 114187576. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335859fc0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 114635490, current: 114635426; changing to 114635491. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933691bc40] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f24840] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933691bc40] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f24840] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f0fd80] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a06500] Auto-inserting h264_mp4toannexb bitstream filter
+frame=71677 fps=4068 q=-1.0 size= 1014528KiB time=00:39:58.43 bitrate=3465.2kbits/s speed= 136x elapsed=0:00:17.61    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f0fd80] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a06500] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335856fc0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 115369502, current: 115368862; changing to 115369503. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f24840] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 115422110, current: 115421710; changing to 115422111. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335856fc0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335851e00] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 115774486, current: 115774044; changing to 115774487. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336917dc0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 115935836, current: 115935788; changing to 115935837. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335851e00] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f24840] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 1 times
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336917dc0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 116639025, current: 116638873; changing to 116639026. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335851e00] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a06500] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 117300836, current: 117300316; changing to 117300837. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335851e00] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933690d4c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 117768649, current: 117767966; changing to 117768650. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335851e00] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336918ec0] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 1 times
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f24840] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336917dc0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 118207366, current: 118206786; changing to 118207367. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335845d40] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 118796610, current: 118796158; changing to 118796611. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f15a80] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 118914942, current: 118914658; changing to 118914943. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335851e00] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 119022178, current: 119021948; changing to 119022179. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f2dc00] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 119236988, current: 119236562; changing to 119236989. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f2dc00] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f24840] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93358510c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 119446631, current: 119446366; changing to 119446632. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335851500] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 119508830, current: 119508828; changing to 119508831. This may result in incorrect timestamps in the output file.
+frame=74489 fps=4111 q=-1.0 size= 1047296KiB time=00:41:32.59 bitrate=3442.0kbits/s speed= 138x elapsed=0:00:18.11    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335851500] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 119647068, current: 119646548; changing to 119647069. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335851500] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 1 times
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933585c780] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 121885878, current: 121885542; changing to 121885879. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93358244c0] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 1 times
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336917dc0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 122242841, current: 122242681; changing to 122242842. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336917dc0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335851500] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 122457993, current: 122457279; changing to 122457994. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a06500] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 122920127, current: 122920124; changing to 122920128. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336917dc0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335851500] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933585c040] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a06500] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 123314140, current: 123314065; changing to 123314141. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336930b00] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 1 times
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a06500] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 123794750, current: 123794492; changing to 123794751. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a06500] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 123881532, current: 123880961; changing to 123881533. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f2dc00] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335851500] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933692d1c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a06500] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f24840] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a06500] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 124351881, current: 124351774; changing to 124351882. This may result in incorrect timestamps in the output file.
+frame=77670 fps=4170 q=-1.0 size= 1081088KiB time=00:43:19.22 bitrate=3407.3kbits/s speed= 140x elapsed=0:00:18.62    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a06500] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933692d1c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 124803898, current: 124803407; changing to 124803899. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93358510c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933692d1c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93358510c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f26000] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336926e80] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a14580] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933692d1c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 125713618, current: 125713046; changing to 125713619. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f24840] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336909fc0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93358510c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335824d00] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 126435431, current: 126435350; changing to 126435432. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a22b00] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 126554134, current: 126553868; changing to 126554135. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336909fc0] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 1 times
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 126828137, current: 126827724; changing to 126828138. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933585a640] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 126909644, current: 126909406; changing to 126909645. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f15a80] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 126962654, current: 126962241; changing to 126962655. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a06500] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 127614529, current: 127614074; changing to 127614530. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f26000] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 128301178, current: 128301161; changing to 128301179. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f0dfc0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 128357481, current: 128357199; changing to 128357482. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335857b00] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a27f80] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 128647650, current: 128647071; changing to 128647651. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933692d1c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f26000] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93358510c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 129087935, current: 129087511; changing to 129087936. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335857b00] Auto-inserting h264_mp4toannexb bitstream filter
+frame=80627 fps=4216 q=-1.0 size= 1110784KiB time=00:44:58.38 bitrate=3372.2kbits/s speed= 141x elapsed=0:00:19.12    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a1f200] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 129871430, current: 129870646; changing to 129871431. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a0ce80] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933692a600] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335857b00] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933583a800] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933692d1c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335857b00] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a13b40] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f1f340] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 131038380, current: 131038141; changing to 131038381. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a072c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f26000] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 1 times
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 131393698, current: 131393669; changing to 131393699. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f26000] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336909fc0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335857b00] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335859800] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335842740] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 131749199, current: 131749154; changing to 131749200. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336e04d80] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f26000] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335847400] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336909000] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a072c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 132681274, current: 132681268; changing to 132681275. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f26000] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a07480] Auto-inserting h264_mp4toannexb bitstream filter
+frame=82830 fps=4221 q=-1.0 size= 1136384KiB time=00:46:12.18 bitrate=3358.1kbits/s speed= 141x elapsed=0:00:19.62    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335847400] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336909000] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933692d1c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 133352702, current: 133352262; changing to 133352703. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f0c780] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 133885766, current: 133885577; changing to 133885767. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335847400] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 134063753, current: 134063354; changing to 134063754. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93358510c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f0c780] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a0aec0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335847400] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 134774679, current: 134774394; changing to 134774680. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f0c7c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 134841978, current: 134841644; changing to 134841979. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f93358510c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 134946092, current: 134945730; changing to 134946093. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a15340] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 3 times
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 136288007, current: 136287818; changing to 136288008. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336921100] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335847400] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 136413146, current: 136412714; changing to 136413147. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336d04080] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335847400] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 137189534, current: 137189490; changing to 137189535. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335854c40] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 137228402, current: 137227911; changing to 137228403. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336920640] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335852e40] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336920640] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335852e40] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335842740] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f0c780] Auto-inserting h264_mp4toannexb bitstream filter
+frame=85815 fps=4264 q=-1.0 size= 1169408KiB time=00:47:52.24 bitrate=3335.3kbits/s speed= 143x elapsed=0:00:20.12    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a15340] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 137870830, current: 137870094; changing to 137870831. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933692c9c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f0c780] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 138110870, current: 138110316; changing to 138110871. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933585a200] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336920640] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933690d4c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 139194853, current: 139194564; changing to 139194854. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f0c780] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 139225284, current: 139224994; changing to 139225285. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933692c9c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336d04080] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335842740] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 2 times
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 140735924, current: 140735233; changing to 140735925. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933582aa80] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a1f440] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336921100] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933582aa80] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f29000] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a26ac0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 141044738, current: 141044247; changing to 141044739. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335842740] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 141305367, current: 141305290; changing to 141305368. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f29000] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 1 times
+frame=88468 fps=4289 q=-1.0 size= 1196032KiB time=00:49:21.29 bitrate=3308.6kbits/s speed= 144x elapsed=0:00:20.62    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f29000] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933690d4c0] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 1 times
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335854c40] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933690d4c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 143896988, current: 143896591; changing to 143896989. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335865d80] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 144418831, current: 144418695; changing to 144418832. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933582aa80] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a15340] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f29000] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 145022518, current: 145022446; changing to 145022519. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a18880] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 145128942, current: 145128134; changing to 145128943. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335861080] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336913400] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335854c40] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 145980578, current: 145980150; changing to 145980579. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f2b6c0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f29000] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933583cd40] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 146215620, current: 146215550; changing to 146215621. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933582aa80] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9335854c40] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 146275290, current: 146274791; changing to 146275291. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933692ca80] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933583cd40] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f3ca00] Auto-inserting h264_mp4toannexb bitstream filter
+    Last message repeated 1 times
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 146575860, current: 146575841; changing to 146575861. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a15340] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 146672097, current: 146671919; changing to 146672098. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933582aa80] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 146758959, current: 146758388; changing to 146758960. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a0aec0] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933584c0c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 147110929, current: 147110740; changing to 147110930. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933692ca80] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 147173204, current: 147173202; changing to 147173205. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933583cd40] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 147245906, current: 147245274; changing to 147245907. This may result in incorrect timestamps in the output file.
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9336a18880] Auto-inserting h264_mp4toannexb bitstream filter
+[mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f933583cd40] Auto-inserting h264_mp4toannexb bitstream filter
+frame=91799 fps=4345 q=-1.0 size= 1222656KiB time=00:51:12.93 bitrate=3259.4kbits/s speed= 145x elapsed=0:00:21.12    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f9334f2b6c0] Auto-inserting h264_mp4toannexb bitstream filter
+[aost#0:1/copy @ 0x7f93358239c0] Non-monotonic DTS; previous: 147503554, current: 147503132; changing to 147503555. This may result in incorrect timestamps in the output file.
+[out#0/mp4 @ 0x7f9335835340] video:1174666KiB audio:48276KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.263725%
+frame=91835 fps=4321 q=-1.0 Lsize= 1226167KiB time=00:51:14.13 bitrate=3267.5kbits/s speed= 145x elapsed=0:00:21.25    
+{"transcription_available": true, "kept_segments": 617, "cut_segments": 3, "script_chars": 23431}
+  [23:47:49] rough-cut: done -> projects/new881/rough-cut/{rough_cut.mp4,script.json,edl.json}
+-- analyzing visual content (action/motion detection) --
+  [23:52:38] visual-analysis: {"available": true, "samples": 1532, "samples_with_face": 0}
+-- analyzing audio content (gunfire/impact detection) --
+  [23:52:46] audio-analysis: {"available": true, "transient_count": 1231}
+-- selecting best moments (montage_minutes=0) --
+  [23:52:46] clip-select: {"clip_count": 11, "bonus_count": 3}
+-- clip01 [requested]: 0.0s-60.0s (score=4) "(gunfire/impact detected)" --
+/Users/Apple/autoclip-pipeline/projects/new881__clip01/job.json
+== pipeline: job=new881__clip01 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [23:52:55] raw file: /Users/Apple/autoclip-pipeline/projects/new881__clip01/raw/source.mp4
+-- [2/7] rough cut --
+  [23:52:55] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [23:52:55] graphics-plan: reading script from rough-cut (no re-transcription)
+  [23:52:55] graphics-plan: style='hook card -> raw' preset='tiktok-raw-style' reframe='letterbox' target=1080x1920
+  [23:52:55] graphics-plan: planning beats
+  [23:52:55] graphics-plan: {"beat_count": 2}
+  [23:52:55] graphics-plan: rendering (reframe + beat cards) via engine stand-in
+Traceback (most recent call last):
+  File "/Users/Apple/autoclip-pipeline/skills/graphics-plan/render.py", line 261, in <module>
+    main()
+  File "/Users/Apple/autoclip-pipeline/skills/graphics-plan/render.py", line 255, in main
+    subprocess.run(cmd, check=True, capture_output=True, text=True)
+  File "/usr/local/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['ffmpeg', '-nostdin', '-y', '-i', '/Users/Apple/autoclip-pipeline/projects/new881__clip01/rough-cut/rough_cut.mp4', '-vf', "scale=w=1080:h=1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=black,drawtext=text=Come on:fontcolor=white:fontsize=42:box=1:boxcolor=black@0.55:boxborderw=16:x=(w-text_w)/2:y=h*0.75:enable='between(t\\,0.34\\,3.34)',drawtext=text=What\\'s going on with him? I ain\\'t did this in so long:fontcolor=white:fontsize=42:box=1:boxcolor=black@0.55:boxborderw=16:x=(w-text_w)/2:y=h*0.75:enable='between(t\\,7.12\\,18.02)'", '-c:v', 'libx264', '-preset', 'veryfast', '-c:a', 'aac', '/Users/Apple/autoclip-pipeline/projects/new881__clip01/graphics/graphics_cut.mp4']' returned non-zero exit status 8.
+  [23:52:56]   clip01: paused for second-pass review (normal) — approve with: python3 lib/jobstate.py mark new881__clip01 second_pass done && ./run_pipeline.sh new881__clip01 short-tiktok-raw
+-- clip02 [requested]: 80.28s-140.28s (score=4) "(gunfire/impact detected)" --
+/Users/Apple/autoclip-pipeline/projects/new881__clip02/job.json
+== pipeline: job=new881__clip02 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [23:53:10] raw file: /Users/Apple/autoclip-pipeline/projects/new881__clip02/raw/source.mp4
+-- [2/7] rough cut --
+  [23:53:10] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [23:53:10] graphics-plan: reading script from rough-cut (no re-transcription)
+  [23:53:10] graphics-plan: style='hook card -> raw' preset='tiktok-raw-style' reframe='letterbox' target=1080x1920
+  [23:53:10] graphics-plan: planning beats
+  [23:53:10] graphics-plan: {"beat_count": 1}
+  [23:53:10] graphics-plan: rendering (reframe + beat cards) via engine stand-in
+Traceback (most recent call last):
+  File "/Users/Apple/autoclip-pipeline/skills/graphics-plan/render.py", line 261, in <module>
+    main()
+  File "/Users/Apple/autoclip-pipeline/skills/graphics-plan/render.py", line 255, in main
+    subprocess.run(cmd, check=True, capture_output=True, text=True)
+  File "/usr/local/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['ffmpeg', '-nostdin', '-y', '-i', '/Users/Apple/autoclip-pipeline/projects/new881__clip02/rough-cut/rough_cut.mp4', '-vf', "scale=w=1080:h=1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=black,drawtext=text=I got ethernet again. He\\'s goofy. Go ahead. Oh:fontcolor=white:fontsize=42:box=1:boxcolor=black@0.55:boxborderw=16:x=(w-text_w)/2:y=h*0.75:enable='between(t\\,0.00\\,23.76)'", '-c:v', 'libx264', '-preset', 'veryfast', '-c:a', 'aac', '/Users/Apple/autoclip-pipeline/projects/new881__clip02/graphics/graphics_cut.mp4']' returned non-zero exit status 8.
+  [23:53:10]   clip02: paused for second-pass review (normal) — approve with: python3 lib/jobstate.py mark new881__clip02 second_pass done && ./run_pipeline.sh new881__clip02 short-tiktok-raw
+-- clip03 [requested]: 153.34s-213.34s (score=4) "(gunfire/impact detected)" --
+/Users/Apple/autoclip-pipeline/projects/new881__clip03/job.json
+== pipeline: job=new881__clip03 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [23:53:24] raw file: /Users/Apple/autoclip-pipeline/projects/new881__clip03/raw/source.mp4
+-- [2/7] rough cut --
+  [23:53:24] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [23:53:25] graphics-plan: reading script from rough-cut (no re-transcription)
+  [23:53:25] graphics-plan: style='hook card -> raw' preset='tiktok-raw-style' reframe='letterbox' target=1080x1920
+  [23:53:25] graphics-plan: planning beats
+  [23:53:25] graphics-plan: {"beat_count": 1}
+  [23:53:25] graphics-plan: rendering (reframe + beat cards) via engine stand-in
+Traceback (most recent call last):
+  File "/Users/Apple/autoclip-pipeline/skills/graphics-plan/render.py", line 261, in <module>
+    main()
+  File "/Users/Apple/autoclip-pipeline/skills/graphics-plan/render.py", line 255, in main
+    subprocess.run(cmd, check=True, capture_output=True, text=True)
+  File "/usr/local/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['ffmpeg', '-nostdin', '-y', '-i', '/Users/Apple/autoclip-pipeline/projects/new881__clip03/rough-cut/rough_cut.mp4', '-vf', "scale=w=1080:h=1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=black,drawtext=text=Oh\\, the perfect pass:fontcolor=white:fontsize=42:box=1:boxcolor=black@0.55:boxborderw=16:x=(w-text_w)/2:y=h*0.75:enable='between(t\\,0.00\\,1.64)'", '-c:v', 'libx264', '-preset', 'veryfast', '-c:a', 'aac', '/Users/Apple/autoclip-pipeline/projects/new881__clip03/graphics/graphics_cut.mp4']' returned non-zero exit status 8.
+  [23:53:25]   clip03: paused for second-pass review (normal) — approve with: python3 lib/jobstate.py mark new881__clip03 second_pass done && ./run_pipeline.sh new881__clip03 short-tiktok-raw
+-- clip04 [requested]: 224.36s-284.36s (score=4) "(gunfire/impact detected)" --
+/Users/Apple/autoclip-pipeline/projects/new881__clip04/job.json
+== pipeline: job=new881__clip04 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [23:53:42] raw file: /Users/Apple/autoclip-pipeline/projects/new881__clip04/raw/source.mp4
+-- [2/7] rough cut --
+  [23:53:42] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [23:53:42] graphics-plan: reading script from rough-cut (no re-transcription)
+  [23:53:42] graphics-plan: style='hook card -> raw' preset='tiktok-raw-style' reframe='letterbox' target=1080x1920
+  [23:53:42] graphics-plan: planning beats
+  [23:53:42] graphics-plan: {"beat_count": 1}
+  [23:53:42] graphics-plan: rendering (reframe + beat cards) via engine stand-in
+Traceback (most recent call last):
+  File "/Users/Apple/autoclip-pipeline/skills/graphics-plan/render.py", line 261, in <module>
+    main()
+  File "/Users/Apple/autoclip-pipeline/skills/graphics-plan/render.py", line 255, in main
+    subprocess.run(cmd, check=True, capture_output=True, text=True)
+  File "/usr/local/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['ffmpeg', '-nostdin', '-y', '-i', '/Users/Apple/autoclip-pipeline/projects/new881__clip04/rough-cut/rough_cut.mp4', '-vf', "scale=w=1080:h=1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=black,drawtext=text=Is he:fontcolor=white:fontsize=42:box=1:boxcolor=black@0.55:boxborderw=16:x=(w-text_w)/2:y=h*0.75:enable='between(t\\,0.00\\,60.00)'", '-c:v', 'libx264', '-preset', 'veryfast', '-c:a', 'aac', '/Users/Apple/autoclip-pipeline/projects/new881__clip04/graphics/graphics_cut.mp4']' returned non-zero exit status 8.
+  [23:53:42]   clip04: paused for second-pass review (normal) — approve with: python3 lib/jobstate.py mark new881__clip04 second_pass done && ./run_pipeline.sh new881__clip04 short-tiktok-raw
+-- clip05 [requested]: 284.5s-344.5s (score=4) "(gunfire/impact detected)" --
+/Users/Apple/autoclip-pipeline/projects/new881__clip05/job.json
+== pipeline: job=new881__clip05 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [23:54:00] raw file: /Users/Apple/autoclip-pipeline/projects/new881__clip05/raw/source.mp4
+-- [2/7] rough cut --
+  [23:54:00] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [23:54:00] graphics-plan: reading script from rough-cut (no re-transcription)
+  [23:54:00] graphics-plan: style='hook card -> raw' preset='tiktok-raw-style' reframe='letterbox' target=1080x1920
+  [23:54:00] graphics-plan: planning beats
+  [23:54:00] graphics-plan: {"beat_count": 1}
+  [23:54:00] graphics-plan: rendering (reframe + beat cards) via engine stand-in
+Traceback (most recent call last):
+  File "/Users/Apple/autoclip-pipeline/skills/graphics-plan/render.py", line 261, in <module>
+    main()
+  File "/Users/Apple/autoclip-pipeline/skills/graphics-plan/render.py", line 255, in main
+    subprocess.run(cmd, check=True, capture_output=True, text=True)
+  File "/usr/local/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['ffmpeg', '-nostdin', '-y', '-i', '/Users/Apple/autoclip-pipeline/projects/new881__clip05/rough-cut/rough_cut.mp4', '-vf', "scale=w=1080:h=1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=black,drawtext=text=Is he:fontcolor=white:fontsize=42:box=1:boxcolor=black@0.55:boxborderw=16:x=(w-text_w)/2:y=h*0.75:enable='between(t\\,0.00\\,7.02)'", '-c:v', 'libx264', '-preset', 'veryfast', '-c:a', 'aac', '/Users/Apple/autoclip-pipeline/projects/new881__clip05/graphics/graphics_cut.mp4']' returned non-zero exit status 8.
+  [23:54:00]   clip05: paused for second-pass review (normal) — approve with: python3 lib/jobstate.py mark new881__clip05 second_pass done && ./run_pipeline.sh new881__clip05 short-tiktok-raw
+-- clip06 [requested]: 348.6s-408.6s (score=4) "(gunfire/impact detected)" --
+/Users/Apple/autoclip-pipeline/projects/new881__clip06/job.json
+== pipeline: job=new881__clip06 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [23:54:19] raw file: /Users/Apple/autoclip-pipeline/projects/new881__clip06/raw/source.mp4
+-- [2/7] rough cut --
+  [23:54:19] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [23:54:19] graphics-plan: reading script from rough-cut (no re-transcription)
+  [23:54:19] graphics-plan: style='hook card -> raw' preset='tiktok-raw-style' reframe='letterbox' target=1080x1920
+  [23:54:19] graphics-plan: planning beats
+  [23:54:19] graphics-plan: {"beat_count": 1}
+  [23:54:19] graphics-plan: rendering (reframe + beat cards) via engine stand-in
+Traceback (most recent call last):
+  File "/Users/Apple/autoclip-pipeline/skills/graphics-plan/render.py", line 261, in <module>
+    main()
+  File "/Users/Apple/autoclip-pipeline/skills/graphics-plan/render.py", line 255, in main
+    subprocess.run(cmd, check=True, capture_output=True, text=True)
+  File "/usr/local/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['ffmpeg', '-nostdin', '-y', '-i', '/Users/Apple/autoclip-pipeline/projects/new881__clip06/rough-cut/rough_cut.mp4', '-vf', "scale=w=1080:h=1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=black,drawtext=text=You got to get curvy get to the side. It\\'s not:fontcolor=white:fontsize=42:box=1:boxcolor=black@0.55:boxborderw=16:x=(w-text_w)/2:y=h*0.75:enable='between(t\\,0.00\\,5.08)'", '-c:v', 'libx264', '-preset', 'veryfast', '-c:a', 'aac', '/Users/Apple/autoclip-pipeline/projects/new881__clip06/graphics/graphics_cut.mp4']' returned non-zero exit status 8.
+  [23:54:19]   clip06: paused for second-pass review (normal) — approve with: python3 lib/jobstate.py mark new881__clip06 second_pass done && ./run_pipeline.sh new881__clip06 short-tiktok-raw
+-- clip07 [requested]: 412.42s-472.42s (score=4) "(gunfire/impact detected)" --
+/Users/Apple/autoclip-pipeline/projects/new881__clip07/job.json
+== pipeline: job=new881__clip07 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [23:54:41] raw file: /Users/Apple/autoclip-pipeline/projects/new881__clip07/raw/source.mp4
+-- [2/7] rough cut --
+  [23:54:41] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [23:54:41] graphics-plan: reading script from rough-cut (no re-transcription)
+  [23:54:41] graphics-plan: style='hook card -> raw' preset='tiktok-raw-style' reframe='letterbox' target=1080x1920
+  [23:54:41] graphics-plan: planning beats
+  [23:54:41] graphics-plan: {"beat_count": 2}
+  [23:54:41] graphics-plan: rendering (reframe + beat cards) via engine stand-in
+Traceback (most recent call last):
+  File "/Users/Apple/autoclip-pipeline/skills/graphics-plan/render.py", line 261, in <module>
+    main()
+  File "/Users/Apple/autoclip-pipeline/skills/graphics-plan/render.py", line 255, in main
+    subprocess.run(cmd, check=True, capture_output=True, text=True)
+  File "/usr/local/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['ffmpeg', '-nostdin', '-y', '-i', '/Users/Apple/autoclip-pipeline/projects/new881__clip07/rough-cut/rough_cut.mp4', '-vf', "scale=w=1080:h=1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=black,drawtext=text=Shot that\\'s your shot. You know what I\\'m saying? Yeah:fontcolor=white:fontsize=42:box=1:boxcolor=black@0.55:boxborderw=16:x=(w-text_w)/2:y=h*0.75:enable='between(t\\,0.00\\,0.73)',drawtext=text=Don\\'t do it to me. Oh my good nigga truck stick:fontcolor=white:fontsize=42:box=1:boxcolor=black@0.55:boxborderw=16:x=(w-text_w)/2:y=h*0.75:enable='between(t\\,18.43\\,24.14)'", '-c:v', 'libx264', '-preset', 'veryfast', '-c:a', 'aac', '/Users/Apple/autoclip-pipeline/projects/new881__clip07/graphics/graphics_cut.mp4']' returned non-zero exit status 8.
+  [23:54:42]   clip07: paused for second-pass review (normal) — approve with: python3 lib/jobstate.py mark new881__clip07 second_pass done && ./run_pipeline.sh new881__clip07 short-tiktok-raw
+-- clip08 [requested]: 480.74s-540.74s (score=4) "(gunfire/impact detected)" --
+/Users/Apple/autoclip-pipeline/projects/new881__clip08/job.json
+== pipeline: job=new881__clip08 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [23:55:07] raw file: /Users/Apple/autoclip-pipeline/projects/new881__clip08/raw/source.mp4
+-- [2/7] rough cut --
+  [23:55:07] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [23:55:07] graphics-plan: reading script from rough-cut (no re-transcription)
+  [23:55:07] graphics-plan: style='hook card -> raw' preset='tiktok-raw-style' reframe='letterbox' target=1080x1920
+  [23:55:07] graphics-plan: planning beats
+  [23:55:07] graphics-plan: {"beat_count": 1}
+  [23:55:07] graphics-plan: rendering (reframe + beat cards) via engine stand-in
+Traceback (most recent call last):
+  File "/Users/Apple/autoclip-pipeline/skills/graphics-plan/render.py", line 261, in <module>
+    main()
+  File "/Users/Apple/autoclip-pipeline/skills/graphics-plan/render.py", line 255, in main
+    subprocess.run(cmd, check=True, capture_output=True, text=True)
+  File "/usr/local/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['ffmpeg', '-nostdin', '-y', '-i', '/Users/Apple/autoclip-pipeline/projects/new881__clip08/rough-cut/rough_cut.mp4', '-vf', "scale=w=1080:h=1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=black,drawtext=text=Got to be Canada\\, I think all right:fontcolor=white:fontsize=42:box=1:boxcolor=black@0.55:boxborderw=16:x=(w-text_w)/2:y=h*0.75:enable='between(t\\,28.86\\,57.56)'", '-c:v', 'libx264', '-preset', 'veryfast', '-c:a', 'aac', '/Users/Apple/autoclip-pipeline/projects/new881__clip08/graphics/graphics_cut.mp4']' returned non-zero exit status 8.
+  [23:55:07]   clip08: paused for second-pass review (normal) — approve with: python3 lib/jobstate.py mark new881__clip08 second_pass done && ./run_pipeline.sh new881__clip08 short-tiktok-raw
+-- clip09 [bonus]: 548.94s-608.94s (score=4) "(gunfire/impact detected)" --
+/Users/Apple/autoclip-pipeline/projects/new881__clip09/job.json
+== pipeline: job=new881__clip09 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [23:55:34] raw file: /Users/Apple/autoclip-pipeline/projects/new881__clip09/raw/source.mp4
+-- [2/7] rough cut --
+  [23:55:34] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [23:55:35] graphics-plan: reading script from rough-cut (no re-transcription)
+  [23:55:35] graphics-plan: style='hook card -> raw' preset='tiktok-raw-style' reframe='letterbox' target=1080x1920
+  [23:55:35] graphics-plan: planning beats
+  [23:55:35] graphics-plan: {"beat_count": 0}
+  [23:55:35] graphics-plan: rendering (reframe + beat cards) via engine stand-in
+  [23:55:43] graphics-plan: {"beats_rendered": 0, "face_tracked": false}
+  [23:55:43] graphics-plan: done -> projects/new881__clip09/graphics/{graphics-plan.json,graphics_cut.mp4}
+-- [4/7] second pass (manual review) --
+  [23:55:44] [second_pass] --auto-approve set, skipping manual review
+-- [5/7] captions (format-specific: short-tiktok-raw) --
+  [23:55:44] embedded-captions: reusing rough-cut's word timings (no re-transcription)
+  [23:55:44] embedded-captions: position='low, under face' target=1080x1920
+  [23:55:44] embedded-captions: {"caption_lines": 0, "word_level_lines": 0}
+  [23:55:44] embedded-captions: no caption lines (no transcript available) — copying graphics_cut.mp4 through unburned
+  [23:55:44] embedded-captions: done -> projects/new881__clip09/captions/{captions.ass,captions_cut.mp4}
+-- [6/7] background music — skipped --
+-- [7/7] export --
+  [23:55:44] finalize: promoted captions_cut.mp4 -> outputs/new881__clip09.final.mp4
+  [23:55:45] prune: removed 3 intermediate render(s) + scratch work dir for job 'new881__clip09'
+  [23:55:45] thumbnail-generator: format 'short-tiktok-raw' policy is 'skip' — nothing to do
+== done: outputs/new881__clip09.final.mp4 ==
+-- clip10 [bonus]: 613.24s-673.24s (score=4) "(gunfire/impact detected)" --
+/Users/Apple/autoclip-pipeline/projects/new881__clip10/job.json
+== pipeline: job=new881__clip10 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [23:56:09] raw file: /Users/Apple/autoclip-pipeline/projects/new881__clip10/raw/source.mp4
+-- [2/7] rough cut --
+  [23:56:09] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [23:56:10] graphics-plan: reading script from rough-cut (no re-transcription)
+  [23:56:10] graphics-plan: style='hook card -> raw' preset='tiktok-raw-style' reframe='letterbox' target=1080x1920
+  [23:56:10] graphics-plan: planning beats
+  [23:56:10] graphics-plan: {"beat_count": 0}
+  [23:56:10] graphics-plan: rendering (reframe + beat cards) via engine stand-in
+  [23:56:17] graphics-plan: {"beats_rendered": 0, "face_tracked": false}
+  [23:56:17] graphics-plan: done -> projects/new881__clip10/graphics/{graphics-plan.json,graphics_cut.mp4}
+-- [4/7] second pass (manual review) --
+  [23:56:17] [second_pass] --auto-approve set, skipping manual review
+-- [5/7] captions (format-specific: short-tiktok-raw) --
+  [23:56:17] embedded-captions: reusing rough-cut's word timings (no re-transcription)
+  [23:56:17] embedded-captions: position='low, under face' target=1080x1920
+  [23:56:17] embedded-captions: {"caption_lines": 0, "word_level_lines": 0}
+  [23:56:17] embedded-captions: no caption lines (no transcript available) — copying graphics_cut.mp4 through unburned
+  [23:56:17] embedded-captions: done -> projects/new881__clip10/captions/{captions.ass,captions_cut.mp4}
+-- [6/7] background music — skipped --
+-- [7/7] export --
+  [23:56:17] finalize: promoted captions_cut.mp4 -> outputs/new881__clip10.final.mp4
+  [23:56:18] prune: removed 3 intermediate render(s) + scratch work dir for job 'new881__clip10'
+  [23:56:18] thumbnail-generator: format 'short-tiktok-raw' policy is 'skip' — nothing to do
+== done: outputs/new881__clip10.final.mp4 ==
+-- clip11 [bonus]: 676.04s-736.04s (score=4) "(gunfire/impact detected)" --
+/Users/Apple/autoclip-pipeline/projects/new881__clip11/job.json
+== pipeline: job=new881__clip11 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [23:56:42] raw file: /Users/Apple/autoclip-pipeline/projects/new881__clip11/raw/source.mp4
+-- [2/7] rough cut --
+  [23:56:42] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [23:56:43] graphics-plan: reading script from rough-cut (no re-transcription)
+  [23:56:43] graphics-plan: style='hook card -> raw' preset='tiktok-raw-style' reframe='letterbox' target=1080x1920
+  [23:56:43] graphics-plan: planning beats
+  [23:56:43] graphics-plan: {"beat_count": 0}
+  [23:56:43] graphics-plan: rendering (reframe + beat cards) via engine stand-in
+  [23:56:49] graphics-plan: {"beats_rendered": 0, "face_tracked": false}
+  [23:56:49] graphics-plan: done -> projects/new881__clip11/graphics/{graphics-plan.json,graphics_cut.mp4}
+-- [4/7] second pass (manual review) --
+  [23:56:50] [second_pass] --auto-approve set, skipping manual review
+-- [5/7] captions (format-specific: short-tiktok-raw) --
+  [23:56:50] embedded-captions: reusing rough-cut's word timings (no re-transcription)
+  [23:56:50] embedded-captions: position='low, under face' target=1080x1920
+  [23:56:50] embedded-captions: {"caption_lines": 0, "word_level_lines": 0}
+  [23:56:50] embedded-captions: no caption lines (no transcript available) — copying graphics_cut.mp4 through unburned
+  [23:56:50] embedded-captions: done -> projects/new881__clip11/captions/{captions.ass,captions_cut.mp4}
+-- [6/7] background music — skipped --
+-- [7/7] export --
+  [23:56:51] finalize: promoted captions_cut.mp4 -> outputs/new881__clip11.final.mp4
+  [23:56:51] prune: removed 3 intermediate render(s) + scratch work dir for job 'new881__clip11'
+  [23:56:51] thumbnail-generator: format 'short-tiktok-raw' policy is 'skip' — nothing to do
+== done: outputs/new881__clip11.final.mp4 ==
+  [23:56:51] cleanup: --keep-raw set, leaving parent raw source and rough-cut render in place
+== clip_pipeline done: check outputs/new881__clip*.final.mp4 or outputs/new881__montage*.final.mp4 ==

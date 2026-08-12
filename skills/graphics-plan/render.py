@@ -24,6 +24,30 @@ import subprocess
 import sys
 
 
+# Real root cause found and fixed: drawtext with no explicit fontfile=
+# relies on fontconfig to resolve a font by NAME — and confirmed on the
+# real production machine, its ffmpeg build has zero fontconfig support
+# (`ffmpeg -version` shows no --enable-libfontconfig, common for Homebrew
+# builds). Without fontconfig, drawtext fails hard rather than falling
+# back to anything. This searches a short list of font paths that
+# reliably exist on the actual platforms this pipeline runs on, and uses
+# the first one found — sidesteps fontconfig entirely instead of
+# depending on it.
+_FONT_CANDIDATES = [
+    "/System/Library/Fonts/Supplemental/Arial.ttf",   # macOS
+    "/System/Library/Fonts/Helvetica.ttc",            # macOS fallback
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",  # Linux (Debian/Ubuntu)
+    "/usr/share/fonts/dejavu/DejaVuSans.ttf",         # Linux (RHEL/Fedora)
+]
+
+
+def find_font_file():
+    for path in _FONT_CANDIDATES:
+        if os.path.exists(path):
+            return path
+    return None  # none found — caller falls back to no-fontfile (old, fontconfig-dependent) behavior
+
+
 def escape_drawtext(text):
     """Proper ffmpeg drawtext escaping, unquoted-value style. ffmpeg's filter
     parser has a well-known apostrophe bug when text is wrapped in single
@@ -54,16 +78,18 @@ def build_filter(width, height, beats, style, reframe="crop"):
         ]
 
     if "card" in style or "hook" in style:
+        font_file = find_font_file()
+        font_param = f"fontfile='{font_file}':" if font_file else ""
         for beat in beats:
             text = escape_drawtext(beat["text"])
             if len(text) > 60:
                 text = text[:57] + "..."
             y = "h*0.1" if "top-half" in style else "h*0.75"
             filters.append(
-                "drawtext=text=%s:fontcolor=white:fontsize=42:"
+                "drawtext=%stext=%s:fontcolor=white:fontsize=42:"
                 "box=1:boxcolor=black@0.55:boxborderw=16:"
                 "x=(w-text_w)/2:y=%s:enable='between(t\\,%.2f\\,%.2f)'"
-                % (text, y, beat["start"], beat["end"])
+                % (font_param, text, y, beat["start"], beat["end"])
             )
 
     return ",".join(filters)
