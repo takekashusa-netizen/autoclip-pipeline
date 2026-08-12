@@ -1,0 +1,5 @@
+== clip_pipeline: job=job1786571638 format=short-tiktok-raw clip_length=60s clip_count=10 ==
+/Users/Apple/autoclip-pipeline/projects/job1786571638/job.json
+-- transcribing full source (once) --
+  [17:29:46] rough-cut: extracting audio from source.mp4
+rough-cut: audio extraction timed out or failed (180s) — likely a corrupted/truncated source

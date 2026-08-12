@@ -55,5 +55,15 @@ if ! run_with_timeout 30 ffmpeg -nostdin -y -ss "$grab_time" -i "$video" -frames
   exit 1
 fi
 
+if [[ -n "${THUMBNAIL_WATERMARK_TEXT:-}" ]]; then
+  brand_result=0
+  brand_output="$(python3 "${PIPELINE_ROOT}/lib/thumbnail_brand.py" "$out_path" "$THUMBNAIL_WATERMARK_TEXT" "${THUMBNAIL_LOGO_PATH:-}" 2>&1)" || brand_result=$?
+  if [[ $brand_result -ne 0 ]]; then
+    log "thumbnail-generator: WARNING — branding failed (${brand_output}), thumbnail still saved unbranded"
+  else
+    log "thumbnail-generator: branded with watermark '${THUMBNAIL_WATERMARK_TEXT}'$([ -n "${THUMBNAIL_LOGO_PATH:-}" ] && echo " + logo")"
+  fi
+fi
+
 state_set "$job" "artifacts.thumbnail" "\"projects/${job}/thumbnail/thumb.jpg\""
 log "thumbnail-generator: done -> projects/${job}/thumbnail/thumb.jpg"
