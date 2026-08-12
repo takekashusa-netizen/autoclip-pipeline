@@ -76,6 +76,39 @@ def escape_drawtext(text):
     return text
 
 
+def render_beat_image(text, width, height, style, font_file):
+    """Renders one beat's caption as a transparent RGBA PNG the same size
+    as the video frame — text + semi-transparent box, positioned per
+    style — for ffmpeg's overlay filter instead of drawtext. Real,
+    permanent fix: confirmed on the production machine that its ffmpeg
+    build has NO drawtext filter at all ("No such filter: 'drawtext'"),
+    not a font-loading issue — no fontfile parameter could ever have
+    fixed that, since the filter itself doesn't exist in the binary.
+    overlay, unlike drawtext, has no optional external library
+    dependency, so this sidesteps the whole problem permanently
+    regardless of how the user's ffmpeg was built."""
+    from PIL import Image, ImageDraw, ImageFont
+
+    img = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    font_size = 42
+    try:
+        font = ImageFont.truetype(font_file, font_size) if font_file else ImageFont.load_default(size=font_size)
+    except Exception:
+        font = ImageFont.load_default()
+
+    bbox = draw.textbbox((0, 0), text, font=font)
+    text_w, text_h = bbox[2] - bbox[0], bbox[3] - bbox[1]
+    x = (width - text_w) // 2
+    y = int(height * 0.1) if "top-half" in style else int(height * 0.75)
+
+    pad = 16
+    draw.rectangle([x - pad, y - pad, x + text_w + pad, y + text_h + pad],
+                   fill=(0, 0, 0, int(255 * 0.55)))
+    draw.text((x, y), text, font=font, fill=(255, 255, 255, 255))
+    return img
+
+
 def build_filter(width, height, beats, style, reframe="crop"):
     if reframe == "letterbox":
         # scale-to-fit + pad, no cropping — gaming HUD/killfeed/minimap at
@@ -91,23 +124,54 @@ def build_filter(width, height, beats, style, reframe="crop"):
             f"crop='min(iw,ih*{width}/{height})':'min(ih,iw*{height}/{width})'",
             f"scale={width}:{height}",
         ]
+    return ",".join(filters)
 
-    if "card" in style or "hook" in style:
-        font_file = find_font_file()
-        font_param = f"fontfile='{font_file}':" if font_file else ""
-        for beat in beats:
-            text = escape_drawtext(beat["text"])
+
+def render_with_caption_overlays(input_path, beats, width, height, style, reframe, out_path):
+    """Full replacement for the drawtext-based card rendering: base
+    reframe filter (unchanged), then one PNG overlay per beat, composited
+    via ffmpeg's overlay filter with enable='between(...)' — same visual
+    timing behavior as the old drawtext approach, zero dependency on
+    drawtext/libfreetype/fontconfig being present in the ffmpeg build."""
+    import tempfile
+    font_file = find_font_file()
+    base_filter = build_filter(width, height, [], style, reframe)
+
+    if not beats:
+        cmd = ["ffmpeg", "-nostdin", "-y", "-i", input_path, "-vf", base_filter,
+               "-c:v", "libx264", "-preset", "veryfast", "-c:a", "aac", out_path]
+        run_ffmpeg(cmd)
+        return 0
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        image_paths = []
+        for i, beat in enumerate(beats):
+            text = beat["text"]
             if len(text) > 60:
                 text = text[:57] + "..."
-            y = "h*0.1" if "top-half" in style else "h*0.75"
-            filters.append(
-                "drawtext=%stext=%s:fontcolor=white:fontsize=42:"
-                "box=1:boxcolor=black@0.55:boxborderw=16:"
-                "x=(w-text_w)/2:y=%s:enable='between(t\\,%.2f\\,%.2f)'"
-                % (font_param, text, y, beat["start"], beat["end"])
-            )
+            img = render_beat_image(text, width, height, style, font_file)
+            img_path = os.path.join(tmpdir, f"beat_{i:03d}.png")
+            img.save(img_path)
+            image_paths.append(img_path)
 
-    return ",".join(filters)
+        cmd = ["ffmpeg", "-nostdin", "-y", "-i", input_path]
+        for p in image_paths:
+            cmd += ["-i", p]
+
+        filter_parts = [f"[0:v]{base_filter}[base]"]
+        prev_label = "base"
+        for i, beat in enumerate(beats):
+            out_label = f"v{i}"
+            filter_parts.append(
+                f"[{prev_label}][{i+1}:v]overlay=0:0:enable='between(t\\,{beat['start']:.2f}\\,{beat['end']:.2f})'[{out_label}]"
+            )
+            prev_label = out_label
+
+        filter_complex = ";".join(filter_parts)
+        cmd += ["-filter_complex", filter_complex, "-map", f"[{prev_label}]", "-map", "0:a?",
+                "-c:v", "libx264", "-preset", "veryfast", "-c:a", "aac", out_path]
+        run_ffmpeg(cmd)
+    return len(beats)
 
 
 def ffprobe_dims(video_path):
@@ -247,54 +311,50 @@ def main():
         except Exception:
             pass
 
+    show_captions = ("card" in style or "hook" in style) and beats
+
     if reframe == "split" and two_speaker_segments:
         work_dir = os.path.join(os.path.dirname(out_path), "_split_work")
         stacked = build_split_screen_video(rough_cut, two_speaker_segments, width, height, work_dir)
-        vf = build_filter(width, height, beats, style, reframe="_already_cropped")
-        drawtext_filters = [f for f in vf.split(",") if f.startswith("drawtext")]
-        cmd = ["ffmpeg", "-nostdin", "-y", "-i", stacked]
-        if drawtext_filters:
-            cmd += ["-vf", ",".join(drawtext_filters)]
-        cmd += ["-c:v", "libx264", "-preset", "veryfast", "-c:a", "aac", out_path]
-        run_ffmpeg(cmd)
+        if show_captions:
+            render_with_caption_overlays(stacked, beats, width, height, style, "_already_cropped", out_path)
+        else:
+            run_ffmpeg(["ffmpeg", "-nostdin", "-y", "-i", stacked, "-c", "copy", out_path])
         import shutil
         shutil.rmtree(work_dir, ignore_errors=True)
-        print(json.dumps({"beats_rendered": len(beats) if ("card" in style or "hook" in style) else 0,
+        print(json.dumps({"beats_rendered": len(beats) if show_captions else 0,
                            "split_screen": True, "segments": len(two_speaker_segments)}))
         return
 
     if face_segments:
-        # face-tracking path: crop+scale happens per-segment above, so the
-        # filter here is JUST the drawtext overlay, applied once to the
-        # already-cropped concatenated result — keeps the well-tested
-        # drawtext logic completely unchanged and reused as-is
+        # face-tracking path: crop+scale happens per-segment above, so
+        # caption overlays (if any) apply once to the already-cropped
+        # concatenated result
         work_dir = os.path.join(os.path.dirname(out_path), "_facetrack_work")
         cropped = build_face_tracked_video(rough_cut, face_segments, width, height, work_dir)
-        vf = build_filter(width, height, beats, style, reframe="_already_cropped")
-        # strip the crop/scale filters build_filter would normally add —
-        # reuse only its drawtext-building logic by re-deriving just that part
-        drawtext_filters = [f for f in vf.split(",") if f.startswith("drawtext")]
-        cmd = ["ffmpeg", "-nostdin", "-y", "-i", cropped]
-        if drawtext_filters:
-            cmd += ["-vf", ",".join(drawtext_filters)]
-        cmd += ["-c:v", "libx264", "-preset", "veryfast", "-c:a", "aac", out_path]
-        run_ffmpeg(cmd)
+        if show_captions:
+            render_with_caption_overlays(cropped, beats, width, height, style, "_already_cropped", out_path)
+        else:
+            run_ffmpeg(["ffmpeg", "-nostdin", "-y", "-i", cropped, "-c", "copy", out_path])
         import shutil
         shutil.rmtree(work_dir, ignore_errors=True)
-        print(json.dumps({"beats_rendered": len(beats) if ("card" in style or "hook" in style) else 0,
+        print(json.dumps({"beats_rendered": len(beats) if show_captions else 0,
                            "face_tracked": True, "face_segments": len(face_segments)}))
         return
 
-    vf = build_filter(width, height, beats, style, reframe)
-    cmd = [
-        "ffmpeg", "-nostdin", "-y", "-i", rough_cut,
-        "-vf", vf,
-        "-c:v", "libx264", "-preset", "veryfast",
-        "-c:a", "aac",
-        out_path,
-    ]
-    run_ffmpeg(cmd)
-    print(json.dumps({"beats_rendered": len(beats) if ("card" in style or "hook" in style) else 0,
+    if show_captions:
+        render_with_caption_overlays(rough_cut, beats, width, height, style, reframe, out_path)
+    else:
+        vf = build_filter(width, height, beats, style, reframe)
+        cmd = [
+            "ffmpeg", "-nostdin", "-y", "-i", rough_cut,
+            "-vf", vf,
+            "-c:v", "libx264", "-preset", "veryfast",
+            "-c:a", "aac",
+            out_path,
+        ]
+        run_ffmpeg(cmd)
+    print(json.dumps({"beats_rendered": len(beats) if show_captions else 0,
                        "face_tracked": False}))
 
 
