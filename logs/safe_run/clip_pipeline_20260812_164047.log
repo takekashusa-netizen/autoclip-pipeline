@@ -1,0 +1,4 @@
+== clip_pipeline: job=new882 format=short-tiktok-raw clip_length=60s clip_count=10 ==
+-- transcribing full source (once) --
+  [16:40:56] rough-cut: extracting audio from source.mp4
+rough-cut: audio extraction timed out or failed (180s) — likely a corrupted/truncated source

@@ -5863,3 +5863,80 @@ skip new881: managed by clip_pipeline.sh (multi-clip job) — resume with ./clip
 skip new882: managed by clip_pipeline.sh (multi-clip job) — resume with ./clip_pipeline.sh directly, not run_pipeline.sh
 
 == resume_all summary: 37 jobs found, 0 resumed, 34 already done, 0 locked/running, 1 missing raw file ==
+
+--- auto-resume triggered at 16:23:53 ---
+skip 55ffc8ca0948: no raw file present (download never completed) — re-submit this one manually
+skip new881: managed by clip_pipeline.sh (multi-clip job) — resume with ./clip_pipeline.sh directly, not run_pipeline.sh
+skip new882: locked (already running, or a stale lock — check manually if this persists)
+
+== resume_all summary: 37 jobs found, 0 resumed, 34 already done, 1 locked/running, 1 missing raw file ==
+
+--- auto-resume triggered at 16:26:04 ---
+skip 55ffc8ca0948: no raw file present (download never completed) — re-submit this one manually
+skip new881: managed by clip_pipeline.sh (multi-clip job) — resume with ./clip_pipeline.sh directly, not run_pipeline.sh
+skip new882: locked (already running, or a stale lock — check manually if this persists)
+
+== resume_all summary: 37 jobs found, 0 resumed, 34 already done, 1 locked/running, 1 missing raw file ==
+
+--- auto-resume triggered at 16:28:21 ---
+skip 55ffc8ca0948: no raw file present (download never completed) — re-submit this one manually
+skip new881: managed by clip_pipeline.sh (multi-clip job) — resume with ./clip_pipeline.sh directly, not run_pipeline.sh
+skip new882: locked (already running, or a stale lock — check manually if this persists)
+
+== resume_all summary: 37 jobs found, 0 resumed, 34 already done, 1 locked/running, 1 missing raw file ==
+
+--- auto-resume triggered at 16:30:35 ---
+skip 55ffc8ca0948: no raw file present (download never completed) — re-submit this one manually
+skip new881: managed by clip_pipeline.sh (multi-clip job) — resume with ./clip_pipeline.sh directly, not run_pipeline.sh
+skip new882: managed by clip_pipeline.sh (multi-clip job) — resume with ./clip_pipeline.sh directly, not run_pipeline.sh
+
+== resume_all summary: 37 jobs found, 0 resumed, 34 already done, 0 locked/running, 1 missing raw file ==
+
+--- auto-resume triggered at 16:32:38 ---
+skip 55ffc8ca0948: no raw file present (download never completed) — re-submit this one manually
+skip new881: managed by clip_pipeline.sh (multi-clip job) — resume with ./clip_pipeline.sh directly, not run_pipeline.sh
+skip new882: managed by clip_pipeline.sh (multi-clip job) — resume with ./clip_pipeline.sh directly, not run_pipeline.sh
+
+== resume_all summary: 37 jobs found, 0 resumed, 34 already done, 0 locked/running, 1 missing raw file ==
+
+--- auto-resume triggered at 16:34:38 ---
+skip 55ffc8ca0948: no raw file present (download never completed) — re-submit this one manually
+skip new881: managed by clip_pipeline.sh (multi-clip job) — resume with ./clip_pipeline.sh directly, not run_pipeline.sh
+skip new882: managed by clip_pipeline.sh (multi-clip job) — resume with ./clip_pipeline.sh directly, not run_pipeline.sh
+
+== resume_all summary: 37 jobs found, 0 resumed, 34 already done, 0 locked/running, 1 missing raw file ==
+
+--- auto-resume triggered at 16:36:40 ---
+skip 55ffc8ca0948: no raw file present (download never completed) — re-submit this one manually
+skip new881: managed by clip_pipeline.sh (multi-clip job) — resume with ./clip_pipeline.sh directly, not run_pipeline.sh
+skip new882: managed by clip_pipeline.sh (multi-clip job) — resume with ./clip_pipeline.sh directly, not run_pipeline.sh
+
+== resume_all summary: 37 jobs found, 0 resumed, 34 already done, 0 locked/running, 1 missing raw file ==
+
+--- auto-resume triggered at 16:38:40 ---
+skip 55ffc8ca0948: no raw file present (download never completed) — re-submit this one manually
+skip new881: managed by clip_pipeline.sh (multi-clip job) — resume with ./clip_pipeline.sh directly, not run_pipeline.sh
+skip new882: managed by clip_pipeline.sh (multi-clip job) — resume with ./clip_pipeline.sh directly, not run_pipeline.sh
+
+== resume_all summary: 37 jobs found, 0 resumed, 34 already done, 0 locked/running, 1 missing raw file ==
+
+--- auto-resume triggered at 16:40:40 ---
+skip 55ffc8ca0948: no raw file present (download never completed) — re-submit this one manually
+skip new881: managed by clip_pipeline.sh (multi-clip job) — resume with ./clip_pipeline.sh directly, not run_pipeline.sh
+skip new882: managed by clip_pipeline.sh (multi-clip job) — resume with ./clip_pipeline.sh directly, not run_pipeline.sh
+
+== resume_all summary: 37 jobs found, 0 resumed, 34 already done, 0 locked/running, 1 missing raw file ==
+
+--- auto-resume triggered at 16:42:55 ---
+skip 55ffc8ca0948: no raw file present (download never completed) — re-submit this one manually
+skip new881: managed by clip_pipeline.sh (multi-clip job) — resume with ./clip_pipeline.sh directly, not run_pipeline.sh
+skip new882: locked (already running, or a stale lock — check manually if this persists)
+
+== resume_all summary: 37 jobs found, 0 resumed, 34 already done, 1 locked/running, 1 missing raw file ==
+
+--- auto-resume triggered at 16:45:04 ---
+skip 55ffc8ca0948: no raw file present (download never completed) — re-submit this one manually
+skip new881: managed by clip_pipeline.sh (multi-clip job) — resume with ./clip_pipeline.sh directly, not run_pipeline.sh
+skip new882: managed by clip_pipeline.sh (multi-clip job) — resume with ./clip_pipeline.sh directly, not run_pipeline.sh
+
+== resume_all summary: 37 jobs found, 0 resumed, 34 already done, 0 locked/running, 1 missing raw file ==
