@@ -25,6 +25,8 @@ clip_length=60
 clip_count=3
 content_type=""
 interval=900  # 15 min default poll
+model="tiny"  # real finding tonight: small silently failed on real
+              # content while tiny worked correctly — safe default here
 args=("$@")
 i=0
 while [[ $i -lt ${#args[@]} ]]; do
@@ -34,6 +36,7 @@ while [[ $i -lt ${#args[@]} ]]; do
     --clip-count) i=$((i+1)); clip_count="${args[$i]}" ;;
     --content-type) i=$((i+1)); content_type="${args[$i]}" ;;
     --interval) i=$((i+1)); interval="${args[$i]}" ;;
+    --model) i=$((i+1)); model="${args[$i]}" ;;
   esac
   i=$((i+1))
 done
@@ -79,10 +82,11 @@ for v in data.get('videos', []):
     fi
 
     clip_args=("${ROOT}/clip_pipeline.sh" "$job" "$format"
-               "--clip-length" "$clip_length" "--clip-count" "$clip_count")
+               "--clip-length" "$clip_length" "--clip-count" "$clip_count"
+               "--auto-approve" "--skip-music")
     [[ -n "$content_type" ]] && clip_args+=(--content-type "$content_type")
 
-    if "${clip_args[@]}" > "${ROOT}/logs/${job}.log" 2>&1; then
+    if PIPELINE_WHISPER_MODEL="$model" "${clip_args[@]}" > "${ROOT}/logs/${job}.log" 2>&1; then
       log "watch_channel: clipped \"${title}\" — organizing output"
       python3 "${ROOT}/lib/organize_output.py" "$job" --title "$title" || \
         log "watch_channel: clip succeeded but organize step failed — check outputs/${job}__clip*.final.mp4 directly"

@@ -1,37 +1,62 @@
-  [13:38:30] doctor: watching + auto-resuming (checks every 60s) — Ctrl+C to stop
-  [15:33:45] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
-  [15:35:46] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
-  [15:37:46] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
-  [15:39:46] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
-  [15:41:46] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
-  [15:43:47] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
-  [15:45:47] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
-  [15:47:47] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
-  [15:49:48] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
-  [15:51:48] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
-  [15:53:48] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
-  [15:55:49] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
-  [15:57:49] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
-  [15:59:49] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
-  [16:01:49] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
-  [16:03:50] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
-  [16:05:50] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
-  [16:07:50] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
-  [16:09:51] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
-  [16:11:51] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
-  [16:13:51] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
-  [16:15:52] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
-  [16:17:52] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
-  [16:19:52] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
-  [16:21:53] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
-  [16:23:53] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
-  [16:26:04] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
-  [16:28:21] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
-  [16:30:35] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
-  [16:32:38] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
-  [16:34:38] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
-  [16:36:40] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
-  [16:38:40] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
-  [16:40:40] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
-  [16:42:55] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
-  [16:45:04] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
+  [16:49:04] doctor: watching + auto-resuming + auto-publishing (private) (checks every 60s) — Ctrl+C to stop
+  [16:49:04] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
+  [16:49:04] doctor: auto-publishing new881__montage01 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [16:49:09] doctor: auto-publish FAILED for new881__montage01: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [16:49:09] doctor: auto-publishing new881__montage02 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [16:49:09] doctor: auto-publish FAILED for new881__montage02: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [16:49:09] doctor: auto-publishing new881__montage04 -> "(visual action detected) | Insane Gaming Moment"
+  [16:49:09] doctor: auto-publish FAILED for new881__montage04: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [16:49:09] doctor: auto-publishing new881__montage03 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [16:49:09] doctor: auto-publish FAILED for new881__montage03: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [16:54:09] doctor: auto-publishing new881__montage01 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [16:54:09] doctor: auto-publish FAILED for new881__montage01: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [16:54:09] doctor: auto-publishing new881__montage02 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [16:54:09] doctor: auto-publish FAILED for new881__montage02: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [16:54:09] doctor: auto-publishing new881__montage04 -> "(visual action detected) | Insane Gaming Moment"
+  [16:54:09] doctor: auto-publish FAILED for new881__montage04: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [16:54:09] doctor: auto-publishing new881__montage03 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [16:54:09] doctor: auto-publish FAILED for new881__montage03: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [16:55:09] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
+  [16:57:10] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
+  [16:59:11] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
+  [16:59:12] doctor: auto-publishing new881__montage01 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [16:59:12] doctor: auto-publish FAILED for new881__montage01: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [16:59:12] doctor: auto-publishing new881__montage02 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [16:59:12] doctor: auto-publish FAILED for new881__montage02: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [16:59:12] doctor: auto-publishing new881__montage04 -> "(visual action detected) | Insane Gaming Moment"
+  [16:59:12] doctor: auto-publish FAILED for new881__montage04: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [16:59:12] doctor: auto-publishing new881__montage03 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [16:59:12] doctor: auto-publish FAILED for new881__montage03: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [17:01:13] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
+  [17:03:14] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
+  [17:04:16] doctor: auto-publishing new881__montage01 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [17:04:16] doctor: auto-publish FAILED for new881__montage01: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [17:04:16] doctor: auto-publishing new881__montage02 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [17:04:16] doctor: auto-publish FAILED for new881__montage02: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [17:04:16] doctor: auto-publishing new881__montage04 -> "(visual action detected) | Insane Gaming Moment"
+  [17:04:16] doctor: auto-publish FAILED for new881__montage04: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [17:04:16] doctor: auto-publishing new881__montage03 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [17:04:16] doctor: auto-publish FAILED for new881__montage03: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [17:05:16] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
+  [17:07:17] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
+  [17:09:19] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
+  [17:09:20] doctor: auto-publishing new881__montage01 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [17:09:20] doctor: auto-publish FAILED for new881__montage01: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [17:09:20] doctor: auto-publishing new881__montage02 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [17:09:20] doctor: auto-publish FAILED for new881__montage02: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [17:09:20] doctor: auto-publishing new881__montage04 -> "(visual action detected) | Insane Gaming Moment"
+  [17:09:20] doctor: auto-publish FAILED for new881__montage04: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [17:09:20] doctor: auto-publishing new881__montage03 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [17:09:20] doctor: auto-publish FAILED for new881__montage03: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [17:11:38] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
+  [17:13:53] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
+  [17:15:04] doctor: auto-publishing new881__montage01 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [17:15:04] doctor: auto-publish FAILED for new881__montage01: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [17:15:05] doctor: auto-publishing new881__montage02 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [17:15:05] doctor: auto-publish FAILED for new881__montage02: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [17:15:06] doctor: auto-publishing new881__montage04 -> "(visual action detected) | Insane Gaming Moment"
+  [17:15:06] doctor: auto-publish FAILED for new881__montage04: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [17:15:06] doctor: auto-publishing new881__montage03 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [17:15:06] doctor: auto-publish FAILED for new881__montage03: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [17:16:19] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
+  [17:18:39] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
