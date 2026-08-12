@@ -140,7 +140,7 @@ elif [[ "$auto_approve" == true ]]; then
 else
   log "waiting on manual review/incremental re-composite — mark done with:"
   log "  python3 lib/jobstate.py mark ${job} second_pass done"
-  echo "== paused: resume with ./run_pipeline.sh ${job} ${format} after Jason approves =="
+  echo "== paused: resume with ./run_pipeline.sh ${job} ${format} after you approve =="
   exit 0
 fi
 

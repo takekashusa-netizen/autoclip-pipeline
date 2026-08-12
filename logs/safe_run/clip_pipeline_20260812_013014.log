@@ -1,0 +1,29 @@
+== clip_pipeline: job=new881 format=long-form-youtube montage_minutes=12 montage_count=1 ==
+  [01:30:31] rough-cut already done for 'new881' — reusing existing transcript
+-- analyzing visual content (action/motion detection) --
+  [01:30:31] visual-analysis: reusing existing visual-analysis.json (delete it manually to force a fresh re-analysis)
+-- analyzing audio content (gunfire/impact detection) --
+  [01:30:31] audio-analysis: reusing existing audio-analysis.json (delete it manually to force a fresh re-analysis)
+-- selecting best moments (montage_minutes=12) --
+  [01:30:31] build-montage: {"montage_count": 1, "segments_per_montage": [80], "durations_sec": [719.6]}
+-- montage01: 80 moments, 719.6s total --
+/Users/Apple/autoclip-pipeline/projects/new881__montage01/job.json
+== pipeline: job=new881__montage01 format=long-form-youtube ==
+-- [1/7] intake --
+  [01:54:45] raw file: /Users/Apple/autoclip-pipeline/projects/new881__montage01/raw/source.mp4
+-- [2/7] rough cut --
+  [01:54:45] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: long-form-youtube) --
+  [01:54:46] graphics-plan: reading script from rough-cut (no re-transcription)
+  [01:54:46] graphics-plan: style='glass + zoom' preset='liquid-glass-style' reframe='letterbox' target=1920x1080
+  [01:54:46] graphics-plan: planning beats
+  [01:54:46] graphics-plan: {"beat_count": 1}
+  [01:54:46] graphics-plan: rendering (reframe + beat cards) via engine stand-in
+  [01:56:38] graphics-plan: {"beats_rendered": 0, "face_tracked": false}
+  [01:56:38] graphics-plan: done -> projects/new881__montage01/graphics/{graphics-plan.json,graphics_cut.mp4}
+-- [4/7] second pass (manual review) --
+  [01:56:38] waiting on manual review/incremental re-composite — mark done with:
+  [01:56:38]   python3 lib/jobstate.py mark new881__montage01 second_pass done
+== paused: resume with ./run_pipeline.sh new881__montage01 long-form-youtube after Jason approves ==
+  [01:56:38] cleanup: --keep-raw set, leaving parent raw source and rough-cut render in place
+== clip_pipeline done: check outputs/new881__clip*.final.mp4 or outputs/new881__montage*.final.mp4 ==

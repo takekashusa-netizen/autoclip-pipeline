@@ -1,0 +1,229 @@
+== clip_pipeline: job=new881 format=short-tiktok-raw clip_length=60s clip_count=8 ==
+  [00:54:17] rough-cut already done for 'new881' — reusing existing transcript
+-- analyzing visual content (action/motion detection) --
+  [00:54:17] visual-analysis: reusing existing visual-analysis.json (delete it manually to force a fresh re-analysis)
+-- analyzing audio content (gunfire/impact detection) --
+  [00:54:18] audio-analysis: reusing existing audio-analysis.json (delete it manually to force a fresh re-analysis)
+-- selecting best moments (montage_minutes=0) --
+  [00:54:18] clip-select: {"clip_count": 11, "bonus_count": 3}
+-- clip01 [requested]: 0.0s-60.0s (score=4) "(gunfire/impact detected)" --
+== pipeline: job=new881__clip01 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [00:54:26] [intake] already done, skipping (use --force to redo)
+-- [2/7] rough cut --
+  [00:54:27] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [00:54:27] [graphics] already done, skipping (use --force to redo)
+-- [4/7] second pass (manual review) --
+  [00:54:27] [second_pass] already approved, skipping
+-- [5/7] captions (format-specific: short-tiktok-raw) --
+  [00:54:27] embedded-captions: reusing rough-cut's word timings (no re-transcription)
+  [00:54:27] embedded-captions: position='low, under face' target=1080x1920
+  [00:54:35] embedded-captions: {"caption_lines": 3}
+  [00:54:35] embedded-captions: done -> projects/new881__clip01/captions/captions_cut.mp4
+-- [6/7] background music — skipped --
+-- [7/7] export --
+  [00:54:35] finalize: promoted captions_cut.mp4 -> outputs/new881__clip01.final.mp4
+  [00:54:35] prune: removed 3 intermediate render(s) + scratch work dir for job 'new881__clip01'
+  [00:54:36] thumbnail-generator: format 'short-tiktok-raw' policy is 'skip' — nothing to do
+== done: outputs/new881__clip01.final.mp4 ==
+-- clip02 [requested]: 80.28s-140.28s (score=4) "(gunfire/impact detected)" --
+== pipeline: job=new881__clip02 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [00:54:53] [intake] already done, skipping (use --force to redo)
+-- [2/7] rough cut --
+  [00:54:53] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [00:54:53] [graphics] already done, skipping (use --force to redo)
+-- [4/7] second pass (manual review) --
+  [00:54:53] [second_pass] already approved, skipping
+-- [5/7] captions (format-specific: short-tiktok-raw) --
+  [00:54:53] embedded-captions: reusing rough-cut's word timings (no re-transcription)
+  [00:54:53] embedded-captions: position='low, under face' target=1080x1920
+  [00:55:01] embedded-captions: {"caption_lines": 5}
+  [00:55:01] embedded-captions: done -> projects/new881__clip02/captions/captions_cut.mp4
+-- [6/7] background music — skipped --
+-- [7/7] export --
+  [00:55:01] finalize: promoted captions_cut.mp4 -> outputs/new881__clip02.final.mp4
+  [00:55:01] prune: removed 3 intermediate render(s) + scratch work dir for job 'new881__clip02'
+  [00:55:01] thumbnail-generator: format 'short-tiktok-raw' policy is 'skip' — nothing to do
+== done: outputs/new881__clip02.final.mp4 ==
+-- clip03 [requested]: 153.34s-213.34s (score=4) "(gunfire/impact detected)" --
+== pipeline: job=new881__clip03 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [00:55:17] [intake] already done, skipping (use --force to redo)
+-- [2/7] rough cut --
+  [00:55:17] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [00:55:17] [graphics] already done, skipping (use --force to redo)
+-- [4/7] second pass (manual review) --
+  [00:55:17] [second_pass] already approved, skipping
+-- [5/7] captions (format-specific: short-tiktok-raw) --
+  [00:55:17] embedded-captions: reusing rough-cut's word timings (no re-transcription)
+  [00:55:17] embedded-captions: position='low, under face' target=1080x1920
+  [00:55:25] embedded-captions: {"caption_lines": 2}
+  [00:55:25] embedded-captions: done -> projects/new881__clip03/captions/captions_cut.mp4
+-- [6/7] background music — skipped --
+-- [7/7] export --
+  [00:55:25] finalize: promoted captions_cut.mp4 -> outputs/new881__clip03.final.mp4
+  [00:55:25] prune: removed 3 intermediate render(s) + scratch work dir for job 'new881__clip03'
+  [00:55:25] thumbnail-generator: format 'short-tiktok-raw' policy is 'skip' — nothing to do
+== done: outputs/new881__clip03.final.mp4 ==
+-- clip04 [requested]: 224.36s-284.36s (score=4) "(gunfire/impact detected)" --
+== pipeline: job=new881__clip04 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [00:55:43] [intake] already done, skipping (use --force to redo)
+-- [2/7] rough cut --
+  [00:55:43] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [00:55:43] [graphics] already done, skipping (use --force to redo)
+-- [4/7] second pass (manual review) --
+  [00:55:43] [second_pass] already approved, skipping
+-- [5/7] captions (format-specific: short-tiktok-raw) --
+  [00:55:44] embedded-captions: reusing rough-cut's word timings (no re-transcription)
+  [00:55:44] embedded-captions: position='low, under face' target=1080x1920
+  [00:55:52] embedded-captions: {"caption_lines": 1}
+  [00:55:52] embedded-captions: done -> projects/new881__clip04/captions/captions_cut.mp4
+-- [6/7] background music — skipped --
+-- [7/7] export --
+  [00:55:52] finalize: promoted captions_cut.mp4 -> outputs/new881__clip04.final.mp4
+  [00:55:52] prune: removed 3 intermediate render(s) + scratch work dir for job 'new881__clip04'
+  [00:55:52] thumbnail-generator: format 'short-tiktok-raw' policy is 'skip' — nothing to do
+== done: outputs/new881__clip04.final.mp4 ==
+-- clip05 [requested]: 284.5s-344.5s (score=4) "(gunfire/impact detected)" --
+== pipeline: job=new881__clip05 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [00:56:11] [intake] already done, skipping (use --force to redo)
+-- [2/7] rough cut --
+  [00:56:11] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [00:56:11] [graphics] already done, skipping (use --force to redo)
+-- [4/7] second pass (manual review) --
+  [00:56:11] [second_pass] already approved, skipping
+-- [5/7] captions (format-specific: short-tiktok-raw) --
+  [00:56:11] embedded-captions: reusing rough-cut's word timings (no re-transcription)
+  [00:56:11] embedded-captions: position='low, under face' target=1080x1920
+  [00:56:19] embedded-captions: {"caption_lines": 5}
+  [00:56:19] embedded-captions: done -> projects/new881__clip05/captions/captions_cut.mp4
+-- [6/7] background music — skipped --
+-- [7/7] export --
+  [00:56:19] finalize: promoted captions_cut.mp4 -> outputs/new881__clip05.final.mp4
+  [00:56:19] prune: removed 3 intermediate render(s) + scratch work dir for job 'new881__clip05'
+  [00:56:20] thumbnail-generator: format 'short-tiktok-raw' policy is 'skip' — nothing to do
+== done: outputs/new881__clip05.final.mp4 ==
+-- clip06 [requested]: 348.6s-408.6s (score=4) "(gunfire/impact detected)" --
+== pipeline: job=new881__clip06 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [00:56:39] [intake] already done, skipping (use --force to redo)
+-- [2/7] rough cut --
+  [00:56:39] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [00:56:39] [graphics] already done, skipping (use --force to redo)
+-- [4/7] second pass (manual review) --
+  [00:56:39] [second_pass] already approved, skipping
+-- [5/7] captions (format-specific: short-tiktok-raw) --
+  [00:56:39] embedded-captions: reusing rough-cut's word timings (no re-transcription)
+  [00:56:39] embedded-captions: position='low, under face' target=1080x1920
+  [00:56:46] embedded-captions: {"caption_lines": 2}
+  [00:56:46] embedded-captions: done -> projects/new881__clip06/captions/captions_cut.mp4
+-- [6/7] background music — skipped --
+-- [7/7] export --
+  [00:56:46] finalize: promoted captions_cut.mp4 -> outputs/new881__clip06.final.mp4
+  [00:56:46] prune: removed 3 intermediate render(s) + scratch work dir for job 'new881__clip06'
+  [00:56:46] thumbnail-generator: format 'short-tiktok-raw' policy is 'skip' — nothing to do
+== done: outputs/new881__clip06.final.mp4 ==
+-- clip07 [requested]: 412.42s-472.42s (score=4) "(gunfire/impact detected)" --
+== pipeline: job=new881__clip07 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [00:57:09] [intake] already done, skipping (use --force to redo)
+-- [2/7] rough cut --
+  [00:57:09] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [00:57:09] [graphics] already done, skipping (use --force to redo)
+-- [4/7] second pass (manual review) --
+  [00:57:09] [second_pass] already approved, skipping
+-- [5/7] captions (format-specific: short-tiktok-raw) --
+  [00:57:09] embedded-captions: reusing rough-cut's word timings (no re-transcription)
+  [00:57:09] embedded-captions: position='low, under face' target=1080x1920
+  [00:57:17] embedded-captions: {"caption_lines": 4}
+  [00:57:17] embedded-captions: done -> projects/new881__clip07/captions/captions_cut.mp4
+-- [6/7] background music — skipped --
+-- [7/7] export --
+  [00:57:17] finalize: promoted captions_cut.mp4 -> outputs/new881__clip07.final.mp4
+  [00:57:17] prune: removed 3 intermediate render(s) + scratch work dir for job 'new881__clip07'
+  [00:57:17] thumbnail-generator: format 'short-tiktok-raw' policy is 'skip' — nothing to do
+== done: outputs/new881__clip07.final.mp4 ==
+-- clip08 [requested]: 480.74s-540.74s (score=4) "(gunfire/impact detected)" --
+== pipeline: job=new881__clip08 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [00:57:45] [intake] already done, skipping (use --force to redo)
+-- [2/7] rough cut --
+  [00:57:45] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [00:57:45] [graphics] already done, skipping (use --force to redo)
+-- [4/7] second pass (manual review) --
+  [00:57:45] [second_pass] already approved, skipping
+-- [5/7] captions (format-specific: short-tiktok-raw) --
+  [00:57:45] embedded-captions: reusing rough-cut's word timings (no re-transcription)
+  [00:57:45] embedded-captions: position='low, under face' target=1080x1920
+  [00:57:53] embedded-captions: {"caption_lines": 1}
+  [00:57:53] embedded-captions: done -> projects/new881__clip08/captions/captions_cut.mp4
+-- [6/7] background music — skipped --
+-- [7/7] export --
+  [00:57:54] finalize: promoted captions_cut.mp4 -> outputs/new881__clip08.final.mp4
+  [00:57:54] prune: removed 3 intermediate render(s) + scratch work dir for job 'new881__clip08'
+  [00:57:54] thumbnail-generator: format 'short-tiktok-raw' policy is 'skip' — nothing to do
+== done: outputs/new881__clip08.final.mp4 ==
+-- clip09 [bonus]: 548.94s-608.94s (score=4) "(gunfire/impact detected)" --
+== pipeline: job=new881__clip09 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [00:58:24] [intake] already done, skipping (use --force to redo)
+-- [2/7] rough cut --
+  [00:58:24] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [00:58:24] [graphics] already done, skipping (use --force to redo)
+-- [4/7] second pass (manual review) --
+  [00:58:24] [second_pass] already approved, skipping
+-- [5/7] captions (format-specific: short-tiktok-raw) --
+  [00:58:24] [captions] already done, skipping (use --force to redo)
+-- [6/7] background music — skipped --
+-- [7/7] export --
+  [00:58:24] [export] already done, skipping (use --force to redo)
+  [00:58:24] thumbnail-generator: format 'short-tiktok-raw' policy is 'skip' — nothing to do
+== done: outputs/new881__clip09.final.mp4 ==
+-- clip10 [bonus]: 613.24s-673.24s (score=4) "(gunfire/impact detected)" --
+== pipeline: job=new881__clip10 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [00:58:51] [intake] already done, skipping (use --force to redo)
+-- [2/7] rough cut --
+  [00:58:51] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [00:58:52] [graphics] already done, skipping (use --force to redo)
+-- [4/7] second pass (manual review) --
+  [00:58:52] [second_pass] already approved, skipping
+-- [5/7] captions (format-specific: short-tiktok-raw) --
+  [00:58:52] [captions] already done, skipping (use --force to redo)
+-- [6/7] background music — skipped --
+-- [7/7] export --
+  [00:58:52] [export] already done, skipping (use --force to redo)
+  [00:58:52] thumbnail-generator: format 'short-tiktok-raw' policy is 'skip' — nothing to do
+== done: outputs/new881__clip10.final.mp4 ==
+-- clip11 [bonus]: 676.04s-736.04s (score=4) "(gunfire/impact detected)" --
+== pipeline: job=new881__clip11 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [00:59:17] [intake] already done, skipping (use --force to redo)
+-- [2/7] rough cut --
+  [00:59:17] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [00:59:17] [graphics] already done, skipping (use --force to redo)
+-- [4/7] second pass (manual review) --
+  [00:59:17] [second_pass] already approved, skipping
+-- [5/7] captions (format-specific: short-tiktok-raw) --
+  [00:59:17] [captions] already done, skipping (use --force to redo)
+-- [6/7] background music — skipped --
+-- [7/7] export --
+  [00:59:17] [export] already done, skipping (use --force to redo)
+  [00:59:18] thumbnail-generator: format 'short-tiktok-raw' policy is 'skip' — nothing to do
+== done: outputs/new881__clip11.final.mp4 ==
+  [00:59:18] cleanup: --keep-raw set, leaving parent raw source and rough-cut render in place
+== clip_pipeline done: check outputs/new881__clip*.final.mp4 or outputs/new881__montage*.final.mp4 ==
