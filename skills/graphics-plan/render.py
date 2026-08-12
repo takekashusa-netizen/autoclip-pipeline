@@ -48,6 +48,21 @@ def find_font_file():
     return None  # none found — caller falls back to no-fontfile (old, fontconfig-dependent) behavior
 
 
+def run_ffmpeg(cmd):
+    """Real bug fixed: every ffmpeg call in this file used check=True with
+    capture_output=True, meaning a failure raised CalledProcessError with
+    the actual ffmpeg stderr message completely invisible — the Python
+    traceback shown to the user (and even in our own logs) never included
+    WHY ffmpeg actually failed, only that it did. This surfaces the real
+    error text before re-raising, so a failure is actually diagnosable
+    instead of a black box."""
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    if result.returncode != 0:
+        print(f"ffmpeg FAILED (exit {result.returncode}). Real stderr:\n{result.stderr}", file=sys.stderr)
+        raise subprocess.CalledProcessError(result.returncode, cmd, output=result.stdout, stderr=result.stderr)
+    return result
+
+
 def escape_drawtext(text):
     """Proper ffmpeg drawtext escaping, unquoted-value style. ffmpeg's filter
     parser has a well-known apostrophe bug when text is wrapped in single
@@ -136,7 +151,7 @@ def build_face_tracked_video(rough_cut, face_segments, target_w, target_h, work_
             "-c:v", "libx264", "-preset", "veryfast", "-c:a", "aac",
             part_file, "-loglevel", "error",
         ]
-        subprocess.run(cmd, check=True, capture_output=True, text=True)
+        run_ffmpeg(cmd)
         part_files.append(part_file)
 
     concat_list = os.path.join(work_dir, "concat.txt")
@@ -182,7 +197,7 @@ def build_split_screen_video(rough_cut, two_speaker_segments, target_w, target_h
                 "-c:v", "libx264", "-preset", "veryfast", "-c:a", "aac",
                 track_file, "-loglevel", "error",
             ]
-            subprocess.run(cmd, check=True, capture_output=True, text=True)
+            run_ffmpeg(cmd)
             track_files.append(track_file)
 
         stacked_file = os.path.join(work_dir, f"stacked_{i:04d}.mp4")
@@ -241,7 +256,7 @@ def main():
         if drawtext_filters:
             cmd += ["-vf", ",".join(drawtext_filters)]
         cmd += ["-c:v", "libx264", "-preset", "veryfast", "-c:a", "aac", out_path]
-        subprocess.run(cmd, check=True, capture_output=True, text=True)
+        run_ffmpeg(cmd)
         import shutil
         shutil.rmtree(work_dir, ignore_errors=True)
         print(json.dumps({"beats_rendered": len(beats) if ("card" in style or "hook" in style) else 0,
@@ -263,7 +278,7 @@ def main():
         if drawtext_filters:
             cmd += ["-vf", ",".join(drawtext_filters)]
         cmd += ["-c:v", "libx264", "-preset", "veryfast", "-c:a", "aac", out_path]
-        subprocess.run(cmd, check=True, capture_output=True, text=True)
+        run_ffmpeg(cmd)
         import shutil
         shutil.rmtree(work_dir, ignore_errors=True)
         print(json.dumps({"beats_rendered": len(beats) if ("card" in style or "hook" in style) else 0,
@@ -278,7 +293,7 @@ def main():
         "-c:a", "aac",
         out_path,
     ]
-    subprocess.run(cmd, check=True, capture_output=True, text=True)
+    run_ffmpeg(cmd)
     print(json.dumps({"beats_rendered": len(beats) if ("card" in style or "hook" in style) else 0,
                        "face_tracked": False}))
 

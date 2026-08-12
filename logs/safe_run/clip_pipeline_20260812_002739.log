@@ -1,0 +1,229 @@
+== clip_pipeline: job=new881 format=short-tiktok-raw clip_length=60s clip_count=8 ==
+  [00:27:45] rough-cut already done for 'new881' — reusing existing transcript
+-- analyzing visual content (action/motion detection) --
+  [00:27:45] visual-analysis: reusing existing visual-analysis.json (delete it manually to force a fresh re-analysis)
+-- analyzing audio content (gunfire/impact detection) --
+  [00:27:45] audio-analysis: reusing existing audio-analysis.json (delete it manually to force a fresh re-analysis)
+-- selecting best moments (montage_minutes=0) --
+  [00:27:45] clip-select: {"clip_count": 11, "bonus_count": 3}
+-- clip01 [requested]: 0.0s-60.0s (score=4) "(gunfire/impact detected)" --
+== pipeline: job=new881__clip01 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [00:27:54] [intake] already done, skipping (use --force to redo)
+-- [2/7] rough cut --
+  [00:27:54] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [00:27:55] graphics-plan: reading script from rough-cut (no re-transcription)
+  [00:27:55] graphics-plan: style='hook card -> raw' preset='tiktok-raw-style' reframe='letterbox' target=1080x1920
+  [00:27:55] graphics-plan: planning beats
+  [00:27:55] graphics-plan: {"beat_count": 2}
+  [00:27:55] graphics-plan: rendering (reframe + beat cards) via engine stand-in
+Traceback (most recent call last):
+  File "/Users/Apple/autoclip-pipeline/skills/graphics-plan/render.py", line 287, in <module>
+    main()
+  File "/Users/Apple/autoclip-pipeline/skills/graphics-plan/render.py", line 281, in main
+    subprocess.run(cmd, check=True, capture_output=True, text=True)
+  File "/usr/local/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['ffmpeg', '-nostdin', '-y', '-i', '/Users/Apple/autoclip-pipeline/projects/new881__clip01/rough-cut/rough_cut.mp4', '-vf', "scale=w=1080:h=1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=black,drawtext=fontfile='/System/Library/Fonts/Supplemental/Arial.ttf':text=Come on:fontcolor=white:fontsize=42:box=1:boxcolor=black@0.55:boxborderw=16:x=(w-text_w)/2:y=h*0.75:enable='between(t\\,0.34\\,3.34)',drawtext=fontfile='/System/Library/Fonts/Supplemental/Arial.ttf':text=What\\'s going on with him? I ain\\'t did this in so long:fontcolor=white:fontsize=42:box=1:boxcolor=black@0.55:boxborderw=16:x=(w-text_w)/2:y=h*0.75:enable='between(t\\,7.12\\,18.02)'", '-c:v', 'libx264', '-preset', 'veryfast', '-c:a', 'aac', '/Users/Apple/autoclip-pipeline/projects/new881__clip01/graphics/graphics_cut.mp4']' returned non-zero exit status 8.
+  [00:27:55]   clip01: paused for second-pass review (normal) — approve with: python3 lib/jobstate.py mark new881__clip01 second_pass done && ./run_pipeline.sh new881__clip01 short-tiktok-raw
+-- clip02 [requested]: 80.28s-140.28s (score=4) "(gunfire/impact detected)" --
+== pipeline: job=new881__clip02 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [00:28:09] [intake] already done, skipping (use --force to redo)
+-- [2/7] rough cut --
+  [00:28:09] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [00:28:09] graphics-plan: reading script from rough-cut (no re-transcription)
+  [00:28:09] graphics-plan: style='hook card -> raw' preset='tiktok-raw-style' reframe='letterbox' target=1080x1920
+  [00:28:09] graphics-plan: planning beats
+  [00:28:09] graphics-plan: {"beat_count": 1}
+  [00:28:09] graphics-plan: rendering (reframe + beat cards) via engine stand-in
+Traceback (most recent call last):
+  File "/Users/Apple/autoclip-pipeline/skills/graphics-plan/render.py", line 287, in <module>
+    main()
+  File "/Users/Apple/autoclip-pipeline/skills/graphics-plan/render.py", line 281, in main
+    subprocess.run(cmd, check=True, capture_output=True, text=True)
+  File "/usr/local/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['ffmpeg', '-nostdin', '-y', '-i', '/Users/Apple/autoclip-pipeline/projects/new881__clip02/rough-cut/rough_cut.mp4', '-vf', "scale=w=1080:h=1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=black,drawtext=fontfile='/System/Library/Fonts/Supplemental/Arial.ttf':text=I got ethernet again. He\\'s goofy. Go ahead. Oh:fontcolor=white:fontsize=42:box=1:boxcolor=black@0.55:boxborderw=16:x=(w-text_w)/2:y=h*0.75:enable='between(t\\,0.00\\,23.76)'", '-c:v', 'libx264', '-preset', 'veryfast', '-c:a', 'aac', '/Users/Apple/autoclip-pipeline/projects/new881__clip02/graphics/graphics_cut.mp4']' returned non-zero exit status 8.
+  [00:28:10]   clip02: paused for second-pass review (normal) — approve with: python3 lib/jobstate.py mark new881__clip02 second_pass done && ./run_pipeline.sh new881__clip02 short-tiktok-raw
+-- clip03 [requested]: 153.34s-213.34s (score=4) "(gunfire/impact detected)" --
+== pipeline: job=new881__clip03 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [00:28:25] [intake] already done, skipping (use --force to redo)
+-- [2/7] rough cut --
+  [00:28:25] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [00:28:25] graphics-plan: reading script from rough-cut (no re-transcription)
+  [00:28:25] graphics-plan: style='hook card -> raw' preset='tiktok-raw-style' reframe='letterbox' target=1080x1920
+  [00:28:25] graphics-plan: planning beats
+  [00:28:26] graphics-plan: {"beat_count": 1}
+  [00:28:26] graphics-plan: rendering (reframe + beat cards) via engine stand-in
+Traceback (most recent call last):
+  File "/Users/Apple/autoclip-pipeline/skills/graphics-plan/render.py", line 287, in <module>
+    main()
+  File "/Users/Apple/autoclip-pipeline/skills/graphics-plan/render.py", line 281, in main
+    subprocess.run(cmd, check=True, capture_output=True, text=True)
+  File "/usr/local/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['ffmpeg', '-nostdin', '-y', '-i', '/Users/Apple/autoclip-pipeline/projects/new881__clip03/rough-cut/rough_cut.mp4', '-vf', "scale=w=1080:h=1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=black,drawtext=fontfile='/System/Library/Fonts/Supplemental/Arial.ttf':text=Oh\\, the perfect pass:fontcolor=white:fontsize=42:box=1:boxcolor=black@0.55:boxborderw=16:x=(w-text_w)/2:y=h*0.75:enable='between(t\\,0.00\\,1.64)'", '-c:v', 'libx264', '-preset', 'veryfast', '-c:a', 'aac', '/Users/Apple/autoclip-pipeline/projects/new881__clip03/graphics/graphics_cut.mp4']' returned non-zero exit status 8.
+  [00:28:26]   clip03: paused for second-pass review (normal) — approve with: python3 lib/jobstate.py mark new881__clip03 second_pass done && ./run_pipeline.sh new881__clip03 short-tiktok-raw
+-- clip04 [requested]: 224.36s-284.36s (score=4) "(gunfire/impact detected)" --
+== pipeline: job=new881__clip04 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [00:28:43] [intake] already done, skipping (use --force to redo)
+-- [2/7] rough cut --
+  [00:28:43] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [00:28:44] graphics-plan: reading script from rough-cut (no re-transcription)
+  [00:28:44] graphics-plan: style='hook card -> raw' preset='tiktok-raw-style' reframe='letterbox' target=1080x1920
+  [00:28:44] graphics-plan: planning beats
+  [00:28:44] graphics-plan: {"beat_count": 1}
+  [00:28:44] graphics-plan: rendering (reframe + beat cards) via engine stand-in
+Traceback (most recent call last):
+  File "/Users/Apple/autoclip-pipeline/skills/graphics-plan/render.py", line 287, in <module>
+    main()
+  File "/Users/Apple/autoclip-pipeline/skills/graphics-plan/render.py", line 281, in main
+    subprocess.run(cmd, check=True, capture_output=True, text=True)
+  File "/usr/local/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['ffmpeg', '-nostdin', '-y', '-i', '/Users/Apple/autoclip-pipeline/projects/new881__clip04/rough-cut/rough_cut.mp4', '-vf', "scale=w=1080:h=1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=black,drawtext=fontfile='/System/Library/Fonts/Supplemental/Arial.ttf':text=Is he:fontcolor=white:fontsize=42:box=1:boxcolor=black@0.55:boxborderw=16:x=(w-text_w)/2:y=h*0.75:enable='between(t\\,0.00\\,60.00)'", '-c:v', 'libx264', '-preset', 'veryfast', '-c:a', 'aac', '/Users/Apple/autoclip-pipeline/projects/new881__clip04/graphics/graphics_cut.mp4']' returned non-zero exit status 8.
+  [00:28:44]   clip04: paused for second-pass review (normal) — approve with: python3 lib/jobstate.py mark new881__clip04 second_pass done && ./run_pipeline.sh new881__clip04 short-tiktok-raw
+-- clip05 [requested]: 284.5s-344.5s (score=4) "(gunfire/impact detected)" --
+== pipeline: job=new881__clip05 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [00:29:02] [intake] already done, skipping (use --force to redo)
+-- [2/7] rough cut --
+  [00:29:02] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [00:29:02] graphics-plan: reading script from rough-cut (no re-transcription)
+  [00:29:02] graphics-plan: style='hook card -> raw' preset='tiktok-raw-style' reframe='letterbox' target=1080x1920
+  [00:29:02] graphics-plan: planning beats
+  [00:29:03] graphics-plan: {"beat_count": 1}
+  [00:29:03] graphics-plan: rendering (reframe + beat cards) via engine stand-in
+Traceback (most recent call last):
+  File "/Users/Apple/autoclip-pipeline/skills/graphics-plan/render.py", line 287, in <module>
+    main()
+  File "/Users/Apple/autoclip-pipeline/skills/graphics-plan/render.py", line 281, in main
+    subprocess.run(cmd, check=True, capture_output=True, text=True)
+  File "/usr/local/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['ffmpeg', '-nostdin', '-y', '-i', '/Users/Apple/autoclip-pipeline/projects/new881__clip05/rough-cut/rough_cut.mp4', '-vf', "scale=w=1080:h=1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=black,drawtext=fontfile='/System/Library/Fonts/Supplemental/Arial.ttf':text=Is he:fontcolor=white:fontsize=42:box=1:boxcolor=black@0.55:boxborderw=16:x=(w-text_w)/2:y=h*0.75:enable='between(t\\,0.00\\,7.02)'", '-c:v', 'libx264', '-preset', 'veryfast', '-c:a', 'aac', '/Users/Apple/autoclip-pipeline/projects/new881__clip05/graphics/graphics_cut.mp4']' returned non-zero exit status 8.
+  [00:29:03]   clip05: paused for second-pass review (normal) — approve with: python3 lib/jobstate.py mark new881__clip05 second_pass done && ./run_pipeline.sh new881__clip05 short-tiktok-raw
+-- clip06 [requested]: 348.6s-408.6s (score=4) "(gunfire/impact detected)" --
+== pipeline: job=new881__clip06 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [00:29:21] [intake] already done, skipping (use --force to redo)
+-- [2/7] rough cut --
+  [00:29:21] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [00:29:22] graphics-plan: reading script from rough-cut (no re-transcription)
+  [00:29:22] graphics-plan: style='hook card -> raw' preset='tiktok-raw-style' reframe='letterbox' target=1080x1920
+  [00:29:22] graphics-plan: planning beats
+  [00:29:22] graphics-plan: {"beat_count": 1}
+  [00:29:22] graphics-plan: rendering (reframe + beat cards) via engine stand-in
+Traceback (most recent call last):
+  File "/Users/Apple/autoclip-pipeline/skills/graphics-plan/render.py", line 287, in <module>
+    main()
+  File "/Users/Apple/autoclip-pipeline/skills/graphics-plan/render.py", line 281, in main
+    subprocess.run(cmd, check=True, capture_output=True, text=True)
+  File "/usr/local/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['ffmpeg', '-nostdin', '-y', '-i', '/Users/Apple/autoclip-pipeline/projects/new881__clip06/rough-cut/rough_cut.mp4', '-vf', "scale=w=1080:h=1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=black,drawtext=fontfile='/System/Library/Fonts/Supplemental/Arial.ttf':text=You got to get curvy get to the side. It\\'s not:fontcolor=white:fontsize=42:box=1:boxcolor=black@0.55:boxborderw=16:x=(w-text_w)/2:y=h*0.75:enable='between(t\\,0.00\\,5.08)'", '-c:v', 'libx264', '-preset', 'veryfast', '-c:a', 'aac', '/Users/Apple/autoclip-pipeline/projects/new881__clip06/graphics/graphics_cut.mp4']' returned non-zero exit status 8.
+  [00:29:22]   clip06: paused for second-pass review (normal) — approve with: python3 lib/jobstate.py mark new881__clip06 second_pass done && ./run_pipeline.sh new881__clip06 short-tiktok-raw
+-- clip07 [requested]: 412.42s-472.42s (score=4) "(gunfire/impact detected)" --
+== pipeline: job=new881__clip07 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [00:29:44] [intake] already done, skipping (use --force to redo)
+-- [2/7] rough cut --
+  [00:29:44] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [00:29:45] graphics-plan: reading script from rough-cut (no re-transcription)
+  [00:29:45] graphics-plan: style='hook card -> raw' preset='tiktok-raw-style' reframe='letterbox' target=1080x1920
+  [00:29:45] graphics-plan: planning beats
+  [00:29:45] graphics-plan: {"beat_count": 2}
+  [00:29:45] graphics-plan: rendering (reframe + beat cards) via engine stand-in
+Traceback (most recent call last):
+  File "/Users/Apple/autoclip-pipeline/skills/graphics-plan/render.py", line 287, in <module>
+    main()
+  File "/Users/Apple/autoclip-pipeline/skills/graphics-plan/render.py", line 281, in main
+    subprocess.run(cmd, check=True, capture_output=True, text=True)
+  File "/usr/local/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['ffmpeg', '-nostdin', '-y', '-i', '/Users/Apple/autoclip-pipeline/projects/new881__clip07/rough-cut/rough_cut.mp4', '-vf', "scale=w=1080:h=1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=black,drawtext=fontfile='/System/Library/Fonts/Supplemental/Arial.ttf':text=Shot that\\'s your shot. You know what I\\'m saying? Yeah:fontcolor=white:fontsize=42:box=1:boxcolor=black@0.55:boxborderw=16:x=(w-text_w)/2:y=h*0.75:enable='between(t\\,0.00\\,0.73)',drawtext=fontfile='/System/Library/Fonts/Supplemental/Arial.ttf':text=Don\\'t do it to me. Oh my good nigga truck stick:fontcolor=white:fontsize=42:box=1:boxcolor=black@0.55:boxborderw=16:x=(w-text_w)/2:y=h*0.75:enable='between(t\\,18.43\\,24.14)'", '-c:v', 'libx264', '-preset', 'veryfast', '-c:a', 'aac', '/Users/Apple/autoclip-pipeline/projects/new881__clip07/graphics/graphics_cut.mp4']' returned non-zero exit status 8.
+  [00:29:45]   clip07: paused for second-pass review (normal) — approve with: python3 lib/jobstate.py mark new881__clip07 second_pass done && ./run_pipeline.sh new881__clip07 short-tiktok-raw
+-- clip08 [requested]: 480.74s-540.74s (score=4) "(gunfire/impact detected)" --
+== pipeline: job=new881__clip08 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [00:30:11] [intake] already done, skipping (use --force to redo)
+-- [2/7] rough cut --
+  [00:30:11] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [00:30:11] graphics-plan: reading script from rough-cut (no re-transcription)
+  [00:30:11] graphics-plan: style='hook card -> raw' preset='tiktok-raw-style' reframe='letterbox' target=1080x1920
+  [00:30:11] graphics-plan: planning beats
+  [00:30:11] graphics-plan: {"beat_count": 1}
+  [00:30:11] graphics-plan: rendering (reframe + beat cards) via engine stand-in
+Traceback (most recent call last):
+  File "/Users/Apple/autoclip-pipeline/skills/graphics-plan/render.py", line 287, in <module>
+    main()
+  File "/Users/Apple/autoclip-pipeline/skills/graphics-plan/render.py", line 281, in main
+    subprocess.run(cmd, check=True, capture_output=True, text=True)
+  File "/usr/local/Cellar/python@3.12/3.12.13_4/Frameworks/Python.framework/Versions/3.12/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['ffmpeg', '-nostdin', '-y', '-i', '/Users/Apple/autoclip-pipeline/projects/new881__clip08/rough-cut/rough_cut.mp4', '-vf', "scale=w=1080:h=1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=black,drawtext=fontfile='/System/Library/Fonts/Supplemental/Arial.ttf':text=Got to be Canada\\, I think all right:fontcolor=white:fontsize=42:box=1:boxcolor=black@0.55:boxborderw=16:x=(w-text_w)/2:y=h*0.75:enable='between(t\\,28.86\\,57.56)'", '-c:v', 'libx264', '-preset', 'veryfast', '-c:a', 'aac', '/Users/Apple/autoclip-pipeline/projects/new881__clip08/graphics/graphics_cut.mp4']' returned non-zero exit status 8.
+  [00:30:12]   clip08: paused for second-pass review (normal) — approve with: python3 lib/jobstate.py mark new881__clip08 second_pass done && ./run_pipeline.sh new881__clip08 short-tiktok-raw
+-- clip09 [bonus]: 548.94s-608.94s (score=4) "(gunfire/impact detected)" --
+== pipeline: job=new881__clip09 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [00:30:41] [intake] already done, skipping (use --force to redo)
+-- [2/7] rough cut --
+  [00:30:41] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [00:30:41] [graphics] already done, skipping (use --force to redo)
+-- [4/7] second pass (manual review) --
+  [00:30:41] [second_pass] already approved, skipping
+-- [5/7] captions (format-specific: short-tiktok-raw) --
+  [00:30:41] [captions] already done, skipping (use --force to redo)
+-- [6/7] background music — skipped --
+-- [7/7] export --
+  [00:30:41] [export] already done, skipping (use --force to redo)
+  [00:30:41] thumbnail-generator: format 'short-tiktok-raw' policy is 'skip' — nothing to do
+== done: outputs/new881__clip09.final.mp4 ==
+-- clip10 [bonus]: 613.24s-673.24s (score=4) "(gunfire/impact detected)" --
+== pipeline: job=new881__clip10 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [00:31:07] [intake] already done, skipping (use --force to redo)
+-- [2/7] rough cut --
+  [00:31:07] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [00:31:07] [graphics] already done, skipping (use --force to redo)
+-- [4/7] second pass (manual review) --
+  [00:31:07] [second_pass] already approved, skipping
+-- [5/7] captions (format-specific: short-tiktok-raw) --
+  [00:31:07] [captions] already done, skipping (use --force to redo)
+-- [6/7] background music — skipped --
+-- [7/7] export --
+  [00:31:07] [export] already done, skipping (use --force to redo)
+  [00:31:08] thumbnail-generator: format 'short-tiktok-raw' policy is 'skip' — nothing to do
+== done: outputs/new881__clip10.final.mp4 ==
+-- clip11 [bonus]: 676.04s-736.04s (score=4) "(gunfire/impact detected)" --
+== pipeline: job=new881__clip11 format=short-tiktok-raw ==
+-- [1/7] intake --
+  [00:31:34] [intake] already done, skipping (use --force to redo)
+-- [2/7] rough cut --
+  [00:31:34] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: short-tiktok-raw) --
+  [00:31:34] [graphics] already done, skipping (use --force to redo)
+-- [4/7] second pass (manual review) --
+  [00:31:34] [second_pass] already approved, skipping
+-- [5/7] captions (format-specific: short-tiktok-raw) --
+  [00:31:34] [captions] already done, skipping (use --force to redo)
+-- [6/7] background music — skipped --
+-- [7/7] export --
+  [00:31:34] [export] already done, skipping (use --force to redo)
+  [00:31:34] thumbnail-generator: format 'short-tiktok-raw' policy is 'skip' — nothing to do
+== done: outputs/new881__clip11.final.mp4 ==
+  [00:31:34] cleanup: --keep-raw set, leaving parent raw source and rough-cut render in place
+== clip_pipeline done: check outputs/new881__clip*.final.mp4 or outputs/new881__montage*.final.mp4 ==
