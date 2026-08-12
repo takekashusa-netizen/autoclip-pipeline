@@ -59,6 +59,7 @@ while [[ $i -lt ${#args[@]} ]]; do
     --clip-count)  i=$((i+1)); clip_count="${args[$i]}" ;;
     --bonus-clips) i=$((i+1)); bonus_clips="${args[$i]}" ;;
     --montage-minutes) i=$((i+1)); montage_minutes="${args[$i]}" ;;
+    --montage) montage_minutes=12 ;;
     --montage-count) i=$((i+1)); montage_count="${args[$i]}" ;;
     --skip-music)  skip_music=true ;;
     --auto-approve) auto_approve=true ;;

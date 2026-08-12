@@ -1,0 +1,21 @@
+== pipeline: job=new881__montage01 format=long-form-youtube ==
+-- [1/7] intake --
+  [09:19:12] [intake] already done, skipping (use --force to redo)
+-- [2/7] rough cut --
+  [09:19:12] [rough_cut] already done, skipping (use --force to redo)
+-- [3/7] graphics (format-specific: long-form-youtube) --
+  [09:19:12] [graphics] already done, skipping (use --force to redo)
+-- [4/7] second pass (manual review) --
+  [09:19:12] [second_pass] already approved, skipping
+-- [5/7] captions (format-specific: long-form-youtube) --
+  [09:19:12] embedded-captions: format 'long-form-youtube' has captions disabled (e.g. long-form relies on YT CC) — skipping
+-- [6/7] background music (optional) --
+  [09:19:12] background-music: no track found at projects/new881__montage01/music/ — this step is optional, passing video through unchanged
+  [09:19:12] background-music: to add a score, drop an mp3/wav/m4a into projects/new881__montage01/music/ and re-run with --force
+  [09:19:31] background-music: done -> projects/new881__montage01/music-out/scored_cut.mp4
+-- [7/7] export --
+  [09:19:45] finalize: promoted scored_cut.mp4 -> outputs/new881__montage01.final.mp4
+  [09:19:46] prune: removed 3 intermediate render(s) + scratch work dir for job 'new881__montage01'
+  [09:19:47] thumbnail-generator: grabbing frame at t=4.3s (hook beat if available)
+  [09:19:54] thumbnail-generator: done -> projects/new881__montage01/thumbnail/thumb.jpg
+== done: outputs/new881__montage01.final.mp4 ==
