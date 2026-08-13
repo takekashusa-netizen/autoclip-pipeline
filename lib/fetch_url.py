@@ -31,6 +31,16 @@ def main():
     os.makedirs(raw_dir, exist_ok=True)
     out_template = os.path.join(raw_dir, "source.%(ext)s")
 
+    # Real gap fixed: the URL used to only get saved AFTER a successful
+    # download (see below) — confirmed directly on a real interrupted
+    # download, where the .part files survived but the URL that could
+    # have resumed it was nowhere to be found, permanently orphaning
+    # 233MB of real progress. Writing it here, before the download even
+    # starts, means it survives any interruption — a crash, a kill, a
+    # network drop — not just a clean success.
+    with open(os.path.join(raw_dir, "source_url.json"), "w") as f:
+        json.dump({"source_url": url}, f, indent=2)
+
     ydl_opts = {
         "outtmpl": out_template,
         "format": "bv*[height<=1080]+140/bv*[height<=1080]+ba/b[height<=1080]/b",
