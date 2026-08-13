@@ -35,7 +35,8 @@ def list_jobs():
     jobs = []
     if not os.path.isdir(PROJECTS_DIR):
         return jobs
-    for name in sorted(os.listdir(PROJECTS_DIR)):
+    all_names = sorted(os.listdir(PROJECTS_DIR))
+    for name in all_names:
         job_json = os.path.join(PROJECTS_DIR, name, "job.json")
         if not os.path.exists(job_json):
             continue
@@ -47,9 +48,29 @@ def list_jobs():
         steps = data.get("steps", {})
         export_status = steps.get("export", {}).get("status", "pending")
         locked = os.path.exists(os.path.join(PROJECTS_DIR, name, ".lock"))
+
+        # Real bug fixed: a "parent" job that spawns clip/montage/best-
+        # windows subjobs (or extracts directly to outputs/<job>_best_windows/)
+        # never sets its OWN export step — that only happens for a
+        # single-video job's own 7-step pipeline. Confirmed directly: a
+        # job we'd already verified produced 3 perfect real output files
+        # was still showing as "pending/failed" here, purely because
+        # this check only ever looked at the job's own export status.
+        is_effectively_done = export_status == "done"
+        if not is_effectively_done:
+            has_subjobs_done = any(
+                n.startswith(f"{name}__") and
+                json.load(open(os.path.join(PROJECTS_DIR, n, "job.json"))).get("steps", {}).get("export", {}).get("status") == "done"
+                for n in all_names
+                if n.startswith(f"{name}__") and os.path.exists(os.path.join(PROJECTS_DIR, n, "job.json"))
+            )
+            has_best_windows_output = os.path.isdir(os.path.join(OUTPUTS_DIR, f"{name}_best_windows")) and \
+                any(f.endswith(".mp4") for f in os.listdir(os.path.join(OUTPUTS_DIR, f"{name}_best_windows")))
+            is_effectively_done = has_subjobs_done or has_best_windows_output
+
         jobs.append({
             "job": name,
-            "status": "done" if export_status == "done" else ("running" if locked else "pending/failed"),
+            "status": "done" if is_effectively_done else ("running" if locked else "pending/failed"),
             "error": data.get("error"),
             "youtube_url": data.get("youtube_url"),
         })
