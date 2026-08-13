@@ -1,0 +1,3 @@
+webhook_trigger: listening on port 8765 — POST /trigger, GET /health
+webhook_trigger: 127.0.0.1 - "GET /health HTTP/1.1" 200 -
+webhook_trigger: 127.0.0.1 - "POST /trigger HTTP/1.1" 202 -
