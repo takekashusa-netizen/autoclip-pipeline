@@ -279,8 +279,26 @@ if [[ "$best_windows_minutes" != "0" ]]; then
 
   final_out_dir="${PIPELINE_ROOT}/outputs/${job}_best_windows"
   mkdir -p "$final_out_dir"
+  # Real bug fixed: this was extracting from rough_cut_video (the
+  # ALREADY-CUT, filler-word-removed file — shorter than the original)
+  # while best_windows.py computes window positions against the
+  # ORIGINAL full-length timeline (source_duration_sec, and every
+  # transcript/visual/audio timestamp feeding into it). That mismatch
+  # meant window start/end times didn't correspond to real content in
+  # rough_cut_video at all — confirmed directly on a real job: window 1
+  # came out truncated (218s instead of the intended 720s), windows 2
+  # and 3 came out completely empty (262 bytes, ffmpeg seeking past the
+  # end of the shorter file). raw_source is the original, uncut video —
+  # the same timeline everything else in this feature was computed
+  # against, exactly matching how clip/montage extraction already
+  # correctly uses the original source, not the cut one.
+  raw_source="$(job_raw_file "$job")"
+  if [[ -z "$raw_source" || ! -f "$raw_source" ]]; then
+    echo "extract-best-windows: raw source not found (was it deleted?) — cannot extract with correct timing. Re-download the source to fix this." >&2
+    exit 1
+  fi
   ext_exit=0
-  ext_result="$(python3 "${SKILL_DIR}/extract_best_windows.py" "$rough_cut_video" "$windows_json" "$final_out_dir" "$job" 2>&1)" || ext_exit=$?
+  ext_result="$(python3 "${SKILL_DIR}/extract_best_windows.py" "$raw_source" "$windows_json" "$final_out_dir" "$job" 2>&1)" || ext_exit=$?
   if [[ $ext_exit -ne 0 ]]; then
     echo "extract-best-windows FAILED (exit ${ext_exit}): $(echo "$ext_result" | tail -10)" >&2
     exit 1
