@@ -16,16 +16,23 @@ KNOWN_TABS = ("streams", "videos", "shorts", "featured", "playlists", "community
 
 
 def normalize_to_streams_tab(channel_url):
-    """Points the URL at the channel's Live tab specifically — not /videos
-    (regular uploads) or /shorts — so only actual livestreams get listed,
-    never Shorts or normal uploads. If the URL already targets a specific
-    tab, leave it alone (explicit choice wins)."""
+    """Points the URL at the right 'past broadcasts' tab for the
+    platform — not live-only, not Shorts/clips. Real bug fixed: this
+    only ever handled YouTube URLs; a bare Twitch channel URL fell
+    through unchanged, and yt-dlp's default behavior for that is its
+    live-stream-only extractor — confirmed directly on a real channel:
+    it reported "not currently live" instead of ever listing VODs,
+    since Twitch has no "/streams" tab in the YouTube sense at all —
+    its real VOD archive lives at /videos. If the URL already targets a
+    specific tab, leave it alone (explicit choice wins)."""
     url = channel_url.rstrip("/")
     for tab in KNOWN_TABS:
         if url.endswith(f"/{tab}"):
             return url  # already targets a specific tab, don't override
     if re.search(r"youtube\.com/(@[\w.-]+|channel/[\w-]+|c/[\w.-]+)$", url):
         return url + "/streams"
+    if re.search(r"twitch\.tv/[\w-]+$", url):
+        return url + "/videos"  # Twitch's real VOD archive tab — /streams isn't a real distinct page here
     return url  # not a recognizable bare-channel URL — pass through as-is
 
 
