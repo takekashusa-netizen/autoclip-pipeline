@@ -1,3 +1,2 @@
-  [19:43:39] watch_channel: watching https://www.twitch.tv/gtaxzombies (poll every 900s, format=short-tiktok-raw, 8x60s clips)
-ERROR: [twitch:stream] gtaxzombies: The channel is not currently live
-  [19:43:43] watch_channel: couldn't list channel videos — ERROR: [twitch:stream] gtaxzombies: The channel is not currently live
+  [19:57:55] watch_channel: watching https://www.twitch.tv/gtaxzombies (poll every 900s, format=short-tiktok-raw, 8x60s clips)
+  [19:57:56] watch_channel: no new videos, checking again in 900s

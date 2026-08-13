@@ -364,3 +364,43 @@
   [19:42:26] doctor: auto-publish FAILED for new881__montage03: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
   [19:43:26] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
   [19:45:26] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
+  [19:47:26] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
+  [19:47:26] doctor: auto-publishing new881__montage01 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [19:47:26] doctor: auto-publish FAILED for new881__montage01: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [19:47:26] doctor: auto-publishing new881__montage02 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [19:47:26] doctor: auto-publish FAILED for new881__montage02: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [19:47:26] doctor: auto-publishing new881__montage04 -> "(visual action detected) | Insane Gaming Moment"
+  [19:47:26] doctor: auto-publish FAILED for new881__montage04: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [19:47:26] doctor: auto-publishing new881__montage03 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [19:47:26] doctor: auto-publish FAILED for new881__montage03: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [19:49:27] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
+  [19:51:27] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
+  [19:52:27] doctor: auto-publishing new881__montage01 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [19:52:27] doctor: auto-publish FAILED for new881__montage01: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [19:52:27] doctor: auto-publishing new881__montage02 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [19:52:27] doctor: auto-publish FAILED for new881__montage02: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [19:52:27] doctor: auto-publishing new881__montage04 -> "(visual action detected) | Insane Gaming Moment"
+  [19:52:27] doctor: auto-publish FAILED for new881__montage04: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [19:52:27] doctor: auto-publishing new881__montage03 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [19:52:27] doctor: auto-publish FAILED for new881__montage03: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [19:53:27] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
+  [19:55:27] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
+  [19:57:28] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
+  [19:57:28] doctor: auto-publishing new881__montage01 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [19:57:28] doctor: auto-publish FAILED for new881__montage01: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [19:57:28] doctor: auto-publishing new881__montage02 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [19:57:28] doctor: auto-publish FAILED for new881__montage02: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [19:57:28] doctor: auto-publishing new881__montage04 -> "(visual action detected) | Insane Gaming Moment"
+  [19:57:28] doctor: auto-publish FAILED for new881__montage04: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [19:57:28] doctor: auto-publishing new881__montage03 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [19:57:28] doctor: auto-publish FAILED for new881__montage03: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [19:59:28] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
+  [20:01:28] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
+  [20:02:28] doctor: auto-publishing new881__montage01 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [20:02:28] doctor: auto-publish FAILED for new881__montage01: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [20:02:28] doctor: auto-publishing new881__montage02 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [20:02:28] doctor: auto-publish FAILED for new881__montage02: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [20:02:28] doctor: auto-publishing new881__montage04 -> "(visual action detected) | Insane Gaming Moment"
+  [20:02:28] doctor: auto-publish FAILED for new881__montage04: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [20:02:28] doctor: auto-publishing new881__montage03 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [20:02:28] doctor: auto-publish FAILED for new881__montage03: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
