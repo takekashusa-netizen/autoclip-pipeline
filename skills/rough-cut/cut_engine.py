@@ -86,15 +86,22 @@ def _load_with_timeout(loader_fn, timeout_sec=MODEL_LOAD_TIMEOUT_SEC):
     return result["value"]
 
 
-def _first_item_with_timeout(iterator, timeout_sec):
+def _first_item_with_timeout(iterator, timeout_sec, label="segment"):
     """Same timeout-detection pattern as _load_with_timeout, applied to
-    pulling the FIRST item out of a lazy generator — this is where the
-    real gap was tonight. faster-whisper's transcribe() returns instantly
-    (it's lazy), so a stall during VAD's full-file scan or other setup
-    work happens the moment we try to iterate, which is BEFORE the
-    per-segment checkpoint loop ever starts. Confirmed via real evidence
-    tonight: a 129-minute stuck run had genuinely zero checkpoints,
-    because it never got past fetching item #1."""
+    pulling an item out of a lazy generator — this is where the real gap
+    was tonight, in two parts. First: faster-whisper's transcribe()
+    returns instantly (it's lazy), so a stall during VAD's full-file scan
+    happens the moment we try to iterate, BEFORE the per-segment
+    checkpoint loop ever starts — confirmed via real evidence: a
+    129-minute stuck run had genuinely zero checkpoints, because it
+    never got past fetching item #1. Second: every LATER item used to
+    have zero protection at all, on the mistaken assumption that
+    checkpointing already covered it — it doesn't; checkpointing lets
+    you resume after a restart, it does nothing to detect a hang in the
+    first place. This same function now guards every item, not just the
+    first, with `label` making the resulting error message accurate to
+    which one actually stalled instead of always claiming to be the
+    first."""
     import threading
     result = {}
     sentinel = object()
@@ -110,12 +117,12 @@ def _first_item_with_timeout(iterator, timeout_sec):
     t.join(timeout_sec)
     if t.is_alive():
         raise TimeoutError(
-            f"first segment stalled past {timeout_sec}s with no progress — "
-            f"this happens during VAD/setup, BEFORE any transcript data "
-            f"exists, so nothing is recoverable from this attempt; likely "
-            f"the same network hang pattern seen repeatedly tonight "
-            f"(confirmed via CLOSE_WAIT TCP connections + OpenMP worker "
-            f"threads parked at a barrier, real evidence, not a guess)"
+            f"{label} stalled past {timeout_sec}s with no progress — "
+            f"likely the same network/resource hang pattern seen "
+            f"repeatedly tonight (confirmed via CLOSE_WAIT TCP "
+            f"connections + OpenMP worker threads parked at a barrier "
+            f"for the first-segment case; a later segment stalling the "
+            f"same way is the same class of issue, just later in the run)"
         )
     if "error" in result:
         raise result["error"]
@@ -256,16 +263,29 @@ def try_faster_whisper(audio_path, job=None, duration=None, work_dir=None):
     # item from this lazy generator — BEFORE the per-segment checkpoint
     # loop below ever runs even once. Confirmed with real evidence
     # tonight: a 129-minute stuck run had genuinely zero checkpoints,
-    # because it never got past this exact point. This wraps ONLY the
-    # first fetch in a timeout (subsequent segments are typically much
-    # faster once the initial setup succeeds, and are already protected
-    # by the per-segment checkpointing below).
+    # because it never got past this exact point.
+    #
+    # Real gap fixed: every segment AFTER the first used to have zero
+    # timeout protection at all — the reasoning at the time was that
+    # checkpointing already covered it, but that conflates two different
+    # things. Checkpointing lets you RESUME after a restart; it does
+    # nothing to DETECT a hang in the first place. A stall on segment
+    # #500 of a multi-thousand-segment transcription would sit there
+    # forever with zero automatic signal anything was wrong — the exact
+    # silent-stall risk, just possible at any point instead of only the
+    # start. Every segment now gets the same real timeout as the first.
     first_segment_timeout = int(os.environ.get("PIPELINE_FIRST_SEGMENT_TIMEOUT_SEC", 600))
-    first_item, sentinel = _first_item_with_timeout(seg_iter, first_segment_timeout)
+    per_segment_timeout = int(os.environ.get("PIPELINE_SEGMENT_TIMEOUT_SEC", 300))
+    first_item, sentinel = _first_item_with_timeout(seg_iter, first_segment_timeout, label="first segment")
     if first_item is not sentinel:
         process_segment(first_item)
-    for s in seg_iter:
-        process_segment(s)
+    seg_num = 1
+    while True:
+        seg_num += 1
+        item, sentinel2 = _first_item_with_timeout(seg_iter, per_segment_timeout, label=f"segment #{seg_num}")
+        if item is sentinel2:
+            break  # generator genuinely exhausted, not a hang
+        process_segment(item)
     if job:
         progress_mod.report(job, "transcribing", 100, "transcription complete")
     if checkpoint_path and os.path.exists(checkpoint_path):

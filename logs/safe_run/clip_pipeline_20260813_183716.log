@@ -1,0 +1,5 @@
+== clip_pipeline: job=job1786627920 format=long-form-youtube best_windows_minutes=10 best_windows_count=20 (continuous, non-overlapping) ==
+/Users/Apple/autoclip-pipeline/projects/job1786627920/job.json
+-- transcribing full source (once) --
+  [18:37:30] rough-cut: extracting audio from source.mp4
+rough-cut: audio extraction timed out or failed (180s) — likely a corrupted/truncated source
