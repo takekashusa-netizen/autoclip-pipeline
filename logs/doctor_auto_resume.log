@@ -9622,3 +9622,13 @@ skip new882: managed by clip_pipeline.sh (multi-clip job) — resume with ./clip
 skip webhook1786583067: managed by clip_pipeline.sh (multi-clip job) — resume with ./clip_pipeline.sh directly, not run_pipeline.sh
 
 == resume_all summary: 51 jobs found, 0 resumed, 45 already done, 0 locked/running, 1 missing raw file ==
+
+--- auto-resume triggered at 08:48:27 ---
+skip 55ffc8ca0948: no raw file present (download never completed) — re-submit this one manually
+skip job1786571638: managed by clip_pipeline.sh (multi-clip job) — resume with ./clip_pipeline.sh directly, not run_pipeline.sh
+skip job1786607232: managed by clip_pipeline.sh (multi-clip job) — resume with ./clip_pipeline.sh directly, not run_pipeline.sh
+skip new881: managed by clip_pipeline.sh (multi-clip job) — resume with ./clip_pipeline.sh directly, not run_pipeline.sh
+skip new882: managed by clip_pipeline.sh (multi-clip job) — resume with ./clip_pipeline.sh directly, not run_pipeline.sh
+skip webhook1786583067: managed by clip_pipeline.sh (multi-clip job) — resume with ./clip_pipeline.sh directly, not run_pipeline.sh
+
+== resume_all summary: 51 jobs found, 0 resumed, 45 already done, 0 locked/running, 1 missing raw file ==

@@ -4368,3 +4368,4 @@
   [08:45:27] doctor: auto-publishing webhook1786583067__clip08 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
   [08:45:27] doctor: auto-publish FAILED for webhook1786583067__clip08: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
   [08:46:27] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
+  [08:48:27] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
