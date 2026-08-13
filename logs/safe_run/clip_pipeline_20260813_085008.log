@@ -5,3 +5,5 @@
 -- analyzing audio content (gunfire/impact detection) --
   [08:50:13] audio-analysis: reusing existing audio-analysis.json (delete it manually to force a fresh re-analysis)
   [08:50:13] best-windows: {"window_count": 3, "durations_sec": [720.0, 720.0, 720.0]}
+  [08:55:31] extract-best-windows: {"extracted": 3, "paths": ["/Users/Apple/autoclip-pipeline/outputs/job1786607232_best_windows/job1786607232_window01.mp4", "/Users/Apple/autoclip-pipeline/outputs/job1786607232_best_windows/job1786607232_window02.mp4", "/Users/Apple/autoclip-pipeline/outputs/job1786607232_best_windows/job1786607232_window03.mp4"]}
+== best-windows done: check /Users/Apple/autoclip-pipeline/outputs/job1786607232_best_windows/ for real, continuous, non-overlapping clips ==

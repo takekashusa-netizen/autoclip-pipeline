@@ -4402,3 +4402,196 @@
   [08:50:28] doctor: auto-publish FAILED for webhook1786583067__clip08: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
   [08:52:28] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
   [08:54:28] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
+  [08:55:29] doctor: auto-publishing webhook1786583067__clip03 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [08:55:29] doctor: auto-publish FAILED for webhook1786583067__clip03: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [08:55:29] doctor: auto-publishing webhook1786583067__clip04 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [08:55:29] doctor: auto-publish FAILED for webhook1786583067__clip04: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [08:55:29] doctor: auto-publishing new881__montage01 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [08:55:29] doctor: auto-publish FAILED for new881__montage01: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [08:55:29] doctor: auto-publishing webhook1786583067__clip05 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [08:55:29] doctor: auto-publish FAILED for webhook1786583067__clip05: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [08:55:29] doctor: auto-publishing webhook1786583067__clip02 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [08:55:29] doctor: auto-publish FAILED for webhook1786583067__clip02: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [08:55:29] doctor: auto-publishing webhook1786583067__clip11 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [08:55:29] doctor: auto-publish FAILED for webhook1786583067__clip11: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [08:55:29] doctor: auto-publishing webhook1786583067__clip10 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [08:55:29] doctor: auto-publish FAILED for webhook1786583067__clip10: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [08:55:29] doctor: auto-publishing new881__montage02 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [08:55:29] doctor: auto-publish FAILED for new881__montage02: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [08:55:29] doctor: auto-publishing webhook1786583067__clip09 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [08:55:29] doctor: auto-publish FAILED for webhook1786583067__clip09: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [08:55:29] doctor: auto-publishing webhook1786583067__clip07 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [08:55:29] doctor: auto-publish FAILED for webhook1786583067__clip07: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [08:55:29] doctor: auto-publishing new881__montage04 -> "(visual action detected) | Insane Gaming Moment"
+  [08:55:29] doctor: auto-publish FAILED for new881__montage04: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [08:55:29] doctor: auto-publishing new881__montage03 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [08:55:29] doctor: auto-publish FAILED for new881__montage03: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [08:55:29] doctor: auto-publishing webhook1786583067__clip01 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [08:55:29] doctor: auto-publish FAILED for webhook1786583067__clip01: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [08:55:29] doctor: auto-publishing webhook1786583067__clip06 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [08:55:29] doctor: auto-publish FAILED for webhook1786583067__clip06: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [08:55:29] doctor: auto-publishing webhook1786583067__clip08 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [08:55:29] doctor: auto-publish FAILED for webhook1786583067__clip08: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [08:56:29] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
+  [08:58:29] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
+  [09:00:30] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
+  [09:00:30] doctor: auto-publishing webhook1786583067__clip03 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:00:30] doctor: auto-publish FAILED for webhook1786583067__clip03: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:00:30] doctor: auto-publishing webhook1786583067__clip04 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:00:30] doctor: auto-publish FAILED for webhook1786583067__clip04: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:00:30] doctor: auto-publishing new881__montage01 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:00:30] doctor: auto-publish FAILED for new881__montage01: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:00:30] doctor: auto-publishing webhook1786583067__clip05 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:00:30] doctor: auto-publish FAILED for webhook1786583067__clip05: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:00:30] doctor: auto-publishing webhook1786583067__clip02 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:00:30] doctor: auto-publish FAILED for webhook1786583067__clip02: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:00:30] doctor: auto-publishing webhook1786583067__clip11 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:00:30] doctor: auto-publish FAILED for webhook1786583067__clip11: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:00:30] doctor: auto-publishing webhook1786583067__clip10 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:00:30] doctor: auto-publish FAILED for webhook1786583067__clip10: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:00:30] doctor: auto-publishing new881__montage02 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:00:30] doctor: auto-publish FAILED for new881__montage02: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:00:30] doctor: auto-publishing webhook1786583067__clip09 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:00:30] doctor: auto-publish FAILED for webhook1786583067__clip09: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:00:30] doctor: auto-publishing webhook1786583067__clip07 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:00:30] doctor: auto-publish FAILED for webhook1786583067__clip07: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:00:30] doctor: auto-publishing new881__montage04 -> "(visual action detected) | Insane Gaming Moment"
+  [09:00:30] doctor: auto-publish FAILED for new881__montage04: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:00:30] doctor: auto-publishing new881__montage03 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:00:30] doctor: auto-publish FAILED for new881__montage03: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:00:30] doctor: auto-publishing webhook1786583067__clip01 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:00:30] doctor: auto-publish FAILED for webhook1786583067__clip01: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:00:30] doctor: auto-publishing webhook1786583067__clip06 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:00:30] doctor: auto-publish FAILED for webhook1786583067__clip06: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:00:30] doctor: auto-publishing webhook1786583067__clip08 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:00:30] doctor: auto-publish FAILED for webhook1786583067__clip08: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:02:30] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
+  [09:04:30] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
+  [09:05:30] doctor: auto-publishing webhook1786583067__clip03 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:05:30] doctor: auto-publish FAILED for webhook1786583067__clip03: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:05:30] doctor: auto-publishing webhook1786583067__clip04 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:05:30] doctor: auto-publish FAILED for webhook1786583067__clip04: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:05:30] doctor: auto-publishing new881__montage01 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:05:30] doctor: auto-publish FAILED for new881__montage01: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:05:30] doctor: auto-publishing webhook1786583067__clip05 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:05:30] doctor: auto-publish FAILED for webhook1786583067__clip05: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:05:30] doctor: auto-publishing webhook1786583067__clip02 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:05:30] doctor: auto-publish FAILED for webhook1786583067__clip02: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:05:30] doctor: auto-publishing webhook1786583067__clip11 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:05:30] doctor: auto-publish FAILED for webhook1786583067__clip11: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:05:30] doctor: auto-publishing webhook1786583067__clip10 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:05:30] doctor: auto-publish FAILED for webhook1786583067__clip10: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:05:30] doctor: auto-publishing new881__montage02 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:05:30] doctor: auto-publish FAILED for new881__montage02: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:05:30] doctor: auto-publishing webhook1786583067__clip09 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:05:30] doctor: auto-publish FAILED for webhook1786583067__clip09: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:05:30] doctor: auto-publishing webhook1786583067__clip07 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:05:30] doctor: auto-publish FAILED for webhook1786583067__clip07: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:05:30] doctor: auto-publishing new881__montage04 -> "(visual action detected) | Insane Gaming Moment"
+  [09:05:30] doctor: auto-publish FAILED for new881__montage04: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:05:30] doctor: auto-publishing new881__montage03 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:05:30] doctor: auto-publish FAILED for new881__montage03: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:05:30] doctor: auto-publishing webhook1786583067__clip01 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:05:30] doctor: auto-publish FAILED for webhook1786583067__clip01: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:05:30] doctor: auto-publishing webhook1786583067__clip06 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:05:30] doctor: auto-publish FAILED for webhook1786583067__clip06: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:05:30] doctor: auto-publishing webhook1786583067__clip08 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:05:30] doctor: auto-publish FAILED for webhook1786583067__clip08: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:06:30] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
+  [09:08:30] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
+  [09:10:31] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
+  [09:10:31] doctor: auto-publishing webhook1786583067__clip03 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:10:31] doctor: auto-publish FAILED for webhook1786583067__clip03: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:10:31] doctor: auto-publishing webhook1786583067__clip04 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:10:31] doctor: auto-publish FAILED for webhook1786583067__clip04: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:10:31] doctor: auto-publishing new881__montage01 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:10:31] doctor: auto-publish FAILED for new881__montage01: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:10:31] doctor: auto-publishing webhook1786583067__clip05 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:10:31] doctor: auto-publish FAILED for webhook1786583067__clip05: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:10:31] doctor: auto-publishing webhook1786583067__clip02 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:10:31] doctor: auto-publish FAILED for webhook1786583067__clip02: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:10:31] doctor: auto-publishing webhook1786583067__clip11 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:10:31] doctor: auto-publish FAILED for webhook1786583067__clip11: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:10:31] doctor: auto-publishing webhook1786583067__clip10 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:10:31] doctor: auto-publish FAILED for webhook1786583067__clip10: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:10:31] doctor: auto-publishing new881__montage02 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:10:31] doctor: auto-publish FAILED for new881__montage02: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:10:31] doctor: auto-publishing webhook1786583067__clip09 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:10:31] doctor: auto-publish FAILED for webhook1786583067__clip09: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:10:31] doctor: auto-publishing webhook1786583067__clip07 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:10:31] doctor: auto-publish FAILED for webhook1786583067__clip07: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:10:31] doctor: auto-publishing new881__montage04 -> "(visual action detected) | Insane Gaming Moment"
+  [09:10:31] doctor: auto-publish FAILED for new881__montage04: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:10:31] doctor: auto-publishing new881__montage03 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:10:31] doctor: auto-publish FAILED for new881__montage03: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:10:31] doctor: auto-publishing webhook1786583067__clip01 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:10:31] doctor: auto-publish FAILED for webhook1786583067__clip01: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:10:31] doctor: auto-publishing webhook1786583067__clip06 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:10:31] doctor: auto-publish FAILED for webhook1786583067__clip06: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:10:31] doctor: auto-publishing webhook1786583067__clip08 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:10:31] doctor: auto-publish FAILED for webhook1786583067__clip08: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:12:31] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
+  [09:14:31] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
+  [09:15:31] doctor: auto-publishing webhook1786583067__clip03 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:15:31] doctor: auto-publish FAILED for webhook1786583067__clip03: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:15:31] doctor: auto-publishing webhook1786583067__clip04 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:15:31] doctor: auto-publish FAILED for webhook1786583067__clip04: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:15:31] doctor: auto-publishing new881__montage01 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:15:31] doctor: auto-publish FAILED for new881__montage01: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:15:31] doctor: auto-publishing webhook1786583067__clip05 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:15:31] doctor: auto-publish FAILED for webhook1786583067__clip05: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:15:31] doctor: auto-publishing webhook1786583067__clip02 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:15:31] doctor: auto-publish FAILED for webhook1786583067__clip02: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:15:31] doctor: auto-publishing webhook1786583067__clip11 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:15:31] doctor: auto-publish FAILED for webhook1786583067__clip11: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:15:31] doctor: auto-publishing webhook1786583067__clip10 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:15:31] doctor: auto-publish FAILED for webhook1786583067__clip10: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:15:31] doctor: auto-publishing new881__montage02 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:15:31] doctor: auto-publish FAILED for new881__montage02: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:15:31] doctor: auto-publishing webhook1786583067__clip09 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:15:31] doctor: auto-publish FAILED for webhook1786583067__clip09: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:15:31] doctor: auto-publishing webhook1786583067__clip07 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:15:31] doctor: auto-publish FAILED for webhook1786583067__clip07: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:15:31] doctor: auto-publishing new881__montage04 -> "(visual action detected) | Insane Gaming Moment"
+  [09:15:31] doctor: auto-publish FAILED for new881__montage04: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:15:31] doctor: auto-publishing new881__montage03 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:15:31] doctor: auto-publish FAILED for new881__montage03: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:15:31] doctor: auto-publishing webhook1786583067__clip01 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:15:31] doctor: auto-publish FAILED for webhook1786583067__clip01: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:15:31] doctor: auto-publishing webhook1786583067__clip06 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:15:31] doctor: auto-publish FAILED for webhook1786583067__clip06: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:15:31] doctor: auto-publishing webhook1786583067__clip08 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:15:31] doctor: auto-publish FAILED for webhook1786583067__clip08: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:16:31] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
+  [09:18:31] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
+  [09:20:31] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
+  [09:20:32] doctor: auto-publishing webhook1786583067__clip03 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:20:32] doctor: auto-publish FAILED for webhook1786583067__clip03: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:20:32] doctor: auto-publishing webhook1786583067__clip04 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:20:32] doctor: auto-publish FAILED for webhook1786583067__clip04: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:20:32] doctor: auto-publishing new881__montage01 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:20:32] doctor: auto-publish FAILED for new881__montage01: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:20:32] doctor: auto-publishing webhook1786583067__clip05 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:20:32] doctor: auto-publish FAILED for webhook1786583067__clip05: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:20:32] doctor: auto-publishing webhook1786583067__clip02 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:20:32] doctor: auto-publish FAILED for webhook1786583067__clip02: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:20:32] doctor: auto-publishing webhook1786583067__clip11 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:20:32] doctor: auto-publish FAILED for webhook1786583067__clip11: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:20:32] doctor: auto-publishing webhook1786583067__clip10 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:20:32] doctor: auto-publish FAILED for webhook1786583067__clip10: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:20:32] doctor: auto-publishing new881__montage02 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:20:32] doctor: auto-publish FAILED for new881__montage02: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:20:32] doctor: auto-publishing webhook1786583067__clip09 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:20:32] doctor: auto-publish FAILED for webhook1786583067__clip09: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:20:32] doctor: auto-publishing webhook1786583067__clip07 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:20:32] doctor: auto-publish FAILED for webhook1786583067__clip07: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:20:32] doctor: auto-publishing new881__montage04 -> "(visual action detected) | Insane Gaming Moment"
+  [09:20:32] doctor: auto-publish FAILED for new881__montage04: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:20:32] doctor: auto-publishing new881__montage03 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:20:32] doctor: auto-publish FAILED for new881__montage03: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:20:32] doctor: auto-publishing webhook1786583067__clip01 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:20:32] doctor: auto-publish FAILED for webhook1786583067__clip01: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:20:32] doctor: auto-publishing webhook1786583067__clip06 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:20:32] doctor: auto-publish FAILED for webhook1786583067__clip06: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
+  [09:20:32] doctor: auto-publishing webhook1786583067__clip08 -> "(gunfire/impact detected) 🔥 INSANE Gaming Moment"
+  [09:20:32] doctor: auto-publish FAILED for webhook1786583067__clip08: No OAuth client secrets found at /Users/Apple/autoclip-pipeline/lib/../youtube_client_secret.json. See setup instructions to create one in Google Cloud Console.
