@@ -60,15 +60,23 @@ while true; do
   while IFS= read -r line; do
     [[ -n "$line" ]] && new_videos+=("$line")
   done < <(python3 -c "
-import json
+import json, sys
 seen = set(json.load(open('${seen_file}')))
-data = json.loads('''${videos_json}''')
+data = json.loads(sys.argv[1])
 for v in data.get('videos', []):
     if v['id'] not in seen:
         print(f\"{v['id']}\t{v['url']}\t{v['title']}\")
-")
+" "$videos_json")
 
-  for line in "${new_videos[@]}"; do
+  # Real bug fixed: on bash < 4.4 (what macOS ships — the same class of
+  # issue as the mapfile incompatibility found earlier tonight),
+  # referencing ${array[@]} on a genuinely EMPTY array under set -u
+  # throws "unbound variable" even though the array WAS properly
+  # declared with new_videos=(). This portable idiom
+  # (${array[@]+"${array[@]}"}) safely expands to nothing instead of
+  # erroring when the array is empty — which is the normal, expected
+  # case every time there's nothing new to clip.
+  for line in ${new_videos[@]+"${new_videos[@]}"}; do
     [[ -z "$line" ]] && continue
     IFS=$'\t' read -r vid url title <<< "$line"
     job="watch_${vid}"

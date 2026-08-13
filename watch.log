@@ -1,2 +1,2 @@
-  [17:21:01] watch_channel: watching https://www.twitch.tv/CHANNEL_NAME (poll every 900s, format=short-tiktok-raw, 8x60s clips)
-  [17:21:31] watch_channel: couldn't list channel videos — yt-dlp not installed
+  [19:37:49] watch_channel: watching https://www.twitch.tv/gtaxzombies (poll every 900s, format=short-tiktok-raw, 8x60s clips)
+./watch_channel.sh: line 113: new_videos[@]: unbound variable
