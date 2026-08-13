@@ -467,9 +467,9 @@ def render_cut(raw_video, kept_segments, out_path, work_dir, job=None):
     if not kept_segments:
         try:
             subprocess.run(["ffmpeg", "-nostdin", "-y", "-i", raw_video, "-c", "copy", out_path],
-                            check=True, timeout=300)
+                            check=True, timeout=1800)
         except subprocess.TimeoutExpired as e:
-            raise RuntimeError("whole-file copy timed out after 300s — "
+            raise RuntimeError("whole-file copy timed out after 1800s — "
                                 "likely a corrupted/truncated source") from e
         return
 

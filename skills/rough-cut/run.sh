@@ -38,8 +38,16 @@ else
   # tonight — zero timeout protection, and it's the FIRST real ffmpeg
   # call in the whole pipeline, so a corrupted/truncated source hangs
   # here before anything downstream ever gets a chance to run.
-  if ! run_with_timeout 180 ffmpeg -nostdin -y -i "$raw_video" -vn -ac 1 -ar 16000 "$audio_path" -loglevel error; then
-    echo "rough-cut: audio extraction timed out or failed (180s) — likely a corrupted/truncated source" >&2
+  #
+  # Real gap fixed: 180s was too short for the mechanism's own sake,
+  # not a hang — confirmed directly on a real 8.67GB, 5.66-hour source,
+  # where a genuinely still-working extraction got killed at 180s
+  # simply because raw audio extraction from a file that large takes
+  # longer than that. Same class of "timeout value too conservative for
+  # real large files" issue already found once tonight in the
+  # best-windows extraction step — this is the same fix applied here.
+  if ! run_with_timeout 1800 ffmpeg -nostdin -y -i "$raw_video" -vn -ac 1 -ar 16000 "$audio_path" -loglevel error; then
+    echo "rough-cut: audio extraction timed out or failed (1800s) — likely a corrupted/truncated source" >&2
     exit 1
   fi
 
@@ -47,7 +55,7 @@ else
   # audio not routed into the recording) — whisper hallucinates repeated
   # garbage ("you you you...") on near-silent input instead of erroring,
   # so catch this explicitly rather than trusting a fake transcript.
-  mean_db="$(run_with_timeout 60 ffmpeg -nostdin -i "$audio_path" -af volumedetect -f null - 2>&1 \
+  mean_db="$(run_with_timeout 300 ffmpeg -nostdin -i "$audio_path" -af volumedetect -f null - 2>&1 \
     | grep -o 'mean_volume: [-0-9.]*' | grep -o '[-0-9.]*' || echo "0")"
   is_silent="$(python3 -c "print('1' if float('${mean_db:-0}' or 0) < -50 else '0')" 2>/dev/null || echo "0")"
 

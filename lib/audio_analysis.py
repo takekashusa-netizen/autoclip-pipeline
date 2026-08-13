@@ -22,14 +22,18 @@ import sys
 import numpy as np
 
 
-def extract_pcm(video_path, sample_rate=16000, timeout_sec=180):
+def extract_pcm(video_path, sample_rate=16000, timeout_sec=1800):
     """Returns a 1-D float32 numpy array of mono PCM samples, via ffmpeg
     piped raw output — no temp file needed.
 
     Real bug fixed: no timeout — the same corrupted-source-tail hang
     that cost real time twice tonight (in a different call, but the
     identical shape of bug) could happen here too, since this reads the
-    full audio track and would hang forever if ffmpeg gets stuck."""
+    full audio track and would hang forever if ffmpeg gets stuck.
+    Timeout raised from an initial 180s after finding that value too
+    short for a real multi-hour rough_cut file — same class of "too
+    conservative for genuinely large real files" issue found and fixed
+    elsewhere tonight."""
     cmd = [
         "ffmpeg", "-nostdin", "-v", "error", "-i", video_path,
         "-f", "f32le", "-ac", "1", "-ar", str(sample_rate), "-",
