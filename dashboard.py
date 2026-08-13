@@ -113,6 +113,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
   <select id="platform">
     <option value="youtube">YouTube (55s clips)</option>
     <option value="tiktok">TikTok (25s clips)</option>
+    <option value="longform">Long-form YouTube (10+ min continuous)</option>
   </select>
   <input type="text" id="clipcount" placeholder="Clip count" value="10" style="width:100px">
   <br>
