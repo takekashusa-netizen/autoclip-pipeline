@@ -323,7 +323,7 @@ def _select_expr(segments):
     return "+".join(f"between(t\\,{s['start']}\\,{s['end']})" for s in segments)
 
 
-def _render_batch_select(raw_video, segments, out_path, timeout_sec=180):
+def _render_batch_select(raw_video, segments, out_path, timeout_sec=1800):
     """Old approach — kept ONLY as a fallback for the rare case where
     per-segment seeking (below) somehow fails on a given segment. NOT used
     as the primary path anymore: measured ~30x slower on a real 1080p
@@ -414,7 +414,7 @@ def _output_is_valid(path, expected_duration, tolerance=0.5):
     return abs(actual - expected_duration) <= tolerance
 
 
-def _extract_segment(raw_video, start, end, out_path, timeout_sec=120):
+def _extract_segment(raw_video, start, end, out_path, timeout_sec=None):
     """Seeks directly to the segment instead of scanning from the start —
     the actual fix. -ss before -i is a fast keyframe seek; a pre-roll plus
     a second -ss after -i (frame-accurate within that pre-roll window)
@@ -428,17 +428,20 @@ def _extract_segment(raw_video, start, end, out_path, timeout_sec=120):
     the output, and retry with a larger margin if it's not right, before
     falling back to the slower whole-file select method as a last resort.
 
-    Real bug fixed: none of these subprocess.run() calls ever had a
-    timeout — confirmed directly on a real stuck job (part_00036.mp4,
-    48 bytes, main thread parked in a forked-subprocess read for over an
-    hour) that this hangs forever with zero protection when ffmpeg gets
-    stuck seeking into a corrupted/truncated region of the source — the
-    same corrupted-tail class of issue diagnosed and fixed elsewhere
-    tonight for a different video, just never patched here. A timeout
-    per attempt means a bad segment now fails fast and falls through to
-    the next margin (or the whole-file fallback) instead of hanging the
-    entire job indefinitely."""
+    Real bug fixed, twice now: first, no timeout at all. Then, a FIXED
+    120s default — confirmed directly on a real job that this is wrong
+    in principle, not just too small: a genuine "kept" stretch of
+    transcript-derived content can be any length (this one was 1046s,
+    17+ minutes), and re-encoding that much video can legitimately take
+    longer than any single fixed guess, especially under real CPU
+    contention. No fixed constant is ever permanently correct here — the
+    timeout now scales with the actual work being requested (duration),
+    so it stays right-sized regardless of how long a future segment
+    happens to be, instead of needing another manual bump the next time
+    a longer one shows up."""
     duration = end - start
+    if timeout_sec is None:
+        timeout_sec = max(120, int(duration * 3))  # generous multiple of realtime, covers heavy contention
     for margin in (2.0, 8.0, 20.0, 60.0):
         coarse = max(0.0, start - margin)
         fine_offset = start - coarse
@@ -456,8 +459,13 @@ def _extract_segment(raw_video, start, end, out_path, timeout_sec=120):
 
     # every margin failed — fall back to the old whole-file select approach
     # for just this one segment (slow, but correct; self-healing beats a
-    # hard failure on what's hopefully a rare edge case)
-    _render_batch_select(raw_video, [{"start": start, "end": end}], out_path)
+    # hard failure on what's hopefully a rare edge case). This scan has to
+    # walk from the start of the source up to `end`, so its own timeout
+    # scales with how far into the file that point is, not just the
+    # segment's own duration — a segment near the end of a long source
+    # needs much more scan time than an equally-long one near the start.
+    fallback_timeout = max(1800, int(end * 0.5))
+    _render_batch_select(raw_video, [{"start": start, "end": end}], out_path, timeout_sec=fallback_timeout)
 
 
 def render_cut(raw_video, kept_segments, out_path, work_dir, job=None):

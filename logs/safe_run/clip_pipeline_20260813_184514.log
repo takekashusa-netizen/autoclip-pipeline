@@ -1,0 +1,5 @@
+== clip_pipeline: job=job1786627920 format=long-form-youtube best_windows_minutes=10 best_windows_count=20 (continuous, non-overlapping) ==
+-- transcribing full source (once) --
+  [18:45:29] rough-cut: extracting audio from source.mp4
+  [18:52:32] rough-cut: transcribing + building EDL
+  [19:25:58] rough-cut: FAILED — This error doesn't match a known pattern yet.
