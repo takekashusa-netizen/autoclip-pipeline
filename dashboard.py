@@ -37,7 +37,7 @@ OUTPUTS_DIR = os.path.realpath(os.path.join(ROOT, "outputs"))
 PROJECTS_DIR = os.path.join(ROOT, "projects")
 sys.path.insert(0, os.path.join(ROOT, "lib"))
 
-WATCHER_PID_FILE = os.path.join(ROOT, ".watcher.pid")
+_WATCHER_STATE = {}  # real, in-process thread state — replaces the old separate-subprocess+PID-file approach
 
 
 def sanitize_job_name(name):
@@ -102,18 +102,6 @@ def list_outputs():
         size_mb = round(os.path.getsize(path) / (1024 * 1024), 1)
         outputs.append({"name": name, "size_mb": size_mb})
     return outputs
-
-
-def is_watcher_running():
-    if not os.path.exists(WATCHER_PID_FILE):
-        return False
-    try:
-        with open(WATCHER_PID_FILE) as f:
-            pid = int(f.read().strip())
-        os.kill(pid, 0)
-        return True
-    except (ProcessLookupError, ValueError, OSError):
-        return False
 
 
 def background_maintenance_loop(interval_sec=120, resume_interval_sec=600, publish_interval_sec=300,
@@ -567,31 +555,37 @@ class Handler(BaseHTTPRequestHandler):
         if not channel_url:
             self._send_json(400, {"error": "missing channel_url"})
             return
-        if is_watcher_running():
+        if _WATCHER_STATE.get("thread") and _WATCHER_STATE["thread"].is_alive():
             self._send_json(409, {"error": "watcher already running — stop it first"})
             return
-        log_path = os.path.join(ROOT, "watch.log")
-        with open(log_path, "w") as f:
-            proc = subprocess.Popen(
-                [os.path.join(ROOT, "watch_channel.sh"), channel_url, "--content-type", "gaming"],
-                stdout=f, stderr=subprocess.STDOUT, cwd=ROOT, start_new_session=True,
-            )
-        with open(WATCHER_PID_FILE, "w") as f:
-            f.write(str(proc.pid))
-        self._send_json(202, {"status": "started", "pid": proc.pid})
+        try:
+            from channel_watcher import watch_loop, DEFAULT_INTERVAL_SEC
+        except ImportError as e:
+            self._send_json(500, {"error": f"channel_watcher unavailable: {e}"})
+            return
+        interval_sec = data.get("interval_sec", DEFAULT_INTERVAL_SEC)
+        stop_event = threading.Event()
+        t = threading.Thread(
+            target=watch_loop,
+            args=(channel_url, stop_event),
+            kwargs={"content_type": data.get("content_type", "gaming"), "interval_sec": interval_sec},
+            daemon=True,
+        )
+        _WATCHER_STATE["thread"] = t
+        _WATCHER_STATE["stop_event"] = stop_event
+        _WATCHER_STATE["channel_url"] = channel_url
+        t.start()
+        self._send_json(202, {"status": "started", "channel_url": channel_url,
+                               "interval_sec": interval_sec, "interval_hours": round(interval_sec / 3600, 1)})
 
     def _handle_watch_stop(self):
-        if not is_watcher_running():
+        thread = _WATCHER_STATE.get("thread")
+        if not thread or not thread.is_alive():
             self._send_json(200, {"status": "not running"})
             return
-        with open(WATCHER_PID_FILE) as f:
-            pid = int(f.read().strip())
-        try:
-            os.kill(pid, 9)
-        except ProcessLookupError:
-            pass
-        os.remove(WATCHER_PID_FILE)
-        self._send_json(200, {"status": "stopped"})
+        _WATCHER_STATE["stop_event"].set()
+        thread.join(timeout=10)  # real, bounded wait — the loop checks stop_event between polls, not mid-download
+        self._send_json(200, {"status": "stopped" if not thread.is_alive() else "stop requested (mid-task, will finish shortly)"})
 
     def log_message(self, format, *args):
         print(f"dashboard: {self.address_string()} - {format % args}", flush=True)
