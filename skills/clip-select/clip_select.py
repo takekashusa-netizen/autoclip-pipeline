@@ -58,6 +58,52 @@ def is_mostly_loading_screen(start, end, visual_analysis, threshold=0.6, motion_
     return avg_motion < motion_threshold
 
 
+def build_word_boundary_index(kept_segments):
+    """Flattens every word across all kept segments into one time-sorted
+    list — the real data needed to keep clip boundaries from cutting
+    someone off mid-word or mid-sentence, matching what real competing
+    tools (vidIQ, Opus Clip) do. Whisper's word_timestamps=True already
+    captures this per-word timing; this just makes it searchable."""
+    words = []
+    for seg in kept_segments:
+        for w in seg.get("words", []):
+            words.append(w)
+    words.sort(key=lambda w: w["start"])
+    return words
+
+
+def snap_start_to_word_boundary(t, word_index, max_shift_sec=2.0):
+    """Moves a proposed clip START time forward to the start of the
+    nearest word at or after it, within a reasonable shift — never
+    backward (that would just make the clip longer than requested), and
+    capped so a genuinely isolated word far away doesn't drag the start
+    time somewhere unreasonable."""
+    if not word_index:
+        return t
+    best = t
+    for w in word_index:
+        if w["start"] >= t:
+            if w["start"] - t <= max_shift_sec:
+                best = w["start"]
+            break
+    return best
+
+
+def snap_end_to_word_boundary(t, word_index, max_shift_sec=2.0):
+    """Moves a proposed clip END time to the end of the word that's
+    currently in progress at that point, if any — so a clip doesn't cut
+    off mid-word. Only shifts forward (extends slightly), and only
+    within a reasonable cap."""
+    if not word_index:
+        return t
+    for w in word_index:
+        if w["start"] < t < w["end"]:
+            if w["end"] - t <= max_shift_sec:
+                return w["end"]
+            break
+    return t
+
+
 def candidate_windows(kept_segments, clip_length, duration, visual_analysis=None, audio_analysis=None, lead_in_sec=4.0):
     """One candidate window per tagged beat, centered on that beat,
     clamped to source bounds. Transcript-based beats (highlight/hook/etc)
@@ -74,7 +120,13 @@ def candidate_windows(kept_segments, clip_length, duration, visual_analysis=None
     3-5s range asked for) BEFORE the actual moment, rather than
     centering the whole clip on it — a gunshot/action spike is more
     watchable with a beat of buildup before it than with the moment
-    landing dead-center and half the clip spent on the aftermath."""
+    landing dead-center and half the clip spent on the aftermath.
+
+    Boundaries are snapped to real word edges (start/end) rather than
+    left as raw arithmetic — the same "don't cut mid-sentence" real
+    feature comparable clipping tools already have, made possible here
+    since whisper's word-level timestamps are already captured."""
+    word_index = build_word_boundary_index(kept_segments)
     candidates = []
     for i, seg in enumerate(kept_segments):
         tags = classify(seg, i, is_first=(i == 0))
@@ -85,6 +137,8 @@ def candidate_windows(kept_segments, clip_length, duration, visual_analysis=None
         start = max(0.0, mid - clip_length / 2)
         end = min(duration, start + clip_length)
         start = max(0.0, end - clip_length)  # re-clamp if end hit the ceiling
+        start = snap_start_to_word_boundary(start, word_index)
+        end = snap_end_to_word_boundary(end, word_index)
         if is_mostly_loading_screen(start, end, visual_analysis):
             continue
         candidates.append({"start": start, "end": end, "score": s, "text": seg["text"]})
