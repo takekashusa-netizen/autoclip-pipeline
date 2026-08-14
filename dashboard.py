@@ -29,6 +29,7 @@ import subprocess
 import sys
 import threading
 import time
+import socketserver
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -313,6 +314,17 @@ setInterval(refreshJobs, 10000);
 </body>
 </html>
 """
+
+
+class ThreadingHTTPServer(socketserver.ThreadingMixIn, HTTPServer):
+    """Real, permanent architectural fix — confirmed directly on a real
+    hang: a blocking, interactive request (OAuth consent, which opens a
+    browser and waits on the user) running inside a plain HTTPServer
+    doesn't just block that one request, it freezes the ENTIRE server
+    for every other request too, since Python's stdlib HTTPServer is
+    single-threaded by default. daemon_threads=True so a stuck request
+    thread doesn't prevent the whole process from exiting cleanly."""
+    daemon_threads = True
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -604,7 +616,7 @@ def main():
         mode = "auto-resume" + (" + auto-publish" if args.auto_publish else "")
         print(f"dashboard: background maintenance thread started ({mode})", flush=True)
 
-    server = HTTPServer(("0.0.0.0", args.port), Handler)
+    server = ThreadingHTTPServer(("0.0.0.0", args.port), Handler)
     print(f"dashboard: open http://localhost:{args.port} in your browser", flush=True)
     server.serve_forever()
 
