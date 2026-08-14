@@ -1,7 +1,74 @@
 dashboard: background maintenance thread started (auto-resume)
-  [09:31:36] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
+  [09:40:21] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
 dashboard: open http://localhost:8765 in your browser
 dashboard: 127.0.0.1 - "GET /api/jobs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/jobs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/outputs HTTP/1.1" 200 -
+Please visit this URL to authorize this application: https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=126669256911-dil068d62ol12kg4cg4saagdustkrj1r.apps.googleusercontent.com&redirect_uri=http%3A%2F%2Flocalhost%3A53472%2F&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fyoutube.upload&state=XDceID9Zxc6zF4ZRbrVlx0bMkl1NMq&code_challenge=mNlK-8toHii9slR1nuX6PP5RYjRfVRlhKdRCmStBY4M&code_challenge_method=S256&access_type=offline
+dashboard: 127.0.0.1 - "GET /api/jobs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/outputs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/jobs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/outputs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/jobs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/outputs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/jobs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/outputs HTTP/1.1" 200 -
+Please visit this URL to authorize this application: https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=126669256911-dil068d62ol12kg4cg4saagdustkrj1r.apps.googleusercontent.com&redirect_uri=http%3A%2F%2Flocalhost%3A53494%2F&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fyoutube.upload&state=ksjUQpWECWpKAPfuzCGGn405gpXKaE&code_challenge=XGrxE-kXv2-5n9nKlBbWhkDQPOcpVboy7xH3hlnQCYI&code_challenge_method=S256&access_type=offline
+dashboard: 127.0.0.1 - "GET /api/jobs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/outputs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/jobs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/outputs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "POST /api/publish/youtube HTTP/1.1" 500 -
+dashboard: 127.0.0.1 - "GET /api/jobs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/outputs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET / HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/jobs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/outputs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/jobs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/outputs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/jobs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/outputs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/jobs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/outputs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/jobs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/outputs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/jobs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/outputs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/jobs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/outputs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/jobs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/outputs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/jobs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/outputs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/jobs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/outputs HTTP/1.1" 200 -
+  [09:50:22] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
+dashboard: 127.0.0.1 - "GET /api/jobs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/outputs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "POST /api/publish/youtube HTTP/1.1" 500 -
+dashboard: 127.0.0.1 - "GET /api/jobs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/outputs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/jobs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/outputs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/jobs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/outputs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/jobs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/outputs HTTP/1.1" 200 -
+{"video_id": "QOcfVmNw4NI", "url": "https://youtu.be/QOcfVmNw4NI"}
+dashboard: 127.0.0.1 - "POST /api/publish/youtube HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/jobs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/outputs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/jobs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/outputs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/jobs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/outputs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/jobs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/outputs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/jobs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/outputs HTTP/1.1" 200 -
+  [10:00:22] doctor: found unfinished job(s) with nothing currently running for them — auto-resuming (/Users/Apple/autoclip-pipeline/resume_all.sh --auto-approve)
+dashboard: 127.0.0.1 - "GET /api/jobs HTTP/1.1" 200 -
+dashboard: 127.0.0.1 - "GET /api/outputs HTTP/1.1" 200 -
 dashboard: 127.0.0.1 - "GET /api/jobs HTTP/1.1" 200 -
 dashboard: 127.0.0.1 - "GET /api/outputs HTTP/1.1" 200 -
 dashboard: 127.0.0.1 - "GET /api/jobs HTTP/1.1" 200 -
