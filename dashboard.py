@@ -372,6 +372,51 @@ class ThreadingHTTPServer(socketserver.ThreadingMixIn, HTTPServer):
     daemon_threads = True
 
 
+WATCHER_STATE_FILE = os.path.join(ROOT, ".watcher_state.json")
+
+
+def start_watcher_thread(channel_url, content_type="gaming", interval_sec=None):
+    """The real, shared start logic — used both by the HTTP endpoint and
+    by the startup auto-resume, so there's one implementation, not two
+    that could drift apart."""
+    from channel_watcher import watch_loop, DEFAULT_INTERVAL_SEC
+    interval_sec = interval_sec or DEFAULT_INTERVAL_SEC
+    stop_event = threading.Event()
+    t = threading.Thread(
+        target=watch_loop,
+        args=(channel_url, stop_event),
+        kwargs={"content_type": content_type, "interval_sec": interval_sec},
+        daemon=True,
+    )
+    _WATCHER_STATE["thread"] = t
+    _WATCHER_STATE["stop_event"] = stop_event
+    _WATCHER_STATE["channel_url"] = channel_url
+    t.start()
+    with open(WATCHER_STATE_FILE, "w") as f:
+        json.dump({"channel_url": channel_url, "content_type": content_type, "interval_sec": interval_sec}, f)
+    return interval_sec
+
+
+def resume_watcher_if_needed():
+    """Real, permanent fix for the exact gap just hit: since the watcher
+    now runs as a thread INSIDE this process (the whole point of
+    consolidating it), restarting this process also stops the watcher —
+    a real regression from when it was a fully separate process. This
+    persists across restarts by checking for saved state on startup and
+    resuming automatically, restoring the same durability a separate
+    process used to give for free."""
+    if not os.path.exists(WATCHER_STATE_FILE):
+        return
+    try:
+        with open(WATCHER_STATE_FILE) as f:
+            state = json.load(f)
+        interval_sec = start_watcher_thread(state["channel_url"], state.get("content_type", "gaming"), state.get("interval_sec"))
+        print(f"dashboard: auto-resumed channel watcher for {state['channel_url']} "
+              f"(interval={interval_sec}s) — was running before the last restart", flush=True)
+    except Exception as e:
+        print(f"dashboard: could not auto-resume channel watcher — {e}", flush=True)
+
+
 class Handler(BaseHTTPRequestHandler):
     def _send_json(self, status_code, payload):
         body = json.dumps(payload).encode()
@@ -686,22 +731,10 @@ class Handler(BaseHTTPRequestHandler):
             self._send_json(409, {"error": "watcher already running — stop it first"})
             return
         try:
-            from channel_watcher import watch_loop, DEFAULT_INTERVAL_SEC
+            interval_sec = start_watcher_thread(channel_url, data.get("content_type", "gaming"), data.get("interval_sec"))
         except ImportError as e:
             self._send_json(500, {"error": f"channel_watcher unavailable: {e}"})
             return
-        interval_sec = data.get("interval_sec", DEFAULT_INTERVAL_SEC)
-        stop_event = threading.Event()
-        t = threading.Thread(
-            target=watch_loop,
-            args=(channel_url, stop_event),
-            kwargs={"content_type": data.get("content_type", "gaming"), "interval_sec": interval_sec},
-            daemon=True,
-        )
-        _WATCHER_STATE["thread"] = t
-        _WATCHER_STATE["stop_event"] = stop_event
-        _WATCHER_STATE["channel_url"] = channel_url
-        t.start()
         self._send_json(202, {"status": "started", "channel_url": channel_url,
                                "interval_sec": interval_sec, "interval_hours": round(interval_sec / 3600, 1)})
 
@@ -712,6 +745,8 @@ class Handler(BaseHTTPRequestHandler):
             return
         _WATCHER_STATE["stop_event"].set()
         thread.join(timeout=10)  # real, bounded wait — the loop checks stop_event between polls, not mid-download
+        if os.path.exists(WATCHER_STATE_FILE):
+            os.remove(WATCHER_STATE_FILE)  # explicit stop means don't auto-resume this on the next restart
         self._send_json(200, {"status": "stopped" if not thread.is_alive() else "stop requested (mid-task, will finish shortly)"})
 
     def log_message(self, format, *args):
@@ -736,6 +771,8 @@ def main():
         t.start()
         mode = "auto-resume" + (" + auto-publish" if args.auto_publish else "")
         print(f"dashboard: background maintenance thread started ({mode})", flush=True)
+
+    resume_watcher_if_needed()
 
     server = ThreadingHTTPServer(("0.0.0.0", args.port), Handler)
     print(f"dashboard: open http://localhost:{args.port} in your browser", flush=True)
