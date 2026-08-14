@@ -115,26 +115,42 @@ def is_watcher_running():
         return False
 
 
-def background_maintenance_loop(interval_sec=120, resume_interval_sec=600, publish_interval_sec=300, auto_publish=False):
+def background_maintenance_loop(interval_sec=120, resume_interval_sec=600, publish_interval_sec=300,
+                                 metadata_interval_sec=60, auto_publish=False, content_type="gaming"):
     """The real consolidation: doctor.py's auto-resume and auto-publish
     logic, running as a thread INSIDE this same server process instead
     of a separate one you have to remember to start alongside it.
     Imports doctor.py's actual functions rather than reimplementing
     them, so there's exactly one real implementation of this logic, not
-    two copies that can drift apart."""
+    two copies that can drift apart.
+
+    Also generates real title/description/tags the moment ANY job
+    finishes — not gated behind auto_publish, since the metadata is
+    useful for a manual download+post too, not just auto-upload."""
     try:
         import doctor as doctor_mod
     except ImportError as e:
         print(f"dashboard: background maintenance unavailable — {e}", flush=True)
         return
+    try:
+        from auto_metadata import generate_metadata_for_all_finished_jobs
+    except ImportError as e:
+        generate_metadata_for_all_finished_jobs = None
+        print(f"dashboard: auto-metadata unavailable — {e}", flush=True)
 
     last_resume = 0.0
     last_publish = 0.0
+    last_metadata = 0.0
     while True:
         try:
             if time.time() - last_resume >= resume_interval_sec:
                 doctor_mod.auto_resume(auto_approve=True)
                 last_resume = time.time()
+            if generate_metadata_for_all_finished_jobs and time.time() - last_metadata >= metadata_interval_sec:
+                generated = generate_metadata_for_all_finished_jobs(content_type=content_type)
+                if generated:
+                    print(f"dashboard: generated metadata for {len(generated)} newly-finished job(s): {generated}", flush=True)
+                last_metadata = time.time()
             if auto_publish and time.time() - last_publish >= publish_interval_sec:
                 doctor_mod.publish_pending_jobs()
                 last_publish = time.time()
