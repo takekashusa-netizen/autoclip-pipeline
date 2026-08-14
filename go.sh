@@ -45,7 +45,7 @@ if [[ $# -gt 0 && "$1" != --* ]]; then
 fi
 [[ -z "$job" ]] && job="job$(date +%s)"
 
-platform="youtube"
+platform="longform"   # default mode per explicit preference — 10+ min continuous segments, not short clips, unless --platform tiktok/youtube is explicitly requested
 clip_count=10
 clip_length=""   # resolved from platform below, unless explicitly overridden
 content_type="gaming"

@@ -132,9 +132,9 @@ DASHBOARD_HTML = """<!DOCTYPE html>
   <h2>New Job</h2>
   <input type="text" id="url" placeholder="Video URL (e.g. https://www.twitch.tv/videos/XXXX)">
   <select id="platform">
-    <option value="youtube">YouTube (55s clips)</option>
+    <option value="longform" selected>Long-form YouTube (10+ min continuous)</option>
     <option value="tiktok">TikTok (25s clips)</option>
-    <option value="longform">Long-form YouTube (10+ min continuous)</option>
+    <option value="youtube">YouTube (35s clips)</option>
   </select>
   <input type="text" id="clipcount" placeholder="Clip count" value="10" style="width:100px">
   <br>
