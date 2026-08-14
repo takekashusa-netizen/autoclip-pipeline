@@ -116,7 +116,8 @@ def is_watcher_running():
 
 
 def background_maintenance_loop(interval_sec=120, resume_interval_sec=600, publish_interval_sec=300,
-                                 metadata_interval_sec=60, auto_publish=False, content_type="gaming"):
+                                 metadata_interval_sec=60, schedule_interval_sec=300,
+                                 auto_publish=False, content_type="gaming"):
     """The real consolidation: doctor.py's auto-resume and auto-publish
     logic, running as a thread INSIDE this same server process instead
     of a separate one you have to remember to start alongside it.
@@ -126,7 +127,11 @@ def background_maintenance_loop(interval_sec=120, resume_interval_sec=600, publi
 
     Also generates real title/description/tags the moment ANY job
     finishes — not gated behind auto_publish, since the metadata is
-    useful for a manual download+post too, not just auto-upload."""
+    useful for a manual download+post too, not just auto-upload.
+
+    Also processes the real publish schedule — 2 posts/day per
+    platform at research-backed optimal times, not everything at once
+    the moment it's queued."""
     try:
         import doctor as doctor_mod
     except ImportError as e:
@@ -137,10 +142,16 @@ def background_maintenance_loop(interval_sec=120, resume_interval_sec=600, publi
     except ImportError as e:
         generate_metadata_for_all_finished_jobs = None
         print(f"dashboard: auto-metadata unavailable — {e}", flush=True)
+    try:
+        from publish_scheduler import process_due_items
+    except ImportError as e:
+        process_due_items = None
+        print(f"dashboard: publish scheduler unavailable — {e}", flush=True)
 
     last_resume = 0.0
     last_publish = 0.0
     last_metadata = 0.0
+    last_schedule = 0.0
     while True:
         try:
             if time.time() - last_resume >= resume_interval_sec:
@@ -151,6 +162,11 @@ def background_maintenance_loop(interval_sec=120, resume_interval_sec=600, publi
                 if generated:
                     print(f"dashboard: generated metadata for {len(generated)} newly-finished job(s): {generated}", flush=True)
                 last_metadata = time.time()
+            if process_due_items and time.time() - last_schedule >= schedule_interval_sec:
+                published = process_due_items()
+                if published:
+                    print(f"dashboard: processed {len(published)} due schedule item(s)", flush=True)
+                last_schedule = time.time()
             if auto_publish and time.time() - last_publish >= publish_interval_sec:
                 doctor_mod.publish_pending_jobs()
                 last_publish = time.time()
@@ -366,8 +382,34 @@ class Handler(BaseHTTPRequestHandler):
             self._handle_publish_tiktok()
         elif self.path == "/api/originality-boost":
             self._handle_originality_boost()
+        elif self.path == "/api/schedule/best-windows":
+            self._handle_schedule_best_windows()
         else:
             self._send_json(404, {"error": "not found"})
+
+    def _handle_schedule_best_windows(self):
+        try:
+            data = self._read_json_body()
+        except Exception as e:
+            self._send_json(400, {"error": f"invalid JSON: {e}"})
+            return
+        job = data.get("job")
+        if not job:
+            self._send_json(400, {"error": "missing job"})
+            return
+        platform = data.get("platform", "youtube")
+        try:
+            from publish_scheduler import enqueue_best_windows_job
+        except ImportError as e:
+            self._send_json(500, {"error": f"scheduler unavailable: {e}"})
+            return
+        try:
+            queued = enqueue_best_windows_job(job, platform=platform)
+        except Exception as e:
+            self._send_json(500, {"error": str(e)})
+            return
+        self._send_json(200, {"job": job, "queued": len(queued),
+                               "schedule": [{"content_id": q["content_id"], "when": q["scheduled_time"]} for q in queued]})
 
     def _handle_publish_youtube(self):
         try:

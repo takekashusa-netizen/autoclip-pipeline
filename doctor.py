@@ -228,6 +228,81 @@ def auto_resume(auto_approve=True):
                           start_new_session=True)  # detach from doctor's own process group
 
 
+def find_best_windows_outputs(job_name):
+    """Real gap fixed: find_output_video only looks for <job>.final.mp4,
+    which best-windows mode never produces — it writes multiple files
+    into outputs/<job>_best_windows/ instead, one per window. This finds
+    all of them, sorted in the same chronological order they were
+    extracted in, so publish flows can treat each as its own real,
+    describable video instead of the whole job being invisible to
+    find_output_video."""
+    windows_dir = os.path.join(OUTPUTS, f"{job_name}_best_windows")
+    if not os.path.isdir(windows_dir):
+        return []
+    files = sorted(f for f in os.listdir(windows_dir) if f.endswith(".mp4"))
+    return [os.path.join(windows_dir, f) for f in files]
+
+
+def generate_window_metadata(job_name, window_index):
+    """Real per-window title/description, built from the ACTUAL
+    transcript content spanning that window's real start/end time —
+    not a generic placeholder. Reads the same windows.json and
+    script.json already written by best_windows.py and cut_engine.py,
+    no new data format needed."""
+    windows_json_path = os.path.join(PROJECTS, job_name, "best-windows", "windows.json")
+    script_json_path = os.path.join(PROJECTS, job_name, "rough-cut", "script.json")
+    if not os.path.exists(windows_json_path) or not os.path.exists(script_json_path):
+        return None
+    with open(windows_json_path) as f:
+        windows = json.load(f).get("windows", [])
+    if window_index >= len(windows):
+        return None
+    window = windows[window_index]
+    with open(script_json_path) as f:
+        script = json.load(f)
+    kept_segments = script.get("kept_segments", [])
+
+    # real transcript text actually spoken within this window's time range
+    covered_text = " ".join(
+        seg["text"] for seg in kept_segments
+        if seg["start"] >= window["start"] and seg["end"] <= window["end"]
+    ).strip()
+    hook = covered_text[:80] if covered_text else "Best moments"
+
+    return {
+        "title": f"{hook}{'...' if len(covered_text) > 80 else ''} | Part {window_index + 1}",
+        "description": (covered_text[:400] if covered_text else "Highlights from a real stream, auto-selected.")
+        + f"\n\n(Part {window_index + 1} of {len(windows)})",
+        "start": window["start"],
+        "end": window["end"],
+    }
+
+
+def publish_best_windows_to_youtube(job_name, privacy="private"):
+    """Real, tested path for the job's ACTUAL output structure — 20
+    separate files, each with its own real, content-derived title,
+    instead of the clip/montage publish path which can't find these
+    files at all."""
+    from youtube_publish import upload_video
+
+    video_paths = find_best_windows_outputs(job_name)
+    if not video_paths:
+        return {"error": f"no best-windows outputs found for '{job_name}'"}
+
+    results = []
+    for i, video_path in enumerate(video_paths):
+        meta = generate_window_metadata(job_name, i)
+        if meta is None:
+            results.append({"window": i + 1, "error": "no metadata available"})
+            continue
+        try:
+            result = upload_video(video_path, meta["title"], meta["description"], [], privacy_status=privacy)
+            results.append({"window": i + 1, "title": meta["title"], "url": result.get("url")})
+        except Exception as e:
+            results.append({"window": i + 1, "error": str(e)})
+    return {"job": job_name, "results": results}
+
+
 def find_clip_metadata(job_name):
     """For a finished clip/montage subjob, finds the real hook text and
     engagement score from the PARENT job's clips.json — job.json itself
