@@ -223,6 +223,29 @@ DASHBOARD_HTML = """<!DOCTYPE html>
   <table id="outputsTable"><thead><tr><th>File</th><th>Size</th><th></th></tr></thead><tbody></tbody></table>
 </div>
 
+<div class="card">
+  <h2>Publish Schedule</h2>
+  <p style="opacity:0.7; font-size:0.9em;">2 posts/day per platform, at real research-backed optimal times.</p>
+  <input type="text" id="scheduleJob" placeholder="Job name (e.g. job1786627920)">
+  <select id="schedulePlatform">
+    <option value="youtube">YouTube</option>
+  </select>
+  <br>
+  <button onclick="scheduleJob()">Schedule All Windows</button>
+  <span id="scheduleResult"></span>
+  <table id="scheduleTable"><thead><tr><th>Content</th><th>Platform</th><th>When</th><th>Status</th></tr></thead><tbody></tbody></table>
+</div>
+
+<div class="card">
+  <h2>Thumbnail Branding</h2>
+  <input type="text" id="brandJob" placeholder="Job name">
+  <input type="text" id="brandText" placeholder="Watermark text (e.g. GtaxZombies)">
+  <input type="text" id="brandLogoPath" placeholder="Logo file path (optional)">
+  <br>
+  <button onclick="brandThumbnail()">Apply Branding</button>
+  <span id="brandResult"></span>
+</div>
+
 <script>
 async function triggerJob() {
   const url = document.getElementById('url').value;
@@ -276,6 +299,32 @@ async function boostOutput(filename) {
   refreshJobs();
 }
 
+async function scheduleJob() {
+  const job = document.getElementById('scheduleJob').value;
+  const platform = document.getElementById('schedulePlatform').value;
+  if (!job) { document.getElementById('scheduleResult').textContent = ' Enter a job name first'; return; }
+  const res = await fetch('/api/schedule/best-windows', {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({job, platform})
+  });
+  const data = await res.json();
+  document.getElementById('scheduleResult').textContent = data.error ? ` Error: ${data.error}` : ` Queued ${data.queued} item(s)`;
+  refreshJobs();
+}
+
+async function brandThumbnail() {
+  const job = document.getElementById('brandJob').value;
+  const watermark_text = document.getElementById('brandText').value;
+  const logo_path = document.getElementById('brandLogoPath').value;
+  if (!job || !watermark_text) { document.getElementById('brandResult').textContent = ' Enter job and watermark text'; return; }
+  const res = await fetch('/api/brand-thumbnail', {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({job, watermark_text, logo_path: logo_path || undefined})
+  });
+  const data = await res.json();
+  document.getElementById('brandResult').textContent = data.error ? ` Error: ${data.error}` : ` Applied to ${data.job}`;
+}
+
 async function refreshJobs() {
   const res = await fetch('/api/jobs');
   const jobs = await res.json();
@@ -293,6 +342,14 @@ async function refreshJobs() {
   tbody2.innerHTML = outputs.map(o => `<tr>
     <td>${o.name}</td><td>${o.size_mb} MB</td>
     <td><a href="/download/${encodeURIComponent(o.name)}">download</a> <button onclick="boostOutput('${o.name}')">Boost</button></td>
+  </tr>`).join('');
+
+  const res3 = await fetch('/api/schedule');
+  const schedule = await res3.json();
+  const tbody3 = document.querySelector('#scheduleTable tbody');
+  tbody3.innerHTML = schedule.map(s => `<tr>
+    <td>${s.content_id}</td><td>${s.platform}</td><td>${s.scheduled_time}</td>
+    <td class="status-${s.status === 'published' ? 'done' : (s.status === 'error' ? 'failed' : 'running')}">${s.status}</td>
   </tr>`).join('');
 }
 
@@ -341,6 +398,8 @@ class Handler(BaseHTTPRequestHandler):
             self._send_json(200, list_jobs())
         elif self.path == "/api/outputs":
             self._send_json(200, list_outputs())
+        elif self.path == "/api/schedule":
+            self._handle_schedule_view()
         elif self.path.startswith("/download/"):
             self._serve_download()
         else:
@@ -380,10 +439,14 @@ class Handler(BaseHTTPRequestHandler):
             self._handle_publish_youtube()
         elif self.path == "/api/publish/tiktok":
             self._handle_publish_tiktok()
+        elif self.path == "/api/publish/instagram":
+            self._handle_publish_instagram()
         elif self.path == "/api/originality-boost":
             self._handle_originality_boost()
         elif self.path == "/api/schedule/best-windows":
             self._handle_schedule_best_windows()
+        elif self.path == "/api/brand-thumbnail":
+            self._handle_brand_thumbnail()
         else:
             self._send_json(404, {"error": "not found"})
 
@@ -493,6 +556,70 @@ class Handler(BaseHTTPRequestHandler):
             self._send_json(500, {"error": f"TikTok publish failed: {e}"})
             return
         self._send_json(200, {"job": job, "result": result})
+
+    def _handle_publish_instagram(self):
+        try:
+            data = self._read_json_body()
+        except Exception as e:
+            self._send_json(400, {"error": f"invalid JSON: {e}"})
+            return
+        job = data.get("job")
+        video_url = data.get("video_url")
+        if not job or not video_url:
+            self._send_json(400, {"error": "missing job or video_url — Instagram's API requires a real, "
+                                             "publicly-accessible URL, not a local file path"})
+            return
+        try:
+            import doctor as doctor_mod
+            from instagram_publish import publish_reel
+        except ImportError as e:
+            self._send_json(500, {"error": f"publish libraries unavailable: {e}"})
+            return
+        video_path = doctor_mod.find_output_video(job)
+        caption = data.get("caption", job)
+        try:
+            result = publish_reel(video_url, caption, video_path_for_duration_check=video_path)
+        except Exception as e:
+            self._send_json(500, {"error": f"Instagram publish failed: {e}"})
+            return
+        self._send_json(200, {"job": job, "result": result})
+
+    def _handle_schedule_view(self):
+        try:
+            from publish_scheduler import _load_queue
+        except ImportError as e:
+            self._send_json(500, {"error": f"scheduler unavailable: {e}"})
+            return
+        self._send_json(200, _load_queue())
+
+    def _handle_brand_thumbnail(self):
+        try:
+            data = self._read_json_body()
+        except Exception as e:
+            self._send_json(400, {"error": f"invalid JSON: {e}"})
+            return
+        job = data.get("job")
+        watermark_text = data.get("watermark_text")
+        if not job or not watermark_text:
+            self._send_json(400, {"error": "missing job or watermark_text"})
+            return
+        try:
+            import doctor as doctor_mod
+            from thumbnail_brand import brand_thumbnail
+        except ImportError as e:
+            self._send_json(500, {"error": f"thumbnail_brand unavailable: {e}"})
+            return
+        thumb_path = os.path.join(PROJECTS_DIR, job, "thumbnail", "thumb.jpg")
+        if not os.path.exists(thumb_path):
+            self._send_json(404, {"error": f"no thumbnail found for job '{job}' at {thumb_path}"})
+            return
+        logo_path = data.get("logo_path")
+        try:
+            brand_thumbnail(thumb_path, watermark_text, logo_path)
+        except Exception as e:
+            self._send_json(500, {"error": str(e)})
+            return
+        self._send_json(200, {"job": job, "thumbnail": thumb_path, "watermark_text": watermark_text})
 
     def _handle_originality_boost(self):
         try:
