@@ -39,15 +39,16 @@ else
   # call in the whole pipeline, so a corrupted/truncated source hangs
   # here before anything downstream ever gets a chance to run.
   #
-  # Real gap fixed: 180s was too short for the mechanism's own sake,
-  # not a hang — confirmed directly on a real 8.67GB, 5.66-hour source,
-  # where a genuinely still-working extraction got killed at 180s
-  # simply because raw audio extraction from a file that large takes
-  # longer than that. Same class of "timeout value too conservative for
-  # real large files" issue already found once tonight in the
-  # best-windows extraction step — this is the same fix applied here.
-  if ! run_with_timeout 1800 ffmpeg -nostdin -y -i "$raw_video" -vn -ac 1 -ar 16000 "$audio_path" -loglevel error; then
-    echo "rough-cut: audio extraction timed out or failed (1800s) — likely a corrupted/truncated source" >&2
+  # Real gap fixed, twice now: first a fixed 180s, then a fixed 1800s —
+  # confirmed directly on a real 8.67GB, 5.66-hour source that even a
+  # generous fixed guess is the wrong shape of fix, since it'll always
+  # eventually be wrong for either direction (too short for an even
+  # longer source, needlessly slow to fail on a short one). This now
+  # scales with the real, already-known duration of THIS source instead
+  # of guessing a one-size-fits-all constant.
+  audio_timeout="$(python3 -c "print(max(300, int(${src_duration:-0} * 0.5)))" 2>/dev/null || echo 1800)"
+  if ! run_with_timeout "$audio_timeout" ffmpeg -nostdin -y -i "$raw_video" -vn -ac 1 -ar 16000 "$audio_path" -loglevel error; then
+    echo "rough-cut: audio extraction timed out or failed (${audio_timeout}s) — likely a corrupted/truncated source" >&2
     exit 1
   fi
 
@@ -55,7 +56,8 @@ else
   # audio not routed into the recording) — whisper hallucinates repeated
   # garbage ("you you you...") on near-silent input instead of erroring,
   # so catch this explicitly rather than trusting a fake transcript.
-  mean_db="$(run_with_timeout 300 ffmpeg -nostdin -i "$audio_path" -af volumedetect -f null - 2>&1 \
+  volumedetect_timeout="$(python3 -c "print(max(120, int(${src_duration:-0} * 0.3)))" 2>/dev/null || echo 300)"
+  mean_db="$(run_with_timeout "$volumedetect_timeout" ffmpeg -nostdin -i "$audio_path" -af volumedetect -f null - 2>&1 \
     | grep -o 'mean_volume: [-0-9.]*' | grep -o '[-0-9.]*' || echo "0")"
   is_silent="$(python3 -c "print('1' if float('${mean_db:-0}' or 0) < -50 else '0')" 2>/dev/null || echo "0")"
 

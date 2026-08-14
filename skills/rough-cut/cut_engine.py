@@ -473,11 +473,20 @@ def render_cut(raw_video, kept_segments, out_path, work_dir, job=None):
     that segment's own duration, not the whole source), then concatenates
     via stream copy (no re-encode on the concat step)."""
     if not kept_segments:
+        # Real bug fixed, three times now: no timeout, then a fixed 180s,
+        # then a fixed 1800s — any single guessed constant is eventually
+        # wrong for some source length. This reads the source's own real
+        # duration (fast, size-independent metadata read) and scales to
+        # it instead. -c copy is a stream copy, not a re-encode, so it's
+        # mostly I/O-bound and much faster per-second-of-content than a
+        # real encode — a smaller multiplier than the encoding cases.
+        duration = ffprobe_duration(raw_video) if os.path.exists(raw_video) else None
+        timeout_sec = max(300, int(duration * 0.2)) if duration else 1800
         try:
             subprocess.run(["ffmpeg", "-nostdin", "-y", "-i", raw_video, "-c", "copy", out_path],
-                            check=True, timeout=1800)
+                            check=True, timeout=timeout_sec)
         except subprocess.TimeoutExpired as e:
-            raise RuntimeError("whole-file copy timed out after 1800s — "
+            raise RuntimeError(f"whole-file copy timed out after {timeout_sec}s — "
                                 "likely a corrupted/truncated source") from e
         return
 

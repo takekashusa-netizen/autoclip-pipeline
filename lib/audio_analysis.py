@@ -22,18 +22,37 @@ import sys
 import numpy as np
 
 
-def extract_pcm(video_path, sample_rate=16000, timeout_sec=1800):
+def _probe_duration(video_path, timeout_sec=30):
+    """Fast metadata-only read — safe with a short, fixed timeout
+    regardless of file size, since this never touches the actual video
+    content, just the container's own header info."""
+    try:
+        result = subprocess.run(
+            ["ffprobe", "-v", "error", "-show_entries", "format=duration",
+             "-of", "default=noprint_wrappers=1:nokey=1", video_path],
+            capture_output=True, text=True, timeout=timeout_sec,
+        )
+        return float(result.stdout.strip())
+    except Exception:
+        return None  # genuinely unknown — caller falls back to a safe default
+
+
+def extract_pcm(video_path, sample_rate=16000, timeout_sec=None):
     """Returns a 1-D float32 numpy array of mono PCM samples, via ffmpeg
     piped raw output — no temp file needed.
 
-    Real bug fixed: no timeout — the same corrupted-source-tail hang
-    that cost real time twice tonight (in a different call, but the
-    identical shape of bug) could happen here too, since this reads the
-    full audio track and would hang forever if ffmpeg gets stuck.
-    Timeout raised from an initial 180s after finding that value too
-    short for a real multi-hour rough_cut file — same class of "too
-    conservative for genuinely large real files" issue found and fixed
-    elsewhere tonight."""
+    Real bug fixed, three times now: first no timeout at all; then a
+    fixed 180s that was too short for a real multi-hour file; then a
+    fixed 1800s that was still just a bigger guess, not a real fix — any
+    single fixed constant is eventually wrong in one direction or the
+    other for some source length. This now reads the source's own real
+    duration first (a fast, safe, size-independent metadata read) and
+    scales the actual timeout to it, so it stays correctly sized
+    whether the source is 10 minutes or 10 hours, without ever needing
+    another manual bump."""
+    if timeout_sec is None:
+        duration = _probe_duration(video_path)
+        timeout_sec = max(300, int(duration * 0.5)) if duration else 1800
     cmd = [
         "ffmpeg", "-nostdin", "-v", "error", "-i", video_path,
         "-f", "f32le", "-ac", "1", "-ar", str(sample_rate), "-",

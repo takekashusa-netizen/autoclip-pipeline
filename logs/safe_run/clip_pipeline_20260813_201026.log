@@ -1,0 +1,4 @@
+== clip_pipeline: job=job1786627920 format=long-form-youtube best_windows_minutes=10 best_windows_count=20 (continuous, non-overlapping) ==
+-- transcribing full source (once) --
+  [20:10:34] rough-cut: extracting audio from source.mp4
+  [20:17:12] rough-cut: transcribing + building EDL
