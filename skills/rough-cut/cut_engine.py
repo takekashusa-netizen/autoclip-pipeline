@@ -189,11 +189,19 @@ def try_faster_whisper(audio_path, job=None, duration=None, work_dir=None):
     transcribe_audio_path = audio_path
     if resume_from > 0 and work_dir:
         trimmed_path = os.path.join(work_dir, "audio_resume.wav")
+        # Real gap fixed, missed in an earlier sweep: fixed 120s doesn't
+        # scale with how much audio actually remains to copy — a resume
+        # point early in a long source leaves nearly the whole file to
+        # trim, while one near the end leaves very little; scale to the
+        # real remaining duration instead of guessing a constant.
+        total_duration = ffprobe_duration(audio_path) if os.path.exists(audio_path) else None
+        remaining = max(0, total_duration - resume_from) if total_duration else None
+        resume_timeout = max(120, int(remaining * 0.3)) if remaining else 1800
         try:
             subprocess.run(
                 ["ffmpeg", "-nostdin", "-y", "-i", audio_path, "-ss", str(resume_from),
                  "-c", "copy", trimmed_path, "-loglevel", "error"],
-                check=True, capture_output=True, text=True, timeout=120,
+                check=True, capture_output=True, text=True, timeout=resume_timeout,
             )
             transcribe_audio_path = trimmed_path
         except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
@@ -382,7 +390,7 @@ def _render_batch_select(raw_video, segments, out_path, timeout_sec=1800):
         subprocess.run(
             ["ffmpeg", "-nostdin", "-y", "-f", "concat", "-safe", "0", "-i", concat_list,
              "-c", "copy", out_path],
-            check=True, timeout=60,
+            check=True, timeout=timeout_sec,
         )
     except subprocess.TimeoutExpired as e:
         raise RuntimeError("concat of already-extracted parts timed out — unexpected, these are just stream copies") from e
@@ -511,15 +519,22 @@ def render_cut(raw_video, kept_segments, out_path, work_dir, job=None):
     with open(concat_list, "w") as f:
         for p in part_files:
             f.write(f"file '{p}'\n")
+    # Real bug fixed, missed in an earlier sweep: a fixed 120s was too
+    # short for this exact "just stream copies" step — confirmed
+    # directly on a real 5.66-hour source with many hundreds of parts,
+    # where concatenating that much real data (even without re-encoding)
+    # genuinely took longer than the fixed guess. Scales with the real,
+    # already-known part count instead of guessing a constant.
+    concat_timeout = max(120, len(part_files) * 3)
     try:
         subprocess.run(
             ["ffmpeg", "-nostdin", "-y", "-f", "concat", "-safe", "0", "-i", concat_list,
              "-c", "copy", out_path],
-            check=True, timeout=120,
+            check=True, timeout=concat_timeout,
         )
     except subprocess.TimeoutExpired as e:
-        raise RuntimeError("final concat of already-extracted parts timed out after 120s — "
-                            "unexpected, these are just stream copies") from e
+        raise RuntimeError(f"final concat of already-extracted parts timed out after {concat_timeout}s — "
+                            "check disk I/O; these are stream copies, not re-encodes") from e
     for p in part_files:
         os.remove(p)
     os.remove(concat_list)

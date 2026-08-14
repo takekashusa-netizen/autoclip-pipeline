@@ -48,7 +48,7 @@ def find_font_file():
     return None  # none found — caller falls back to no-fontfile (old, fontconfig-dependent) behavior
 
 
-def run_ffmpeg(cmd):
+def run_ffmpeg(cmd, timeout_sec=600):
     """Real bug fixed: every ffmpeg call in this file used check=True with
     capture_output=True, meaning a failure raised CalledProcessError with
     the actual ffmpeg stderr message completely invisible — the Python
@@ -57,13 +57,17 @@ def run_ffmpeg(cmd):
     error text before re-raising, so a failure is actually diagnosable
     instead of a black box.
 
-    Real bug fixed: also had no timeout — same corrupted-source hang
-    class found twice elsewhere tonight; every real video/PNG-overlay
-    render this handles was equally exposed to hanging forever."""
+    Real bug fixed, twice now: first no timeout at all, then a fixed
+    180s — confirmed too tight for longform-scale graphics rendering
+    (reframing/beat-card rendering on 10+ minute segments, not just
+    short clips this function was originally sized for). Raised to a
+    more generous default and exposed as a real parameter so a caller
+    processing a long segment can scale it further rather than being
+    stuck with one fixed guess for every use of this shared helper."""
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=180)
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout_sec)
     except subprocess.TimeoutExpired as e:
-        raise RuntimeError("ffmpeg timed out after 180s — likely a corrupted/truncated region of the source") from e
+        raise RuntimeError(f"ffmpeg timed out after {timeout_sec}s — likely a corrupted/truncated region of the source") from e
     if result.returncode != 0:
         print(f"ffmpeg FAILED (exit {result.returncode}). Real stderr:\n{result.stderr}", file=sys.stderr)
         raise subprocess.CalledProcessError(result.returncode, cmd, output=result.stdout, stderr=result.stderr)
