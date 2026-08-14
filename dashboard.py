@@ -428,19 +428,37 @@ class Handler(BaseHTTPRequestHandler):
             self._send_json(500, {"error": f"publish libraries unavailable: {e}"})
             return
 
-        video_path = doctor_mod.find_output_video(job)
-        if not video_path:
-            self._send_json(404, {"error": f"no finished output found for job '{job}'"})
-            return
-        clip_meta = doctor_mod.find_clip_metadata(job)
-        if not clip_meta:
-            self._send_json(404, {"error": f"no clip/montage metadata found for '{job}'"})
-            return
         content_type = data.get("content_type", "gaming")
         privacy = data.get("privacy", "private")
-        title = generate_title(clip_meta, content_type)
-        description = generate_description(clip_meta, source_title=clip_meta.get("source_title"))
-        tags = generate_tags(clip_meta, content_type)
+
+        video_path = doctor_mod.find_output_video(job)
+        if video_path:
+            clip_meta = doctor_mod.find_clip_metadata(job)
+            if not clip_meta:
+                self._send_json(404, {"error": f"no clip/montage metadata found for '{job}'"})
+                return
+            title = generate_title(clip_meta, content_type)
+            description = generate_description(clip_meta, source_title=clip_meta.get("source_title"))
+            tags = generate_tags(clip_meta, content_type)
+        else:
+            # Real gap fixed: this endpoint only ever checked the
+            # clip/montage output pattern — confirmed directly on a real
+            # best-windows job that it returned "no finished output
+            # found" even though 20 real, valid files existed, just
+            # under a different naming pattern this never checked.
+            window_index = data.get("window_index", 0)
+            windows = doctor_mod.find_best_windows_outputs(job)
+            if not windows or window_index >= len(windows):
+                self._send_json(404, {"error": f"no finished output found for job '{job}' "
+                                                 f"(checked both clip/montage and best-windows patterns)"})
+                return
+            video_path = windows[window_index]
+            meta = doctor_mod.generate_window_metadata(job, window_index)
+            if not meta:
+                self._send_json(404, {"error": f"no window metadata available for '{job}' window {window_index}"})
+                return
+            title, description, tags = meta["title"], meta["description"], []
+
         try:
             result = upload_video(video_path, title, description, tags, privacy_status=privacy)
         except Exception as e:
