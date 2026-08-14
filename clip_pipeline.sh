@@ -33,7 +33,7 @@ job="${1:?job id required}"
 format="${2:?format required}"
 shift 2
 
-clip_length=60
+clip_length=35
 clip_count=3
 bonus_clips=3   # default on — grab up to 3 extra strong-highlight moments
                 # beyond clip_count if the source has more worth clipping

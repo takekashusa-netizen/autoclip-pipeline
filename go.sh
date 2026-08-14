@@ -87,7 +87,7 @@ if [[ -z "$clip_length" ]]; then
   if [[ "$platform" == "tiktok" ]]; then
     clip_length=25   # real research finding: 15-30s outperforms longer clips on TikTok specifically
   else
-    clip_length=55   # YouTube Shorts sweet spot
+    clip_length=35   # real research-backed range, but clearly away from a minute per explicit preference
   fi
 fi
 
