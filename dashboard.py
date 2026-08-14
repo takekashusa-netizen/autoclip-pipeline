@@ -2,12 +2,22 @@
 """
 dashboard.py [--port 8765]
 
-A real, functional web dashboard for the pipeline — buttons that
-actually trigger jobs, a live-updating job list, and real download
-links for finished clips. Single Python file, stdlib only, no
-external dependencies. Extends webhook_trigger.py's same async
-launch-and-poll pattern, just with an actual UI on top instead of
-requiring curl/JSON.
+The single, unified AI clipping agent server — every function built
+across this whole session, in one process:
+  - Job submission (short clips or long-form) via a real web UI
+  - Channel watching (start/stop a live poll loop for new VODs)
+  - Background auto-resume for stalled/failed jobs (was doctor.py,
+    now a thread inside this same process, not a separate one to
+    remember to start)
+  - Background auto-publish to YouTube once a job finishes
+  - On-demand publish to YouTube or TikTok for any specific job
+  - Originality Boost (subtle per-clip visual variation) on any output
+  - Real download links for every finished clip
+
+Single Python file, stdlib only for the server itself (publish
+integrations import their own real dependencies only when actually
+used, so the server itself has zero hard dependencies beyond the
+standard library).
 
 Run it, then open http://localhost:8765 in a browser on the same Mac.
 """
@@ -16,12 +26,15 @@ import json
 import os
 import re
 import subprocess
+import sys
+import threading
 import time
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 OUTPUTS_DIR = os.path.realpath(os.path.join(ROOT, "outputs"))
 PROJECTS_DIR = os.path.join(ROOT, "projects")
+sys.path.insert(0, os.path.join(ROOT, "lib"))
 
 WATCHER_PID_FILE = os.path.join(ROOT, ".watcher.pid")
 
@@ -102,6 +115,34 @@ def is_watcher_running():
         return False
 
 
+def background_maintenance_loop(interval_sec=120, resume_interval_sec=600, publish_interval_sec=300, auto_publish=False):
+    """The real consolidation: doctor.py's auto-resume and auto-publish
+    logic, running as a thread INSIDE this same server process instead
+    of a separate one you have to remember to start alongside it.
+    Imports doctor.py's actual functions rather than reimplementing
+    them, so there's exactly one real implementation of this logic, not
+    two copies that can drift apart."""
+    try:
+        import doctor as doctor_mod
+    except ImportError as e:
+        print(f"dashboard: background maintenance unavailable — {e}", flush=True)
+        return
+
+    last_resume = 0.0
+    last_publish = 0.0
+    while True:
+        try:
+            if time.time() - last_resume >= resume_interval_sec:
+                doctor_mod.auto_resume(auto_approve=True)
+                last_resume = time.time()
+            if auto_publish and time.time() - last_publish >= publish_interval_sec:
+                doctor_mod.publish_pending_jobs()
+                last_publish = time.time()
+        except Exception as e:
+            print(f"dashboard: background maintenance error (continuing): {e}", flush=True)
+        time.sleep(interval_sec)
+
+
 DASHBOARD_HTML = """<!DOCTYPE html>
 <html>
 <head>
@@ -153,7 +194,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
 
 <div class="card">
   <h2>Jobs</h2>
-  <table id="jobsTable"><thead><tr><th>Job</th><th>Status</th><th>YouTube</th></tr></thead><tbody></tbody></table>
+  <table id="jobsTable"><thead><tr><th>Job</th><th>Status</th><th>YouTube</th><th></th></tr></thead><tbody></tbody></table>
 </div>
 
 <div class="card">
@@ -194,6 +235,26 @@ async function stopWatcher() {
   document.getElementById('watcherStatus').textContent = data.status === 'stopped' ? ' Stopped' : ` ${data.error || 'not running'}`;
 }
 
+async function publishJob(job, platform) {
+  const res = await fetch(`/api/publish/${platform}`, {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({job})
+  });
+  const data = await res.json();
+  alert(data.error ? `Error: ${data.error}` : `Published: ${data.url || data.result || 'done'}`);
+  refreshJobs();
+}
+
+async function boostOutput(filename) {
+  const res = await fetch('/api/originality-boost', {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({filename})
+  });
+  const data = await res.json();
+  alert(data.error ? `Error: ${data.error}` : `Boosted: ${data.output}`);
+  refreshJobs();
+}
+
 async function refreshJobs() {
   const res = await fetch('/api/jobs');
   const jobs = await res.json();
@@ -202,6 +263,7 @@ async function refreshJobs() {
     <td>${j.job}</td>
     <td class="status-${j.status === 'done' ? 'done' : (j.status === 'running' ? 'running' : 'failed')}">${j.status}</td>
     <td>${j.youtube_url ? `<a href="${j.youtube_url}" target="_blank">view</a>` : ''}</td>
+    <td>${j.status === 'done' ? `<button onclick="publishJob('${j.job}','youtube')">YT</button> <button onclick="publishJob('${j.job}','tiktok')">TikTok</button>` : ''}</td>
   </tr>`).join('');
 
   const res2 = await fetch('/api/outputs');
@@ -209,7 +271,7 @@ async function refreshJobs() {
   const tbody2 = document.querySelector('#outputsTable tbody');
   tbody2.innerHTML = outputs.map(o => `<tr>
     <td>${o.name}</td><td>${o.size_mb} MB</td>
-    <td><a href="/download/${encodeURIComponent(o.name)}">download</a></td>
+    <td><a href="/download/${encodeURIComponent(o.name)}">download</a> <button onclick="boostOutput('${o.name}')">Boost</button></td>
   </tr>`).join('');
 }
 
@@ -282,8 +344,107 @@ class Handler(BaseHTTPRequestHandler):
             self._handle_watch_start()
         elif self.path == "/api/watch/stop":
             self._handle_watch_stop()
+        elif self.path == "/api/publish/youtube":
+            self._handle_publish_youtube()
+        elif self.path == "/api/publish/tiktok":
+            self._handle_publish_tiktok()
+        elif self.path == "/api/originality-boost":
+            self._handle_originality_boost()
         else:
             self._send_json(404, {"error": "not found"})
+
+    def _handle_publish_youtube(self):
+        try:
+            data = self._read_json_body()
+        except Exception as e:
+            self._send_json(400, {"error": f"invalid JSON: {e}"})
+            return
+        job = data.get("job")
+        if not job:
+            self._send_json(400, {"error": "missing job"})
+            return
+        try:
+            import doctor as doctor_mod
+            from youtube_publish import generate_title, generate_description, generate_tags, upload_video
+        except ImportError as e:
+            self._send_json(500, {"error": f"publish libraries unavailable: {e}"})
+            return
+
+        video_path = doctor_mod.find_output_video(job)
+        if not video_path:
+            self._send_json(404, {"error": f"no finished output found for job '{job}'"})
+            return
+        clip_meta = doctor_mod.find_clip_metadata(job)
+        if not clip_meta:
+            self._send_json(404, {"error": f"no clip/montage metadata found for '{job}'"})
+            return
+        content_type = data.get("content_type", "gaming")
+        privacy = data.get("privacy", "private")
+        title = generate_title(clip_meta, content_type)
+        description = generate_description(clip_meta, source_title=clip_meta.get("source_title"))
+        tags = generate_tags(clip_meta, content_type)
+        try:
+            result = upload_video(video_path, title, description, tags, privacy_status=privacy)
+        except Exception as e:
+            self._send_json(500, {"error": f"upload failed: {e}"})
+            return
+        self._send_json(200, {"job": job, "title": title, "video_id": result.get("video_id"), "url": result.get("url")})
+
+    def _handle_publish_tiktok(self):
+        try:
+            data = self._read_json_body()
+        except Exception as e:
+            self._send_json(400, {"error": f"invalid JSON: {e}"})
+            return
+        job = data.get("job")
+        if not job:
+            self._send_json(400, {"error": "missing job"})
+            return
+        try:
+            import doctor as doctor_mod
+            from tiktok_publish import publish_video
+        except ImportError as e:
+            self._send_json(500, {"error": f"publish libraries unavailable: {e}"})
+            return
+        video_path = doctor_mod.find_output_video(job)
+        if not video_path:
+            self._send_json(404, {"error": f"no finished output found for job '{job}'"})
+            return
+        title = data.get("title", job)
+        try:
+            result = publish_video(video_path, title)
+        except Exception as e:
+            self._send_json(500, {"error": f"TikTok publish failed: {e}"})
+            return
+        self._send_json(200, {"job": job, "result": result})
+
+    def _handle_originality_boost(self):
+        try:
+            data = self._read_json_body()
+        except Exception as e:
+            self._send_json(400, {"error": f"invalid JSON: {e}"})
+            return
+        filename = data.get("filename")
+        if not filename:
+            self._send_json(400, {"error": "missing filename"})
+            return
+        candidate = os.path.realpath(os.path.join(OUTPUTS_DIR, filename))
+        if not candidate.startswith(OUTPUTS_DIR + os.sep) or not os.path.isfile(candidate):
+            self._send_json(400, {"error": "invalid or nonexistent filename"})
+            return
+        try:
+            from originality_boost import apply_originality_boost
+        except ImportError as e:
+            self._send_json(500, {"error": f"originality_boost unavailable: {e}"})
+            return
+        out_name = data.get("out_name") or (os.path.splitext(filename)[0] + "_boosted.mp4")
+        out_path = os.path.join(OUTPUTS_DIR, out_name)
+        try:
+            params = apply_originality_boost(candidate, out_path, filename)
+        except Exception as e:
+            self._send_json(500, {"error": f"originality boost failed: {e}"})
+            return
+        self._send_json(200, {"output": out_name, "params": {k: round(v, 4) for k, v in params.items()}})
 
     def _handle_trigger(self):
         try:
@@ -351,7 +512,22 @@ class Handler(BaseHTTPRequestHandler):
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--port", type=int, default=8765)
+    p.add_argument("--auto-publish", action="store_true",
+                    help="also auto-upload newly-finished clips to YouTube as private (requires youtube_client_secret.json set up)")
+    p.add_argument("--no-auto-resume", action="store_true",
+                    help="disable the background auto-resume thread (on by default — this is the real consolidation, doctor.py's watchdog running inside this same process)")
     args = p.parse_args()
+
+    if not args.no_auto_resume:
+        t = threading.Thread(
+            target=background_maintenance_loop,
+            kwargs={"auto_publish": args.auto_publish},
+            daemon=True,
+        )
+        t.start()
+        mode = "auto-resume" + (" + auto-publish" if args.auto_publish else "")
+        print(f"dashboard: background maintenance thread started ({mode})", flush=True)
+
     server = HTTPServer(("0.0.0.0", args.port), Handler)
     print(f"dashboard: open http://localhost:{args.port} in your browser", flush=True)
     server.serve_forever()
