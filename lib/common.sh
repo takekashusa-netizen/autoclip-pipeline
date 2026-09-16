@@ -6,6 +6,24 @@
 # Resolve repo root regardless of where this is sourced from.
 COMMON_SH_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export PIPELINE_ROOT="$(cd "${COMMON_SH_DIR}/.." && pwd)"
+
+# Real, permanent fix: launchd-invoked processes (the background dashboard
+# service, com.takekash.dashboard) do NOT inherit an interactive shell's
+# PATH — Homebrew's bin dirs are typically missing from it. Confirmed
+# tonight as the root cause of finalize.sh's "ffmpeg: command not found"
+# failures, which only happened when the pipeline was resumed automatically
+# via the background service, never when run by hand from a real Terminal.
+# Prepend the common Homebrew locations (Apple Silicon + Intel) plus
+# standard local bins, deduped, so every skill sourcing this file resolves
+# ffmpeg/ffprobe regardless of the invoking environment's PATH.
+for _extra_bin in /opt/homebrew/bin /opt/homebrew/sbin /usr/local/bin /usr/local/sbin; do
+  case ":$PATH:" in
+    *":$_extra_bin:"*) ;;
+    *) [[ -d "$_extra_bin" ]] && PATH="$_extra_bin:$PATH" ;;
+  esac
+done
+export PATH
+unset _extra_bin
 jobstate_cmd() { python3 "${PIPELINE_ROOT}/lib/jobstate.py" "$@"; }
 export -f jobstate_cmd
 

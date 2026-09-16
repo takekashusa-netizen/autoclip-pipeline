@@ -195,6 +195,12 @@ def any_job_needs_resuming():
                 d = json.load(f)
         except Exception:
             continue
+        if d.get("managed_by") == "clip_pipeline":
+            continue  # multi-window job — the parent's own top-level
+                       # export step is vestigial for these (real export
+                       # now happens per-window, tracked in each
+                       # <job>__windowNN/job.json); mirrors resume_all.sh's
+                       # own managed_by check, which already knows this
         if d.get("steps", {}).get("export", {}).get("status") == "done":
             continue  # already finished
         if has_unrecoverable_error(job):

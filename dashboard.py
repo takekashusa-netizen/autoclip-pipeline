@@ -279,6 +279,15 @@ def background_maintenance_loop(interval_sec=60, resume_interval_sec=600, publis
     while True:
         try:
             if time.time() - last_resume >= resume_interval_sec:
+                # doctor.py's own --auto-resume CLI loop calls both of
+                # these together (run_checks() + auto_resume()), but this
+                # background thread was only ever calling auto_resume() —
+                # confirmed tonight via dashboard.log + doctor_auto_resume.log
+                # that check_stale_locks() was never actually running here,
+                # so a lock left behind by a crashed/killed render sat
+                # forever instead of being cleared once its PID was
+                # confirmed dead.
+                doctor_mod.check_stale_locks()
                 doctor_mod.auto_resume(auto_approve=True)
                 last_resume = time.time()
             if generate_metadata_for_all_finished_jobs and time.time() - last_metadata >= metadata_interval_sec:

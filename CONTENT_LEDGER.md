@@ -586,3 +586,27 @@ Follow-up on "fix all the problems when it comes to the url posted to the files 
 **Ran for real this session:** all 59 pending/approved Instagram items now have `public_url` set, and their clips (2.6GB total) are copied into `takekash-site-live/clips/`. **Not live yet** — Netlify only serves what's deployed; needs `netlify deploy --prod` from the user's real Mac Terminal before Instagram's API can actually fetch any of them.
 
 **Still needs the user:** the deploy itself, plus everything from the original audit that was never about URLs (INSTAGRAM_ACCESS_TOKEN/USER_ID, Meta app review, TikTok OAuth token).
+
+## 🩺 DOCTOR/DASHBOARD RELIABILITY FIXES — 2026-09-16
+
+Found while doing a deeper pass after the security/URL fixes, per "find all other problems needed to be fixed."
+
+### What was actually broken
+
+1. **`doctor.py`'s false-positive resume loop (~3,338 occurrences in `dashboard.log`, likely running for weeks).** `any_job_needs_resuming()` only checked a job's top-level `steps.export.status`. For every job created via `clip_pipeline.sh` (the newer multi-window pipeline — 15 of them: apexnba2k2, gtaxlong1, interviewtest, job1786571638, and 11 others), the *parent* `job.json`'s `export` step is vestigial — the real export now happens per-window in each `<job>__windowNN/job.json`, which was correctly `done`. `resume_all.sh` already knows this (it checks `job.json`'s own `"managed_by": "clip_pipeline"` field and skips these with an explicit log line), but `doctor.py` never had that check, so it re-triggered `resume_all.sh --auto-approve` every ~10 minutes for jobs that were already fully finished. Not destructive — `resume_all.sh` correctly no-op'd each time — but pure waste, and noise that buried the *real* failure below in the log.
+
+2. **The real, active failure hiding inside that noise: job `b951cc787dc7`** (5 clips, created 2026-09-15) — every clip finished every step except export, and every export attempt failed with `skills/finalize.sh: line 40: ffmpeg: command not found`, retried ~700 times each over ~24h. Root cause: `finalize.sh` (via `lib/common.sh`) calls `ffmpeg` by bare name, and launchd-invoked processes (the `com.takekash.dashboard` background service) don't inherit an interactive shell's `PATH` — Homebrew's `ffmpeg` was never on it. This never showed up running things by hand from a real Terminal, only via the background service.
+
+3. **A second, compounding bug that let #2's `clip05` get stuck indefinitely:** `doctor.py` has a real, correct stale-lock detector (`check_stale_locks()` — checks whether the PID named in a job's `.lock` file is still alive via `os.kill(pid, 0)`, and only removes the lock if it's genuinely dead). But `dashboard.py`'s live background loop (`background_maintenance_loop`, the thread actually running under launchd right now) was only ever calling `doctor_mod.auto_resume(...)` — never `check_stale_locks()`. That function only ran inside `doctor.py`'s own standalone `--auto-resume` CLI loop, which isn't what's running. Result: `clip05`'s lock, left behind by a crashed/killed render at 07:32, sat there for 10+ hours with nothing ever checking whether its PID was still alive.
+
+### Fixes applied directly (code, not data)
+
+- `lib/common.sh` — prepends `/opt/homebrew/bin`, `/opt/homebrew/sbin`, `/usr/local/bin`, `/usr/local/sbin` to `PATH` (deduped, only if the dir exists) right after resolving `PIPELINE_ROOT`. Every skill script and `run_pipeline.sh` sources this file, so `ffmpeg`/`ffprobe` now resolve regardless of the invoking environment.
+- `dashboard.py` — `background_maintenance_loop()` now calls `doctor_mod.check_stale_locks()` immediately before `doctor_mod.auto_resume(...)`, on the same 10-minute cadence, so a dead-process lock actually gets cleared instead of blocking forever.
+- `doctor.py` — `any_job_needs_resuming()` now skips any job whose `job.json` has `"managed_by": "clip_pipeline"`, mirroring `resume_all.sh`'s own check exactly. Eliminates the false-positive loop for all 15 currently-affected parent jobs.
+
+**Needs you:** restart the dashboard so these land (`./restart_dashboard.sh`) — a running Python process doesn't pick up source changes on its own. After the restart, watch `logs/doctor_auto_resume.log`/`dashboard.log` for one cycle (up to 10 min): `clip05`'s lock should either clear (if its PID is really dead, which all the evidence points to) or, if something genuinely still holds it, stay — either way `check_stale_locks()` will now actually decide that instead of nothing deciding it. Clips 01–04 should then resume and actually export successfully with `ffmpeg` resolving correctly.
+
+### Found, not fixed (flagging only — needs a real decision, not a bug)
+
+- **`projects/` is 65GB** — separate from and much larger than the `outputs/` 7.1GB flagged in the original audit. This is every job's raw footage + every intermediate render (rough-cut, graphics, captions, scored) for every job ever run, with no cleanup step once a job's final output is promoted to `outputs/`. 360GB free out of 932GB right now, so not urgent, but it's the actual bulk of your disk usage and it only grows. Worth a real prune policy (e.g., delete `projects/<job>/{raw,rough-cut,graphics,captions,music,music-out}` once `outputs/<job>.final.mp4` exists and has been published) rather than something to auto-delete without you deciding the retention window.
