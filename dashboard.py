@@ -241,6 +241,7 @@ def list_best_windows_jobs():
 
 def background_maintenance_loop(interval_sec=60, resume_interval_sec=600, publish_interval_sec=300,
                                  metadata_interval_sec=60, schedule_interval_sec=60,
+                                 prune_interval_sec=86400,
                                  auto_publish=False, content_type="gaming"):
     """The real consolidation: doctor.py's auto-resume and auto-publish
     logic, running as a thread INSIDE this same server process instead
@@ -271,11 +272,17 @@ def background_maintenance_loop(interval_sec=60, resume_interval_sec=600, publis
     except ImportError as e:
         process_due_items = None
         print(f"dashboard: publish scheduler unavailable — {e}", flush=True)
+    try:
+        from prune_finished_jobs import prune as prune_finished_jobs
+    except ImportError as e:
+        prune_finished_jobs = None
+        print(f"dashboard: finished-job pruning unavailable — {e}", flush=True)
 
     last_resume = 0.0
     last_publish = 0.0
     last_metadata = 0.0
     last_schedule = 0.0
+    last_prune = 0.0
     while True:
         try:
             if time.time() - last_resume >= resume_interval_sec:
@@ -314,6 +321,19 @@ def background_maintenance_loop(interval_sec=60, resume_interval_sec=600, publis
                 except Exception as stuck_check_err:
                     print(f"dashboard: stuck-item check failed (non-fatal): {stuck_check_err}", flush=True)
                 last_schedule = time.time()
+            if prune_finished_jobs and time.time() - last_prune >= prune_interval_sec:
+                # Real, permanent fix for the ~65GB projects/ buildup found and
+                # cleaned up in the 2026-09-16 audit: once a job (or, for
+                # clip_pipeline.sh jobs, all of its windows) is fully exported
+                # and its final render is confirmed sitting in outputs/, the
+                # raw/rough-cut/work/music intermediates in projects/<job>/ are
+                # pure dead weight — nothing reads them again. Runs once a day
+                # by default; safe to run more often, it's a no-op when there's
+                # nothing newly finished to reclaim.
+                freed, touched = prune_finished_jobs()
+                if touched:
+                    print(f"dashboard: pruned {freed/1e9:.2f} GB of finished-job media across {touched} job dir(s)", flush=True)
+                last_prune = time.time()
             if auto_publish and time.time() - last_publish >= publish_interval_sec:
                 doctor_mod.publish_pending_jobs()
                 last_publish = time.time()
