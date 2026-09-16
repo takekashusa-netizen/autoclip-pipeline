@@ -264,7 +264,15 @@ def process_due_items():
                 item["result"] = result
             elif item["platform"] == "instagram":
                 from instagram_publish import publish_reel
-                result = publish_reel(item["video_path"], item["title"] + chr(10) + item["description"], video_path_for_duration_check=item["video_path"])
+                public_url = item.get("public_url")
+                if not public_url:
+                    raise RuntimeError(
+                        "no public_url set on this queue item — Instagram's API fetches "
+                        "the video from a real public URL, it does not accept a local path. "
+                        "Run lib/prepare_instagram_hosting.py and redeploy takekash-site-live "
+                        "first, then this item will pick up its public_url on the next pass."
+                    )
+                result = publish_reel(public_url, item["title"] + chr(10) + item["description"], video_path_for_duration_check=item["video_path"])
                 item["status"] = "published"
                 item["result"] = result
             else:

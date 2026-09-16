@@ -549,3 +549,40 @@ Ran a top-to-bottom check across the pipeline, takekash-site-live, and the new a
 - **DB vs. reality:** confirmed (again) that `social_posts` in `takekash.db` is a write-only mirror never read by live code. The 9 "blocked" judge-show YouTube rows have no `platform_post_id`, so there's no way to verify from the DB whether that content is actually still live on the real channel — this is exactly the still-open "audit DB vs real YouTube" task from earlier, now with a concrete reason it matters (content-safety, not just bookkeeping accuracy).
 - **Storage:** `outputs/` is 7.1GB with no cleanup/archival policy.
 - Carried forward as still-open: YouTube analytics backfill (must run on the real Mac, not this sandbox), the recurring optimization system (depends on analytics), and the pricing-model conflict from the product brief.
+
+## 🔧 AUDIT FIXES APPLIED — 2026-09-16
+
+Fixed what was safely fixable from this session; left anything needing your own accounts/credentials/interactive login untouched (listed below).
+
+**Done:**
+- Removed a stale `.git/index.lock` that was blocking all git commands.
+- `.gitignore` now covers: `youtube_client_secret.json`, `youtube_token.pickle`, `tiktok_token.json` (pre-emptively, before OAuth ever runs), `.env`/`*.env`, all `*.log` + `logs/`, `.netlify/`, `*.bak*`, `takekash.db`.
+- **Found a real OpenSSH private key (`450967` / `450967.pub`) sitting untracked at the repo root.** It was never committed (good), now gitignored so it can't be accidentally added later. This should really live in `~/.ssh/`, not inside a git-tracked project folder — recommend moving it.
+- **Found `awesome-osint-arsenal/`, a separate git repo, nested inside this one.** Left untouched and gitignored — nested repos break `git add -A` semantics and it's unrelated third-party tooling, not pipeline code.
+- Untracked (`git rm --cached`, files kept on disk) the two files that were actually committed with real credentials: `youtube_client_secret.json`, `youtube_token.pickle`.
+- Committed everything else real that had piled up since the last commit (2026-08-14) — watermarking pipeline, `publish_scheduler.py` fixes, caption burner perf fix, the admin snapshot exporter, and the rest of `lib/` that had never been checked in. Commit `08700ca`. **Not pushed to GitHub** — that's your call, see below.
+
+**Still needs you, specifically (couldn't be done from this session):**
+- **Rotate the YouTube OAuth credentials** in Google Cloud Console — untracking the files doesn't erase them from git history (commit `7d09ea7` and others still have them). Real fix is revoking/regenerating, not just removing from tracking.
+- **Decide whether to purge git history** of the old secret commits (a `git filter-repo`/BFG + force-push) — a real, somewhat destructive operation I won't do without you explicitly asking for it, since it rewrites shared history.
+- **Push commit `08700ca` to GitHub** (`git push`) once you've glanced at it — I didn't have real GitHub auth from this sandboxed session to do it myself even if it were a "just do it" action.
+- **Move the SSH key (`450967`/`450967.pub`) out of this folder.**
+- TikTok OAuth, Instagram credentials + hosting, `ADMIN_KEY` in Netlify — all still need your own logins/accounts, per the earlier audit.
+- YouTube analytics backfill (`fetch_youtube_stats.py`) — confirmed again this session that `oauth2.googleapis.com` is unreachable from this sandboxed bridge; has to run from your real Mac Terminal.
+
+## 🔗 INSTAGRAM PUBLIC-URL FIX + TIKTOK CALLBACK PAGE — 2026-09-16
+
+Follow-up on "fix all the problems when it comes to the url posted to the files being created" — user picked: fix the Instagram public-URL gap by hosting clips on takekash.com itself, and fix the dead TikTok oauth-callback page.
+
+**Root cause confirmed, not assumed:** `lib/instagram_publish.py`'s `publish_reel()` already correctly requires a real public `video_url` (it says so in its own docstring — Instagram's API fetches the video, it doesn't accept upload). The actual bug was one level up: `lib/publish_scheduler.py` line 267 was passing `item["video_path"]` (a local Mac filesystem path) as that argument. Every Instagram item that ever reached this code path would have failed, credentials or not.
+
+**Also found while verifying:** the 8 `interviewtest` batch items (both platforms) had a stale filename in `publish_schedule.json` — `interviewtest_window11.mp4` vs the real file `interviewtest__window11.final.mp4` (double underscore, `.final` suffix). Fixed all 21 affected entries (8 instagram + 13 tiktok/other-status) by matching against the real files on disk before rewriting.
+
+**Built:**
+- `lib/prepare_instagram_hosting.py` — copies every pending/approved Instagram clip into `../takekash-site-live/clips/<content_id>.mp4` and stamps `public_url` (`https://takekash.com/clips/<content_id>.mp4`) onto the queue item. Idempotent (skips files already correctly copied by size match), resumable (writes via `.partial` + atomic rename, flushes queue progress after every change — needed in practice, this took two passes to finish 2.6GB in this sandboxed session's 175s call limit).
+- Fixed `lib/publish_scheduler.py`'s Instagram branch to use `item.get("public_url")` instead of the local path, and to raise a clear, actionable error (not a cryptic API failure) when an item has no `public_url` yet.
+- `takekash-site-live/oauth-callback.html` — real landing page for TikTok's OAuth redirect (was a blank Netlify 404 before). Shows the authorization code in a copyable field (matching the existing manual-copy step documented in `lib/tiktok_oauth_flow.py`), or a clear error state if TikTok returned one. Verified both states render correctly with Playwright before shipping.
+
+**Ran for real this session:** all 59 pending/approved Instagram items now have `public_url` set, and their clips (2.6GB total) are copied into `takekash-site-live/clips/`. **Not live yet** — Netlify only serves what's deployed; needs `netlify deploy --prod` from the user's real Mac Terminal before Instagram's API can actually fetch any of them.
+
+**Still needs the user:** the deploy itself, plus everything from the original audit that was never about URLs (INSTAGRAM_ACCESS_TOKEN/USER_ID, Meta app review, TikTok OAuth token).
