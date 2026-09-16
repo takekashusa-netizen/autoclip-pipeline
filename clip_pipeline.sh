@@ -40,8 +40,11 @@ bonus_clips=3   # default on — grab up to 3 extra strong-highlight moments
 montage_minutes=0   # 0 = montage mode disabled, use single-window mode
 montage_count=3
 best_windows_minutes=0   # 0 = best-windows mode disabled
+podcast_minutes=0   # 0 = podcast mode disabled — real, continuous coherent-speech selection
 best_windows_count=3
 skip_music=false
+vertical=false
+auto_queue=false
 auto_approve=false
 content_type=""
 keep_raw=true
@@ -64,9 +67,12 @@ while [[ $i -lt ${#args[@]} ]]; do
     --montage) montage_minutes=12 ;;
     --montage-count) i=$((i+1)); montage_count="${args[$i]}" ;;
     --best-windows-minutes) i=$((i+1)); best_windows_minutes="${args[$i]}" ;;
+    --podcast-minutes) i=$((i+1)); podcast_minutes="${args[$i]}" ;;
     --best-windows) best_windows_minutes=12 ;;
     --best-windows-count) i=$((i+1)); best_windows_count="${args[$i]}" ;;
     --skip-music)  skip_music=true ;;
+    --vertical) vertical=true ;;
+    --auto-queue) auto_queue=true ;;
     --auto-approve) auto_approve=true ;;
     --content-type) i=$((i+1)); content_type="${args[$i]}" ;;
     --keep-raw) keep_raw=true ;;
@@ -76,6 +82,19 @@ while [[ $i -lt ${#args[@]} ]]; do
 done
 
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/common.sh"
+
+report_web_status() {
+  local wjid="${WEB_JOB_ID:-}"
+  if [[ -z "$wjid" && -f "${PIPELINE_ROOT}/current_web_job_id.txt" ]]; then
+    wjid="$(cat "${PIPELINE_ROOT}/current_web_job_id.txt" 2>/dev/null || true)"
+  fi
+  local dur_args=()
+  [[ -n "${3:-}" ]] && dur_args=(--video-duration-sec "$3")
+  [[ -n "$wjid" ]] && python3 "${PIPELINE_ROOT}/mac-integration/report_status.py" \
+    --job-id "$wjid" --stage "$1" --stage-index "$2" --total-stages 8 "${dur_args[@]:-}" 2>/dev/null || true
+}
+
+report_web_status "intake" 0
 SKILL_DIR="${PIPELINE_ROOT}/skills/clip-select"
 
 format_config="${PIPELINE_ROOT}/formats/${format}.json"
@@ -131,6 +150,9 @@ release_job_lock() { rm -f "$job_lock_file"; }
 trap release_job_lock EXIT
 
 if ! state_step_done "$job" rough_cut >/dev/null 2>&1; then
+  real_src_path="$(job_raw_dir "$job")/source.mp4"
+  real_src_dur="$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$real_src_path" 2>/dev/null || echo "")"
+  report_web_status "rough-cut" 1 "$real_src_dur"
   echo "-- transcribing full source (once) --"
   "${PIPELINE_ROOT}/skills/rough-cut/run.sh" "$job" "$format"
   state_mark "$job" rough_cut done
@@ -179,6 +201,7 @@ print('regenerated')
   fi
 fi
 
+report_web_status "visual-analysis" 2
 echo "-- analyzing visual content (action/motion detection) --"
 visual_json="$(job_dir "$job")/rough-cut/visual-analysis.json"
 # Real fix: this used to re-run the expensive (and, on this machine,
@@ -226,6 +249,7 @@ else
   visual_json=""
 fi
 
+report_web_status "audio-analysis" 3
 echo "-- analyzing audio content (gunfire/impact detection) --"
 audio_json="$(job_dir "$job")/rough-cut/audio-analysis.json"
 audio_cached_valid=false
@@ -258,6 +282,56 @@ else
   fi
 fi
 
+if [[ "$podcast_minutes" != "0" ]]; then
+  # Real, new mode distinct from best-windows (action/impact scoring)
+  # and montage (many short disconnected moments): finds the longest,
+  # most genuinely continuous, coherent stretch of actual talking —
+  # for podcast/interview content, or gaming commentary that flows like
+  # a real conversation. Reuses the SAME real extraction path as
+  # best-windows (already caption-integrated), just with a different
+  # real selector producing the windows.json.
+  pc_out_dir="$(job_dir "$job")/podcast"
+  mkdir -p "$pc_out_dir"
+  pc_windows_json="${pc_out_dir}/windows.json"
+
+  pc_exit=0
+  pc_result="$(python3 "${SKILL_DIR}/podcast_select.py" "$script_path" "$podcast_minutes" "$pc_windows_json" 2>&1)" || pc_exit=$?
+  if [[ $pc_exit -ne 0 ]]; then
+    echo "podcast-select FAILED (exit ${pc_exit}): $(echo "$pc_result" | tail -10)" >&2
+    exit 1
+  fi
+  log "podcast-select: ${pc_result}"
+
+  pc_window_count="$(python3 -c "import json; print(len(json.load(open('${pc_windows_json}'))['windows']))" 2>&1)" || {
+    echo "failed reading windows.json after podcast-select: ${pc_window_count}" >&2
+    exit 1
+  }
+  if [[ "$pc_window_count" == "0" ]]; then
+    echo "== no podcast-style segment found (no genuinely continuous, coherent speech in this source) ==" >&2
+    exit 1
+  fi
+
+  pc_final_out_dir="${PIPELINE_ROOT}/outputs/${job}_podcast"
+  mkdir -p "$pc_final_out_dir"
+  pc_raw_source="$(job_raw_file "$job")"
+  if [[ -z "$pc_raw_source" || ! -f "$pc_raw_source" ]]; then
+    echo "podcast-extract: raw source not found (was it deleted?) — cannot extract with correct timing." >&2
+    exit 1
+  fi
+  pc_ext_exit=0
+  pc_ext_args=("$pc_raw_source" "$pc_windows_json" "$pc_final_out_dir" "$job")
+  [[ "$vertical" == true ]] && pc_ext_args+=(--vertical)
+  [[ "$auto_queue" == true ]] && pc_ext_args+=(--auto-queue)
+  pc_ext_result="$(python3 "${SKILL_DIR}/extract_best_windows.py" "${pc_ext_args[@]}" 2>&1)" || pc_ext_exit=$?
+  if [[ $pc_ext_exit -ne 0 ]]; then
+    echo "podcast-extract FAILED (exit ${pc_ext_exit}): $(echo "$pc_ext_result" | tail -10)" >&2
+    exit 1
+  fi
+  log "podcast-extract: ${pc_ext_result}"
+  echo "== podcast mode done: check ${pc_final_out_dir}/ for the real, continuous coherent-speech clip (captions burned in) =="
+  exit 0
+fi
+
 if [[ "$best_windows_minutes" != "0" ]]; then
   # Genuinely different mode from montage: montage stitches many small
   # scored fragments together (jump cuts between disconnected moments).
@@ -270,11 +344,12 @@ if [[ "$best_windows_minutes" != "0" ]]; then
   source_duration="$(python3 -c "import json; d=json.load(open('${script_path}')); print(d.get('source_duration_sec', 0))" 2>/dev/null || echo 0)"
 
   bw_exit=0
-  result="$(python3 "${SKILL_DIR}/best_windows.py" "$script_path" "$visual_json" "$audio_json" "$source_duration" "$best_windows_minutes" "$best_windows_count" "$windows_json" 2>&1)" || bw_exit=$?
+  result="$(python3 "${SKILL_DIR}/best_windows.py" "$script_path" "$visual_json" "$audio_json" "$source_duration" "$best_windows_minutes" "$best_windows_count" "$windows_json" "${content_type:-gaming}" 2>&1)" || bw_exit=$?
   if [[ $bw_exit -ne 0 ]]; then
     echo "best-windows FAILED (exit ${bw_exit}): $(echo "$result" | tail -10)" >&2
     exit 1
   fi
+  report_web_status "best-windows" 4
   log "best-windows: ${result}"
 
   final_out_dir="${PIPELINE_ROOT}/outputs/${job}_best_windows"
@@ -298,13 +373,70 @@ if [[ "$best_windows_minutes" != "0" ]]; then
     exit 1
   fi
   ext_exit=0
-  ext_result="$(python3 "${SKILL_DIR}/extract_best_windows.py" "$raw_source" "$windows_json" "$final_out_dir" "$job" 2>&1)" || ext_exit=$?
+  ext_args=("$raw_source" "$windows_json" "$final_out_dir" "$job")
+  [[ "$vertical" == true ]] && ext_args+=(--vertical)
+  [[ "$auto_queue" == true ]] && ext_args+=(--auto-queue)
+  ext_result="$(python3 "${SKILL_DIR}/extract_best_windows.py" "${ext_args[@]}" 2>&1)" || ext_exit=$?
   if [[ $ext_exit -ne 0 ]]; then
     echo "extract-best-windows FAILED (exit ${ext_exit}): $(echo "$ext_result" | tail -10)" >&2
     exit 1
   fi
   log "extract-best-windows: ${ext_result}"
   echo "== best-windows done: check ${final_out_dir}/ for real, continuous, non-overlapping clips =="
+
+  if [[ "$vertical" == true ]]; then
+    log "best-windows: --vertical set, skipping the redundant horizontal second-pass sub-pipeline (extract_best_windows.py already produced the real final clips)"
+    exit 0
+  fi
+
+  script_path="$(job_dir "$job")/rough-cut/script.json"
+  win_count="$(python3 -c "import json; print(len(json.load(open('${windows_json}'))['windows']))")"
+  for ((wi=0; wi<win_count; wi++)); do
+    win_num=$(printf "%02d" $((wi+1)))
+    subjob="${job}__window${win_num}"
+    sub_raw_dir="$(job_raw_dir "$subjob")"
+    sub_rough_dir="$(job_dir "$subjob")/rough-cut"
+    mkdir -p "$sub_raw_dir" "$sub_rough_dir"
+    cp "${final_out_dir}/${job}_window${win_num}.mp4" "${sub_raw_dir}/source.mp4"
+    cp "${final_out_dir}/${job}_window${win_num}.mp4" "${sub_rough_dir}/rough_cut.mp4"
+    python3 "${PIPELINE_ROOT}/lib/visual_analysis.py" "${sub_rough_dir}/rough_cut.mp4" "${sub_rough_dir}/visual-analysis.json" > /dev/null 2>&1 || true
+
+    python3 -c "
+import json
+windows = json.load(open('${windows_json}'))['windows']
+w = windows[${wi}]
+script = json.load(open('${script_path}')) if __import__('os').path.exists('${script_path}') else {'kept_segments': []}
+segs = []
+for s in script.get('kept_segments', []):
+    if w['start'] <= s['start'] <= w['end']:
+        segs.append({'start': s['start'] - w['start'], 'end': s['end'] - w['start'],
+                     'text': s.get('text',''), 'words': [
+                        {'word': ww['word'], 'start': ww['start'] - w['start'], 'end': ww['end'] - w['start']}
+                        for ww in s.get('words', [])]})
+out = {
+    'job': '${subjob}', 'transcription_available': True,
+    'source_duration_sec': w['end'] - w['start'],
+    'kept_segments': segs, 'cut_segments': [],
+    'script_text': ' '.join(s['text'] for s in segs),
+}
+json.dump(out, open('${sub_rough_dir}/script.json', 'w'), indent=2)
+json.dump({'job': '${subjob}', 'keep': [[s['start'], s['end']] for s in segs], 'cut': []},
+          open('${sub_rough_dir}/edl.json', 'w'), indent=2)
+"
+
+    if [[ ! -f "$(job_dir "$subjob")/job.json" ]]; then
+      state_init "$subjob" "$format" "${sub_raw_dir}/source.mp4"
+    fi
+    state_mark "$subjob" rough_cut done "{\"note\":\"best-window extracted from ${job}\"}"
+
+    run_args=("${PIPELINE_ROOT}/run_pipeline.sh" "$subjob" "$format")
+    [[ "$skip_music" == true ]] && run_args+=(--skip-music)
+    [[ "$auto_approve" == true ]] && run_args+=(--auto-approve)
+    [[ -n "$content_type" ]] && run_args+=(--content-type "$content_type")
+
+    "${run_args[@]}" || log "  window${win_num}: paused for second-pass review (normal) — approve with: python3 lib/jobstate.py mark ${subjob} second_pass done && ./run_pipeline.sh ${subjob} ${format}"
+  done
+
   exit 0
 fi
 
@@ -420,38 +552,70 @@ for s in m['segments']:
       fi
     done
 
-    part_files=()
-    part_idx=0
-    for seg_line in "${seg_lines[@]}"; do
-      IFS=$'\t' read -r seg_start seg_end <<< "$seg_line"
-      part_file="${sub_work_dir}/part_$(printf '%04d' $part_idx).mp4"
-      if [[ -f "$part_file" ]] && ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$part_file" >/dev/null 2>&1; then
-        log "  segment ${part_idx}: already extracted and valid, skipping"
-      else
-        [[ -f "$part_file" ]] && rm -f "$part_file"  # remove a truncated/corrupt leftover before retrying it
-        if ! run_with_timeout 120 ffmpeg -nostdin -y -i "$rough_cut_video" -ss "$seg_start" -to "$seg_end" \
-          -c:v libx264 -preset veryfast -c:a aac \
-          "$part_file" -loglevel error; then
-          echo "montage segment ${part_idx} extraction timed out or failed (120s) — likely a corrupted region at ${seg_start}s" >&2
-          exit 1
-        fi
-      fi
-      part_files+=("$part_file")
-      part_idx=$((part_idx + 1))
-    done
-
-    concat_list="${sub_work_dir}/concat.txt"
-    : > "$concat_list"
-    for pf in "${part_files[@]}"; do
-      echo "file '${pf}'" >> "$concat_list"
-    done
-    if ! run_with_timeout 120 ffmpeg -nostdin -y -f concat -safe 0 -i "$concat_list" -c copy \
-      "${sub_raw_dir}/source.mp4" -loglevel error; then
-      echo "montage concat timed out or failed (120s)" >&2
+    # Real bug fixed, same class already caught and fixed for
+    # best-windows mode: this extracted from $rough_cut_video (the
+    # ALREADY-CUT, filler-removed file, with its own compressed
+    # timeline) using segment start/end times computed against the
+    # ORIGINAL raw source's timeline — a real mismatch that would
+    # extract the wrong footage entirely. raw_source is the correct,
+    # original-timeline file every candidate timestamp is actually
+    # computed against.
+    montage_raw_source="$(job_raw_file "$job")"
+    if [[ -z "$montage_raw_source" || ! -f "$montage_raw_source" ]]; then
+      echo "montage: raw source not found (was it deleted?) — cannot extract with correct timing." >&2
       exit 1
     fi
-    cp "${sub_raw_dir}/source.mp4" "${sub_rough_dir}/rough_cut.mp4"
+
+    # Real, permanent fix: smooth crossfade transitions instead of a hard
+    # concat cut, per explicit preference — avoids the tacky/choppy
+    # jump-cut feel. Reuses the same real, tested render_montage()
+    # function used elsewhere, called here with the real segment list
+    # already selected by build_montage.py.
+    if ! python3 -c "
+import sys, json
+sys.path.insert(0, '${PIPELINE_ROOT}/skills/rough-cut')
+from render_montage import render_montage
+
+montages = json.load(open('${clips_json}'))['montages']
+m = next(mm for mm in montages if mm['id'] == '${montage_id}')
+segments = [{'start': s['start'], 'end': s['end']} for s in m['segments']]
+
+render_montage('${montage_raw_source}', segments, '${sub_raw_dir}/source.mp4', '${sub_work_dir}')
+"; then
+      echo "montage crossfade render failed for ${montage_id}" >&2
+      exit 1
+    fi
     rm -rf "$sub_work_dir"
+
+    # Real, permanent fix: montage mode never had captions burned in at
+    # all (confirmed directly — it uses a completely separate render
+    # path from best-windows/podcast, which is where the earlier
+    # caption-burn work was wired). Uses the same real, proven overlay
+    # technique via a montage-specific caption generator that re-bases
+    # each disjoint segment's real captions onto the montage's own
+    # crossfaded output timeline.
+    if ! python3 -c "
+import sys, json, os
+sys.path.insert(0, '${PIPELINE_ROOT}')
+sys.path.insert(0, '${PIPELINE_ROOT}/skills/rough-cut')
+import doctor
+from overlay_burner import burn_captions_karaoke_single_pass
+
+montages = json.load(open('${clips_json}'))['montages']
+m = next(mm for mm in montages if mm['id'] == '${montage_id}')
+segments = [{'start': s['start'], 'end': s['end']} for s in m['segments']]
+
+game_name = doctor.determine_video_game('${job}')
+word_groups = doctor.generate_word_groups_for_montage('${job}', segments)
+if word_groups:
+    burn_captions_karaoke_single_pass('${sub_raw_dir}/source.mp4', word_groups, '${sub_rough_dir}/rough_cut.mp4', game_name=game_name)
+else:
+    import shutil
+    shutil.copy('${sub_raw_dir}/source.mp4', '${sub_rough_dir}/rough_cut.mp4')
+"; then
+      echo "montage caption burn-in failed for ${montage_id} — falling back to uncaptioned" >&2
+      cp "${sub_raw_dir}/source.mp4" "${sub_rough_dir}/rough_cut.mp4"
+    fi
 
     # build a synthetic script.json spanning the WHOLE montage, with each
     # segment's text preserved and re-timed to its position in the

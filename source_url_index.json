@@ -1,0 +1,20 @@
+{
+  "https://www.twitch.tv/videos/2863359232": {
+    "canonical_id": null,
+    "duration_sec": null,
+    "extractor": null,
+    "job": "4846dd4ea17b",
+    "status": "fetching",
+    "submitted_at": "2026-09-15T06:05:10Z",
+    "title": null
+  },
+  "https://www.twitch.tv/videos/2868734045": {
+    "canonical_id": null,
+    "duration_sec": null,
+    "extractor": null,
+    "job": "b951cc787dc7",
+    "status": "fetching",
+    "submitted_at": "2026-09-15T06:05:10Z",
+    "title": null
+  }
+}

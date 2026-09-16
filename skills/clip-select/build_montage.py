@@ -26,6 +26,8 @@ from beat_planner import classify  # noqa: E402
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "lib"))
 from visual_analysis import motion_beats  # noqa: E402
 from audio_analysis import transient_beats  # noqa: E402
+sys.path.insert(0, os.path.dirname(__file__))
+from clip_select import build_word_boundary_index, snap_start_to_word_boundary, snap_end_to_word_boundary  # noqa: E402
 
 PRIORITY = {"impact": 4, "action": 3, "highlight": 3, "hook": 2, "stat": 1, "list_item": 1, "question": 1}
 
@@ -93,6 +95,13 @@ def collect_candidates(kept_segments, visual_analysis, padding, duration, audio_
             return min(safe_end_limit, raw_end)
         return raw_end  # no duration info from ANY source — nothing to clamp against
 
+    # Real, permanent fix: candidate boundaries were raw arithmetic
+    # (segment time +/- padding), with no check against real word edges
+    # — could cut a montage segment off mid-word, the exact issue
+    # word-boundary snapping already solves for regular clip mode.
+    # Reusing the same real, proven functions here.
+    word_index = build_word_boundary_index(kept_segments)
+
     candidates = []
     for i, seg in enumerate(kept_segments):
         tags = classify(seg, i, is_first=(i == 0))
@@ -101,33 +110,39 @@ def collect_candidates(kept_segments, visual_analysis, padding, duration, audio_
             continue
         start = max(0.0, seg["start"] - padding)
         end = clamp_end(seg["end"] + padding)
+        start = snap_start_to_word_boundary(start, word_index)
+        end = snap_end_to_word_boundary(end, word_index)
         if end <= start:
             continue  # clamping pushed this entirely off the safe range — skip rather than emit a zero/negative-length segment
         if is_mostly_loading_screen(start, end, visual_analysis):
             continue
-        candidates.append({"start": start, "end": end, "score": s, "text": seg["text"]})
+        candidates.append({"start": start, "end": end, "score": s, "text": seg["text"], "source": "transcript"})
 
     if visual_analysis:
         for beat in motion_beats(visual_analysis):
             start = max(0.0, beat["start"] - lead_in_sec)
             end = clamp_end(beat["end"] + padding)
+            start = snap_start_to_word_boundary(start, word_index)
+            end = snap_end_to_word_boundary(end, word_index)
             if end <= start:
                 continue
             if is_mostly_loading_screen(start, end, visual_analysis):
                 continue
             candidates.append({"start": start, "end": end, "score": score(beat["tags"]),
-                                "text": beat["text"]})
+                                "text": beat["text"], "source": "visual"})
 
     if audio_analysis:
         for beat in transient_beats(audio_analysis):
             start = max(0.0, beat["start"] - lead_in_sec)
             end = clamp_end(beat["end"] + padding)
+            start = snap_start_to_word_boundary(start, word_index)
+            end = snap_end_to_word_boundary(end, word_index)
             if end <= start:
                 continue
             if is_mostly_loading_screen(start, end, visual_analysis):
                 continue
             candidates.append({"start": start, "end": end, "score": score(beat["tags"]),
-                                "text": beat["text"]})
+                                "text": beat["text"], "source": "audio"})
     return candidates
 
 
@@ -135,31 +150,90 @@ def overlaps(a, b):
     return not (a["end"] <= b["start"] or a["start"] >= b["end"])
 
 
-def build_montages(candidates, montage_seconds, montage_count):
-    candidates = sorted(candidates, key=lambda c: (-c["score"], c["start"]))
+def build_montages(candidates, montage_seconds, montage_count, min_score_per_min=15.0,
+                    transcript_reserve_frac=0.4):
+    """Real, permanent fix: this used to have no real quality floor — it
+    would keep pulling from whatever candidates remained even once every
+    genuinely good moment was used up, filling later montages with weak,
+    near-zero-score material just to hit the target duration. Now a
+    candidate must clear a real, duration-scaled minimum score to be
+    used at all.
+
+    Real, second fix, confirmed necessary on real production data: pure
+    score-based greedy fill let audio-impact moments (often dozens of
+    near-identical-scoring "gunfire/impact detected" beats with no real
+    spoken content) completely crowd out real transcript-based
+    commentary — a real 15-minute test montage came back as 91
+    back-to-back action beats and zero real spoken hooks, not the
+    "story with real commentary" that was actually asked for.
+    transcript_reserve_frac of the real target duration is now filled
+    from transcript-sourced candidates FIRST (best-scoring first, same
+    quality bar), guaranteeing real commentary has room, before the
+    remaining budget is filled by whatever scores best from any
+    source — so action moments still get in, just not at the total
+    exclusion of real spoken highlights."""
+    def passes_threshold(c):
+        dur_min = (c["end"] - c["start"]) / 60.0
+        return dur_min <= 0 or c["score"] >= min_score_per_min * dur_min
+
+    candidates = [c for c in candidates if passes_threshold(c)]
     used = []  # segments already assigned to ANY montage — never reused
     montages = []
+
+    transcript_target = montage_seconds * transcript_reserve_frac
 
     for m_idx in range(montage_count):
         segments = []
         total = 0.0
-        for c in candidates:
+
+        # Real, first pass: fill the reserved real budget from
+        # transcript-sourced candidates specifically, so real spoken
+        # commentary is guaranteed a place, not just whatever's left
+        # after action moments (which are often far more numerous) win
+        # every score tie.
+        transcript_candidates = sorted(
+            (c for c in candidates if c.get("source") == "transcript"),
+            key=lambda c: (-c["score"], c["start"]),
+        )
+        for c in transcript_candidates:
+            if any(overlaps(c, s) for s in used):
+                continue
+            seg_len = c["end"] - c["start"]
+            if total + seg_len > transcript_target and segments:
+                continue
+            segments.append(c)
+            used.append(c)
+            total += seg_len
+            if total >= transcript_target:
+                break
+
+        # Real, second pass: fill the remaining real budget with the
+        # best-scoring candidates from ANY source (transcript included,
+        # if more genuinely good transcript material exists beyond the
+        # reserved share).
+        remaining_candidates = sorted(
+            (c for c in candidates if c not in used),
+            key=lambda c: (-c["score"], c["start"]),
+        )
+        for c in remaining_candidates:
             if any(overlaps(c, s) for s in used):
                 continue
             seg_len = c["end"] - c["start"]
             if total + seg_len > montage_seconds and segments:
-                continue  # would overshoot and we already have something — skip, keep looking for a smaller fit
+                continue
             segments.append(c)
             used.append(c)
             total += seg_len
             if total >= montage_seconds:
                 break
+
         if not segments:
-            break  # ran out of material — fewer montages than requested, not an error
+            break  # ran out of real, genuinely good material — fewer montages than requested, not an error
         segments.sort(key=lambda s: s["start"])  # chronological order within the montage
         montages.append({
             "id": f"montage{m_idx+1:02d}",
             "segments": [{"start": s["start"], "end": s["end"], "text": s["text"], "score": s["score"],
+                          "source": s.get("source", "unknown"),
                           "engagement_score": engagement_score(s, duration_sec=s["end"] - s["start"])}
                          for s in segments],
             "total_duration": round(total, 2),

@@ -16,3 +16,22 @@ worker/.channel_watch_seen.json
 *.avi
 *.wav
 *.ass
+
+# secrets — added 2026-09-16 audit (previously exposed, now rotating)
+youtube_client_secret.json
+youtube_token.pickle
+tiktok_token.json
+.env
+*.env
+
+# logs — churn constantly, shouldn't be versioned
+*.log
+logs/
+
+# not project source — untracked deliberately
+450967
+450967.pub
+.netlify/
+awesome-osint-arsenal/
+*.bak*
+takekash.db

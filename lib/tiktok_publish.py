@@ -106,10 +106,7 @@ def get_creator_info(access_token, timeout_sec=30):
     return resp.json().get("data", {})
 
 
-def publish_video(video_path, title, privacy_level=None, timeout_sec=1800, poll_interval_sec=5):
-    """Real init -> upload -> poll flow. privacy_level is REQUIRED by
-    TikTok's own API with no default — if not given here, pulls the
-    first available option from creator_info rather than guessing."""
+def publish_video(video_path, title, privacy_level=None, timeout_sec=1800, poll_interval_sec=5, video_url=None):
     token_data = _load_token()
     token_data = _refresh_access_token_if_needed(token_data)
     access_token = token_data["access_token"]
@@ -121,36 +118,41 @@ def publish_video(video_path, title, privacy_level=None, timeout_sec=1800, poll_
             raise RuntimeError("no privacy_level_options returned by creator_info — cannot publish without one")
         privacy_level = options[0]
 
-    file_size = os.path.getsize(video_path)
+    if video_url:
+        source_info = {"source": "PULL_FROM_URL", "video_url": video_url}
+    else:
+        file_size = os.path.getsize(video_path)
+        source_info = {
+            "source": "FILE_UPLOAD",
+            "video_size": file_size,
+            "chunk_size": file_size,
+            "total_chunk_count": 1,
+        }
 
     init_resp = requests.post(
         f"{API_BASE}/post/publish/video/init/",
         headers={"Authorization": f"Bearer {access_token}", "Content-Type": "application/json"},
         json={
             "post_info": {"title": title, "privacy_level": privacy_level},
-            "source_info": {
-                "source": "FILE_UPLOAD",
-                "video_size": file_size,
-                "chunk_size": file_size,
-                "total_chunk_count": 1,
-            },
+            "source_info": source_info,
         },
         timeout=timeout_sec,
     )
     init_resp.raise_for_status()
     init_data = init_resp.json()["data"]
     publish_id = init_data["publish_id"]
-    upload_url = init_data["upload_url"]
 
-    with open(video_path, "rb") as f:
-        video_bytes = f.read()
-    upload_resp = requests.put(
-        upload_url,
-        headers={"Content-Type": "video/mp4", "Content-Range": f"bytes 0-{file_size - 1}/{file_size}"},
-        data=video_bytes,
-        timeout=timeout_sec,
-    )
-    upload_resp.raise_for_status()
+    if not video_url:
+        upload_url = init_data["upload_url"]
+        with open(video_path, "rb") as f:
+            video_bytes = f.read()
+        upload_resp = requests.put(
+            upload_url,
+            headers={"Content-Type": "video/mp4", "Content-Range": f"bytes 0-{file_size - 1}/{file_size}"},
+            data=video_bytes,
+            timeout=timeout_sec,
+        )
+        upload_resp.raise_for_status()
 
     # Real, documented behavior: publishing is asynchronous — poll until
     # a terminal state, don't assume success just because upload succeeded

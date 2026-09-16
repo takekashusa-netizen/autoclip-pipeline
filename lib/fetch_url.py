@@ -14,6 +14,8 @@ import os
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from url_index import record_resolved, record_error
 COOKIE_BROWSER = os.environ.get("PIPELINE_COOKIE_BROWSER", "chrome")
 
 
@@ -75,6 +77,11 @@ def main():
                 print(json.dumps({"error": "video is private or unavailable"}))
             else:
                 print(json.dumps({"error": msg[:500]}))
+            # Real fix: record the failure in the shared URL index too,
+            # not just print it — otherwise a URL that failed here stays
+            # stuck at status "fetching" forever, permanently blocking a
+            # legitimate retry of the same link.
+            record_error(url, job, msg)
             sys.exit(1)
         downloaded = ydl.prepare_filename(info)
         if info.get("requested_downloads"):
@@ -106,6 +113,22 @@ def main():
     url_info = {"source_url": url, "source_title": info.get("title", "")}
     with open(os.path.join(raw_dir, "source_url.json"), "w") as f:
         json.dump(url_info, f, indent=2)
+
+    # Real fix: fills in the real, resolved metadata (title, duration,
+    # the extractor's own canonical id) in the shared cross-job index,
+    # not just this job's own source_url.json — this is what lets a
+    # future submit of a differently-shaped URL to the SAME content
+    # (e.g. a query param added) still be recognized once resolved, and
+    # gives a single durable record of every real download this pipeline
+    # has ever done, independent of any one job's own files surviving.
+    record_resolved(
+        url, job,
+        title=info.get("title", ""),
+        duration_sec=info.get("duration"),
+        canonical_id=info.get("id"),
+        extractor=info.get("extractor_key") or info.get("extractor"),
+        status="done",
+    )
 
     job_json_path = os.path.join(ROOT, "projects", job, "job.json")
     if os.path.exists(job_json_path):

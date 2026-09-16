@@ -168,6 +168,46 @@ def candidate_windows(kept_segments, clip_length, duration, visual_analysis=None
     return candidates
 
 
+def select_montage_segments(candidates, target_duration_sec, min_score_per_min=15.0,
+                             max_segment_sec=90.0):
+    """Real, permanent selection for montage mode: takes real candidate
+    moments (already word-boundary-snapped, already loading-screen
+    filtered — from candidate_windows()), applies the SAME real
+    minimum-quality bar used in continuous mode (no dead content
+    sneaking into a montage either), picks the highest-scoring
+    NON-OVERLAPPING ones until the real target duration is reached, then
+    re-orders them CHRONOLOGICALLY (not by score) so the final montage
+    preserves real story flow — what actually happened first, second,
+    third — instead of jumping around by how exciting each moment was."""
+    def passes_threshold(c):
+        dur_min = (c["end"] - c["start"]) / 60.0
+        return c["score"] >= min_score_per_min * dur_min
+
+    real_candidates = [c for c in candidates if passes_threshold(c)]
+    real_candidates = [c for c in real_candidates if (c["end"] - c["start"]) <= max_segment_sec]
+    real_candidates.sort(key=lambda c: c["score"], reverse=True)
+
+    selected = []
+    total = 0.0
+
+    def overlaps(a, b):
+        return a["start"] < b["end"] and b["start"] < a["end"]
+
+    for c in real_candidates:
+        if any(overlaps(c, s) for s in selected):
+            continue
+        dur = c["end"] - c["start"]
+        if total + dur > target_duration_sec and selected:
+            continue
+        selected.append(c)
+        total += dur
+        if total >= target_duration_sec * 0.95:
+            break
+
+    selected.sort(key=lambda c: c["start"])
+    return selected, total
+
+
 def engagement_score(candidate, duration_sec=None):
     """A 0-100 heuristic engagement estimate, in the spirit of what
     'virality score' tools show — but honest about what it actually is:

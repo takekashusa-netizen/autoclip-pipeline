@@ -1,50 +1,45 @@
 #!/usr/bin/env bash
 set -uo pipefail
 
-# restart_dashboard.sh [--port 8765]
+# restart_dashboard.sh
 #
-# The permanent fix for "I edited dashboard.py but the running server
-# still has the old code" — Python doesn't hot-reload, so every code
-# change needs a real restart. This used to mean manually hunting down
-# PIDs for both dashboard.py AND its caffeinate wrapper, killing them
-# separately, then relaunching by hand — a multi-step process that's
-# gone wrong more than once tonight. This does it all in one real,
-# verified command: kill anything currently running by name (not by a
-# PID you have to look up first), wait for it to actually be gone,
-# relaunch with the same caffeinate + venv-python pattern used
-# everywhere else, then confirm with a real HTTP health check before
-# declaring success — not just "the process started," but "it's
-# actually answering requests."
+# Now launchd-managed (com.takekash.dashboard) instead of a manual
+# nohup process — this just tells launchd to restart it cleanly via
+# `kickstart -k`, then does the same real, retrying health check as
+# before rather than a single fragile check.
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PLIST="$HOME/Library/LaunchAgents/com.takekash.dashboard.plist"
+LABEL="com.takekash.dashboard"
 port=8765
-if [[ "${1:-}" == "--port" ]]; then
-  port="$2"
+
+if [[ ! -f "$PLIST" ]]; then
+  echo "restart_dashboard: $PLIST not found — launchd service isn't installed" >&2
+  exit 1
 fi
 
-echo "== restart_dashboard: stopping any existing dashboard.py/caffeinate =="
-pkill -f "dashboard.py --port ${port}" 2>/dev/null
-pkill -f "caffeinate -dis python3 ${ROOT}/dashboard.py" 2>/dev/null
-pkill -f "caffeinate -dis python3 dashboard.py" 2>/dev/null
-sleep 1
-
-# confirm it's actually gone before relaunching — a real check, not an assumption
-if pgrep -f "dashboard.py --port ${port}" > /dev/null 2>&1; then
-  echo "restart_dashboard: a dashboard.py process survived the kill — forcing it" >&2
-  pkill -9 -f "dashboard.py --port ${port}" 2>/dev/null
-  sleep 1
-fi
-
-echo "== restart_dashboard: launching fresh (with caffeinate sleep protection) =="
-cd "$ROOT"
-nohup caffeinate -dis python3 dashboard.py --port "$port" > dashboard.log 2>&1 &
-new_pid=$!
-sleep 2
+echo "== restart_dashboard: restarting via launchd =="
+launchctl kickstart -k "gui/$(id -u)/${LABEL}" 2>/dev/null || {
+  echo "restart_dashboard: kickstart failed, trying unload/load instead" >&2
+  launchctl unload "$PLIST" 2>/dev/null
+  launchctl load "$PLIST"
+}
 
 echo "== restart_dashboard: verifying it's actually responding (not just started) =="
-if curl -sf "http://localhost:${port}/api/jobs" > /dev/null 2>&1; then
-  echo "== restart_dashboard: CONFIRMED — genuinely up and responding at http://localhost:${port} =="
+max_attempts=20
+attempt=0
+up=false
+while [[ $attempt -lt $max_attempts ]]; do
+  if curl -sf "http://localhost:${port}/api/jobs" > /dev/null 2>&1; then
+    up=true
+    break
+  fi
+  sleep 1
+  attempt=$((attempt + 1))
+done
+
+if [[ "$up" == "true" ]]; then
+  echo "== restart_dashboard: CONFIRMED — genuinely up and responding at http://localhost:${port} (after ${attempt}s) =="
 else
-  echo "restart_dashboard: launched (PID ${new_pid}) but not yet responding — check dashboard.log for a real error" >&2
+  echo "restart_dashboard: still not responding after ${max_attempts}s — check dashboard.log for a real error" >&2
   exit 1
 fi

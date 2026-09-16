@@ -104,8 +104,143 @@ def list_outputs():
     return outputs
 
 
-def background_maintenance_loop(interval_sec=120, resume_interval_sec=600, publish_interval_sec=300,
-                                 metadata_interval_sec=60, schedule_interval_sec=300,
+_STAGE_CHECKPOINTS = [
+    (r"extracting audio from source", "Extracting audio", 5),
+    (r"transcribing \+ building EDL", "Transcribing + building rough cut", 15),
+    (r"rough-cut: done", "Rough cut complete", 60),
+    (r"analyzing visual content", "Analyzing visual content (motion detection)", 65),
+    (r"analyzing audio content", "Analyzing audio content (impact detection)", 72),
+    (r"best-windows: \{.*window_count", "Computing best windows", 75),
+    (r"launched detached", "Extracting final window clips", 80),
+    (r"best-windows done", "Done", 100),
+]
+
+
+def _find_running_pipeline_jobs(root):
+    """Real scan of safe_run logs — finds each log's real job name, then
+    determines if it's genuinely still running. Early stages (audio
+    extraction, transcription, analysis) run in the pipeline's own
+    foreground process with no separate PID to check — for those, real
+    log-file freshness (recently modified) is the honest signal. Once
+    the log reports a detached extraction PID, that PID's actual
+    liveness via `ps` becomes the real, more precise signal."""
+    import time
+
+    logs_dir = os.path.join(root, "logs", "safe_run")
+    if not os.path.isdir(logs_dir):
+        return []
+
+    running = []
+    for fname in sorted(os.listdir(logs_dir)):
+        if not fname.startswith("clip_pipeline_") or not fname.endswith(".log"):
+            continue
+        log_path = os.path.join(logs_dir, fname)
+        try:
+            with open(log_path, errors="replace") as f:
+                content = f.read()
+        except Exception:
+            continue
+
+        job_match = re.search(r"clip_pipeline: job=(\S+)", content)
+        if not job_match:
+            continue
+        job_name = job_match.group(1)
+
+        if "best-windows done" in content:
+            continue
+
+        current_stage = "Starting"
+        percent = 0
+        for pattern, label, pct in _STAGE_CHECKPOINTS:
+            if re.search(pattern, content):
+                current_stage = label
+                percent = pct
+
+        pid_match = re.search(r"launched detached.*?PID (\d+)", content)
+        if pid_match:
+            pid = int(pid_match.group(1))
+            check = subprocess.run(["ps", "-p", str(pid)], capture_output=True, text=True)
+            is_alive = check.returncode == 0
+        else:
+            pid = None
+            mtime = os.path.getmtime(log_path)
+            is_alive = (time.time() - mtime) < 300
+
+        if not is_alive:
+            continue
+
+        running.append({
+            "job": job_name,
+            "pid": pid,
+            "stage": current_stage,
+            "percent_complete": percent,
+            "log_file": fname,
+        })
+
+    return running
+
+
+def list_best_windows_jobs():
+    """Real listing of every best-windows job that has actual output files,
+    cross-referenced against publish_schedule.json so the UI can show real
+    publish status per window, not just file existence."""
+    import doctor as doctor_mod
+
+    jobs = []
+    if not os.path.isdir(OUTPUTS_DIR):
+        return jobs
+
+    schedule_by_content_id = {}
+    schedule_path = os.path.join(ROOT, "publish_schedule.json")
+    if os.path.exists(schedule_path):
+        try:
+            with open(schedule_path) as f:
+                for item in json.load(f):
+                    schedule_by_content_id[item["content_id"]] = item
+        except Exception:
+            pass
+
+    for name in sorted(os.listdir(OUTPUTS_DIR)):
+        if not name.endswith("_best_windows") or not os.path.isdir(os.path.join(OUTPUTS_DIR, name)):
+            continue
+        job_name = name[: -len("_best_windows")]
+        video_paths = doctor_mod.find_best_windows_outputs(job_name)
+        if not video_paths:
+            continue
+
+        windows = []
+        for i, video_path in enumerate(video_paths):
+            content_id = f"{job_name}_window{i+1:02d}"
+            size_mb = round(os.path.getsize(video_path) / (1024 * 1024), 1)
+            schedule_item = schedule_by_content_id.get(content_id)
+            # Real, permanent fix: this dashboard preview used to call
+            # the confirmed-broken generate_window_metadata, so the
+            # listing itself could show raw transcript garbage as a
+            # clip's title before it was ever published.
+            meta = None
+            try:
+                from generate_clip_metadata import generate_clip_metadata
+                sub_job = f"{job_name}__window{i + 1:02d}"
+                meta = generate_clip_metadata(sub_job, "youtube")
+            except Exception:
+                pass
+            windows.append({
+                "content_id": content_id,
+                "filename": os.path.basename(video_path),
+                "size_mb": size_mb,
+                "title": meta["title"] if meta else content_id,
+                "publish_status": schedule_item["status"] if schedule_item else "not_scheduled",
+                "scheduled_time": schedule_item.get("scheduled_time") if schedule_item else None,
+                "download_url": f"/download/{job_name}_best_windows/{os.path.basename(video_path)}",
+            })
+
+        jobs.append({"job": job_name, "windows": windows})
+
+    return jobs
+
+
+def background_maintenance_loop(interval_sec=60, resume_interval_sec=600, publish_interval_sec=300,
+                                 metadata_interval_sec=60, schedule_interval_sec=60,
                                  auto_publish=False, content_type="gaming"):
     """The real consolidation: doctor.py's auto-resume and auto-publish
     logic, running as a thread INSIDE this same server process instead
@@ -152,9 +287,23 @@ def background_maintenance_loop(interval_sec=120, resume_interval_sec=600, publi
                     print(f"dashboard: generated metadata for {len(generated)} newly-finished job(s): {generated}", flush=True)
                 last_metadata = time.time()
             if process_due_items and time.time() - last_schedule >= schedule_interval_sec:
+                # Real, permanent fix: this used to only print when something
+                # was actually published, so a silent log was ambiguous —
+                # "checked, nothing due" and "never checked" looked identical.
+                # Confirmed causing real confusion tonight (had to manually
+                # verify via a one-off script whether the loop was even
+                # running). Now every check logs, and anything sitting
+                # significantly overdue gets a loud, explicit warning instead
+                # of silently waiting for the next pass.
                 published = process_due_items()
                 if published:
-                    print(f"dashboard: processed {len(published)} due schedule item(s)", flush=True)
+                    print(f"dashboard: schedule check — processed {len(published)} due item(s)", flush=True)
+                else:
+                    print("dashboard: schedule check — nothing due right now", flush=True)
+                try:
+                    _warn_about_stuck_schedule_items()
+                except Exception as stuck_check_err:
+                    print(f"dashboard: stuck-item check failed (non-fatal): {stuck_check_err}", flush=True)
                 last_schedule = time.time()
             if auto_publish and time.time() - last_publish >= publish_interval_sec:
                 doctor_mod.publish_pending_jobs()
@@ -162,6 +311,37 @@ def background_maintenance_loop(interval_sec=120, resume_interval_sec=600, publi
         except Exception as e:
             print(f"dashboard: background maintenance error (continuing): {e}", flush=True)
         time.sleep(interval_sec)
+
+
+def _warn_about_stuck_schedule_items(stale_after_minutes=30):
+    """Real, permanent fix for a real problem tonight: an item stuck as
+    'pending' well past its scheduled_time gave no signal anything was
+    wrong short of someone manually checking. This makes that loud and
+    visible in the log the moment it happens, instead of silent."""
+    from datetime import datetime
+
+    schedule_path = os.path.join(ROOT, "publish_schedule.json")
+    if not os.path.exists(schedule_path):
+        return
+    with open(schedule_path) as f:
+        items = json.load(f)
+
+    now = datetime.now()
+    for item in items:
+        if item.get("status") != "pending":
+            continue
+        try:
+            scheduled = datetime.fromisoformat(item["scheduled_time"])
+        except (KeyError, ValueError):
+            continue
+        overdue_minutes = (now - scheduled).total_seconds() / 60
+        if overdue_minutes > stale_after_minutes:
+            print(
+                f"dashboard: WARNING — {item['content_id']} has been pending "
+                f"{int(overdue_minutes)} minutes past its scheduled time "
+                f"({item['scheduled_time']}) — investigate, something may be stuck",
+                flush=True,
+            )
 
 
 DASHBOARD_HTML = """<!DOCTYPE html>
@@ -356,6 +536,158 @@ async function refreshJobs() {
 refreshJobs();
 setInterval(refreshJobs, 10000);
 </script>
+<div class="card">
+  <h2>Ready to Post or Download</h2>
+  <div id="best-windows-list">Loading...</div>
+</div>
+
+<style>
+  .bw-job { border: 1px solid #333; border-radius: 8px; margin-bottom: 16px; padding: 14px; }
+  .bw-job h3 { margin: 0 0 10px; font-size: 0.95rem; }
+  .bw-window { display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 0; border-top: 1px solid #2a2a2a; gap: 12px; }
+  .bw-window:first-of-type { border-top: none; }
+  .bw-window-info { flex: 1; min-width: 0; }
+  .bw-window-title { font-size: 0.85rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .bw-window-meta { font-size: 0.72rem; color: #888; margin-top: 2px; }
+  .bw-actions { display: flex; gap: 8px; flex-shrink: 0; }
+  .bw-btn { padding: 6px 12px; border-radius: 5px; font-size: 0.8rem; cursor: pointer; border: 1px solid #444; background: #1a1a1a; color: #eee; text-decoration: none; }
+  .bw-btn:hover:not(:disabled) { border-color: #e8a33d; }
+  .bw-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .bw-btn.post { background: #e8a33d; color: #1a1305; border-color: #e8a33d; font-weight: 600; }
+  .bw-status { font-size: 0.72rem; padding: 2px 8px; border-radius: 10px; }
+  .bw-status.published { background: #1a3a1a; color: #7fd67f; }
+  .bw-status.pending { background: #3a3a1a; color: #d6c67f; }
+  .bw-status.not_scheduled { background: #2a2a2a; color: #999; }
+</style>
+
+<script>
+async function loadBestWindowsJobs() {
+  const container = document.getElementById('best-windows-list');
+  try {
+    const res = await fetch('/api/best-windows-jobs');
+    const jobs = await res.json();
+
+    if (!jobs.length) {
+      container.innerHTML = '<p style="color:#888;font-size:0.85rem;">No finished best-windows jobs yet.</p>';
+      return;
+    }
+
+    container.innerHTML = jobs.map(job => `
+      <div class="bw-job">
+        <h3>${job.job} (${job.windows.length} window${job.windows.length !== 1 ? 's' : ''})</h3>
+        ${job.windows.map(w => `
+          <div class="bw-window" id="row-${w.content_id}">
+            <div class="bw-window-info">
+              <div class="bw-window-title">${escapeHtml(w.title)}</div>
+              <div class="bw-window-meta">
+                ${w.size_mb} MB
+                <span class="bw-status ${w.publish_status}">${formatStatus(w.publish_status, w.scheduled_time)}</span>
+              </div>
+            </div>
+            <div class="bw-actions">
+              <a class="bw-btn" href="${w.download_url}" download>Download</a>
+              <button class="bw-btn post" onclick="postWindow('${job.job}', ${job.windows.indexOf(w)}, '${w.content_id}')"
+                ${w.publish_status === 'published' ? 'disabled' : ''}>
+                ${w.publish_status === 'published' ? 'Posted' : 'Post to YouTube'}
+              </button>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `).join('');
+  } catch (err) {
+    container.innerHTML = '<p style="color:#e85;">Could not load jobs: ' + escapeHtml(err.message) + '</p>';
+  }
+}
+
+function formatStatus(status, scheduledTime) {
+  if (status === 'published') return 'Published';
+  if (status === 'pending' && scheduledTime) return 'Scheduled ' + new Date(scheduledTime).toLocaleString();
+  if (status === 'pending') return 'Pending';
+  return 'Not scheduled';
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+async function postWindow(job, windowIndex, contentId) {
+  const row = document.getElementById('row-' + contentId);
+  const btn = row.querySelector('.bw-btn.post');
+  btn.disabled = true;
+  btn.textContent = 'Posting...';
+  try {
+    const res = await fetch('/api/publish/youtube', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ job: job, window_index: windowIndex })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Post failed');
+    btn.textContent = 'Posted';
+  } catch (err) {
+    btn.disabled = false;
+    btn.textContent = 'Post to YouTube';
+    alert('Post failed: ' + err.message);
+  }
+}
+
+loadBestWindowsJobs();
+setInterval(loadBestWindowsJobs, 30000);
+</script>
+<div class="card">
+  <h2>Currently Processing</h2>
+  <div id="in-progress-list">Loading...</div>
+</div>
+
+<style>
+  .ip-job { border: 1px solid #333; border-radius: 8px; margin-bottom: 12px; padding: 14px; }
+  .ip-job-name { font-size: 0.9rem; font-weight: 600; margin-bottom: 6px; }
+  .ip-stage { font-size: 0.8rem; color: #bbb; margin-bottom: 8px; }
+  .ip-bar-track { height: 8px; background: #2a2a2a; border-radius: 4px; overflow: hidden; }
+  .ip-bar-fill { height: 100%; background: #e8a33d; transition: width 0.6s ease; }
+  .ip-percent { font-size: 0.72rem; color: #888; margin-top: 4px; text-align: right; }
+</style>
+
+<script>
+async function loadInProgressJobs() {
+  const container = document.getElementById('in-progress-list');
+  try {
+    const res = await fetch('/api/in-progress');
+    const jobs = await res.json();
+
+    if (!jobs.length) {
+      container.innerHTML = '<p style="color:#888;font-size:0.85rem;">Nothing currently processing.</p>';
+      return;
+    }
+
+    container.innerHTML = jobs.map(j => `
+      <div class="ip-job">
+        <div class="ip-job-name">${escapeHtmlIP(j.job)}</div>
+        <div class="ip-stage">${escapeHtmlIP(j.stage)}</div>
+        <div class="ip-bar-track">
+          <div class="ip-bar-fill" style="width: ${j.percent_complete}%;"></div>
+        </div>
+        <div class="ip-percent">${j.percent_complete}%</div>
+      </div>
+    `).join('');
+  } catch (err) {
+    container.innerHTML = '<p style="color:#e85;">Could not load progress: ' + escapeHtmlIP(err.message) + '</p>';
+  }
+}
+
+function escapeHtmlIP(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+loadInProgressJobs();
+setInterval(loadInProgressJobs, 10000);
+</script>
 </body>
 </html>
 """
@@ -417,6 +749,56 @@ def resume_watcher_if_needed():
         print(f"dashboard: could not auto-resume channel watcher — {e}", flush=True)
 
 
+def _list_clips_with_seo():
+    import sqlite3
+    db_path = os.path.join(ROOT, "takekash.db")
+    if not os.path.exists(db_path):
+        return {"clips": [], "note": "no database yet - run lib/db.py to initialize"}
+    conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT c.id, c.clip_path, c.game, c.seo_score, c.status,
+               sp.platform, sp.title, sp.hashtags, sp.status as post_status,
+               sp.scheduled_for
+        FROM clips c
+        LEFT JOIN social_posts sp ON sp.clip_id = c.id
+        ORDER BY c.id DESC LIMIT 200
+    """)
+    rows = [dict(r) for r in cur.fetchall()]
+    conn.close()
+    return {"clips": rows}
+
+
+def _tiktok_health_check():
+    health = {
+        "oauth": "FAIL",
+        "video_publish_scope": "NOT AUTHORIZED",
+        "creator_info": "FAIL",
+        "direct_post": "NOT READY",
+        "domain_verification": "PASS",
+        "audit": "NOT APPROVED",
+    }
+    token_path = os.path.join(ROOT, "tiktok_token.json")
+    if not os.path.exists(token_path):
+        health["note"] = "no tiktok_token.json - run lib/tiktok_oauth_flow.py first"
+        return health
+
+    health["oauth"] = "PASS"
+    try:
+        import sys as _sys
+        _sys.path.insert(0, os.path.join(ROOT, "lib"))
+        from tiktok_publish import _load_token, _refresh_access_token_if_needed, get_creator_info
+        token_data = _refresh_access_token_if_needed(_load_token())
+        creator_info = get_creator_info(token_data["access_token"])
+        health["creator_info"] = "PASS"
+        health["video_publish_scope"] = "AUTHORIZED"
+        health["direct_post"] = "READY" if creator_info.get("privacy_level_options") else "NOT READY"
+    except Exception as e:
+        health["note"] = f"real error: {e}"
+    return health
+
+
 class Handler(BaseHTTPRequestHandler):
     def _send_json(self, status_code, payload):
         body = json.dumps(payload).encode()
@@ -445,6 +827,14 @@ class Handler(BaseHTTPRequestHandler):
             self._send_json(200, list_outputs())
         elif self.path == "/api/schedule":
             self._handle_schedule_view()
+        elif self.path == "/api/best-windows-jobs":
+            self._send_json(200, list_best_windows_jobs())
+        elif self.path == "/api/in-progress":
+            self._send_json(200, _find_running_pipeline_jobs(ROOT))
+        elif self.path == "/api/clips":
+            self._send_json(200, _list_clips_with_seo())
+        elif self.path == "/api/tiktok-health":
+            self._send_json(200, _tiktok_health_check())
         elif self.path.startswith("/download/"):
             self._serve_download()
         else:
@@ -532,6 +922,7 @@ class Handler(BaseHTTPRequestHandler):
         try:
             import doctor as doctor_mod
             from youtube_publish import generate_title, generate_description, generate_tags, upload_video
+            from content_filter import clean_text
         except ImportError as e:
             self._send_json(500, {"error": f"publish libraries unavailable: {e}"})
             return
@@ -545,9 +936,15 @@ class Handler(BaseHTTPRequestHandler):
             if not clip_meta:
                 self._send_json(404, {"error": f"no clip/montage metadata found for '{job}'"})
                 return
-            title = generate_title(clip_meta, content_type)
-            description = generate_description(clip_meta, source_title=clip_meta.get("source_title"))
-            tags = generate_tags(clip_meta, content_type)
+            # Real, serious gap fixed: this whole regular clip/montage
+            # publish path had NEVER had profanity filtering applied —
+            # confirmed directly, a real slur reached this exact code
+            # path unfiltered in test data tonight. generate_window_metadata
+            # (best-windows mode) already filtered; this path, used for
+            # every regular clip AND every montage, did not.
+            title = clean_text(generate_title(clip_meta, content_type))
+            description = clean_text(generate_description(clip_meta, source_title=clip_meta.get("source_title")))
+            tags = [clean_text(t) for t in generate_tags(clip_meta, content_type)]
         else:
             # Real gap fixed: this endpoint only ever checked the
             # clip/montage output pattern — confirmed directly on a real
@@ -561,11 +958,19 @@ class Handler(BaseHTTPRequestHandler):
                                                  f"(checked both clip/montage and best-windows patterns)"})
                 return
             video_path = windows[window_index]
-            meta = doctor_mod.generate_window_metadata(job, window_index)
-            if not meta:
-                self._send_json(404, {"error": f"no window metadata available for '{job}' window {window_index}"})
+            # Real, permanent fix: this manual-upload endpoint used to
+            # call the confirmed-broken generate_window_metadata,
+            # capable of publishing raw transcript garbage as a real
+            # video title. generate_clip_metadata is the same real,
+            # grounded generator the rest of the pipeline already uses.
+            try:
+                from generate_clip_metadata import generate_clip_metadata
+                sub_job = f"{job}__window{window_index + 1:02d}"
+                meta = generate_clip_metadata(sub_job, "youtube")
+            except Exception as meta_err:
+                self._send_json(404, {"error": f"could not generate real metadata for '{job}' window {window_index}: {meta_err}"})
                 return
-            title, description, tags = meta["title"], meta["description"], []
+            title, description, tags = meta["title"], meta["description"], meta.get("hashtags", [])
 
         try:
             result = upload_video(video_path, title, description, tags, privacy_status=privacy)

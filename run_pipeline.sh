@@ -47,14 +47,36 @@ fi
 # run <step-name> <skill-cmd...>  — skips if job.json already marks it done,
 # unless --force. This is what lets a job resume after the manual
 # second-pass review, or after a crash, without redoing finished work.
+# Real, running counter of how many real pipeline stages have started
+# for this job — used as the real stage index reported to the live
+# status backend, so the public status page can show real, accurate
+# "step N of TOTAL_STAGES" progress.
+STAGE_INDEX=0
+TOTAL_STAGES=6
+
 run_step() {
   local step="$1"; shift
   if [[ "$force" == false ]] && state_step_done "$job" "$step" >/dev/null 2>&1; then
     log "[$step] already done, skipping (use --force to redo)"
+    STAGE_INDEX=$((STAGE_INDEX + 1))
     return 0
   fi
+  local step_start
+  step_start="$(date +%s)"
+  python3 "${PIPELINE_ROOT}/mac-integration/report_status.py" \
+    --job-id "$job" --stage "$step" --stage-index "$STAGE_INDEX" \
+    --total-stages "$TOTAL_STAGES" --status in_progress \
+    >/dev/null 2>&1 || true
   "$@"
   state_mark "$job" "$step" "done"
+  local step_elapsed
+  step_elapsed="$(( $(date +%s) - step_start ))"
+  STAGE_INDEX=$((STAGE_INDEX + 1))
+  python3 "${PIPELINE_ROOT}/mac-integration/report_status.py" \
+    --job-id "$job" --stage "$step" --stage-index "$STAGE_INDEX" \
+    --total-stages "$TOTAL_STAGES" --status in_progress \
+    --elapsed "$step_elapsed" \
+    >/dev/null 2>&1 || true
 }
 
 echo "== pipeline: job=${job} format=${format} =="
@@ -161,5 +183,10 @@ run_step export bash -c "'${PIPELINE_ROOT}/skills/finalize.sh' '${job}' && '${PI
 # usually_skip) so it's not gated by job.json state — just run it, it's
 # idempotent and cheap.
 "${PIPELINE_ROOT}/skills/thumbnail-generator/run.sh" "$job" "$format" || true
+
+python3 "${PIPELINE_ROOT}/mac-integration/report_status.py" \
+  --job-id "$job" --stage "export" --stage-index "$TOTAL_STAGES" \
+  --total-stages "$TOTAL_STAGES" --status complete \
+  >/dev/null 2>&1 || true
 
 echo "== done: outputs/${job}.final.mp4 =="

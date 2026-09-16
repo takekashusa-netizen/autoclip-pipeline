@@ -20,6 +20,7 @@ Configure in Claude Desktop's claude_desktop_config.json:
 """
 import json
 import os
+import re
 import subprocess
 import sys
 
@@ -55,19 +56,73 @@ def tool_submit_clip_job(args):
     clip_length = args.get("clip_length", 60)
     clip_count = args.get("clip_count", 5)
     content_type = args.get("content_type", "")
+    force = bool(args.get("force", False))
+
+    # Real fix for a real incident: this same URL got submitted 3 times
+    # in a row (client-side retries against what looked like a dead
+    # server, but was really just queued behind the blocking bug fixed
+    # below) and started two full duplicate Twitch VOD downloads before
+    # anyone could tell they were the same request. source_url_index.json
+    # (lib/url_index.py) is a durable, cross-job record of every URL this
+    # pipeline has been asked to fetch, checked here BEFORE a job id or
+    # project dir is even created. A URL already "fetching" or "done"
+    # short-circuits instead of starting another download; force=true
+    # (not currently exposed by this tool's own registered schema, but
+    # honored here if a caller passes it) explicitly re-processes anyway.
+    sys.path.insert(0, os.path.join(ROOT, "lib"))
+    from url_index import lookup as url_lookup, record_submitted
+    existing = url_lookup(url)
+    if existing and not force and existing.get("status") in ("fetching", "done"):
+        return {
+            "error": "this URL was already processed or is currently being processed",
+            "existing_job": existing.get("job"),
+            "status": existing.get("status"),
+            "title": existing.get("title"),
+            "submitted_at": existing.get("submitted_at"),
+            "note": "pass force=true to re-process anyway",
+        }
+
     job = args.get("job") or __import__("uuid").uuid4().hex[:12]
+    record_submitted(url, job)
 
-    fetch = _run([sys.executable, os.path.join(ROOT, "lib", "fetch_url.py"), job, url])
-    if fetch.returncode != 0:
-        return {"error": f"download failed: {fetch.stdout.strip() or fetch.stderr[-500:]}"}
+    # Real fix: fetch_url.py used to run synchronously right here, inside
+    # this server's single-threaded stdin loop, with up to a 1800s/30-min
+    # timeout. This server reads one JSON-RPC line, fully handles it, then
+    # reads the next — so every call made while a download was still
+    # running (including totally unrelated ones like list_jobs) just
+    # queued up silently and looked like the whole server had stopped
+    # responding, when it was really stuck behind one long download.
+    # Confirmed directly: two separate submit_clip_job calls both actually
+    # started (two project dirs with in-progress .part downloads), they
+    # were just each blocking every call made in between.
+    # fetch + clip now run chained in one real detached background
+    # process, so this call returns immediately — matching what this
+    # tool's own docstring already promised ("runs in background").
+    import shlex
+    raw_dir = os.path.join(ROOT, "projects", job, "raw")
+    os.makedirs(raw_dir, exist_ok=True)
+    fetch_log = os.path.join(raw_dir, "fetch.log")
 
-    cmd = [os.path.join(ROOT, "clip_pipeline.sh"), job, fmt,
-           "--clip-length", str(clip_length), "--clip-count", str(clip_count)]
+    fetch_cmd = " ".join(shlex.quote(p) for p in [
+        sys.executable, os.path.join(ROOT, "lib", "fetch_url.py"), job, url,
+    ])
+    clip_cmd_parts = [os.path.join(ROOT, "clip_pipeline.sh"), job, fmt,
+                       "--clip-length", str(clip_length), "--clip-count", str(clip_count)]
     if content_type:
-        cmd += ["--content-type", content_type]
-    # runs detached — clip jobs take a long time, MCP tool calls shouldn't block for hours
-    subprocess.Popen(cmd, cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    return {"job": job, "status": "started", "note": "runs in background — use get_job_status to check progress"}
+        clip_cmd_parts += ["--content-type", content_type]
+    clip_cmd = " ".join(shlex.quote(p) for p in clip_cmd_parts)
+
+    # fetch's own stdout/stderr goes to a real log file in the job's raw/
+    # dir (not DEVNULL) specifically so a download failure is still
+    # debuggable after the fact, since it no longer comes back as a
+    # synchronous {"error": ...} response.
+    chained = f"{fetch_cmd} > {shlex.quote(fetch_log)} 2>&1 && {clip_cmd}"
+    subprocess.Popen(["bash", "-c", chained], cwd=ROOT,
+                      stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                      start_new_session=True)  # genuinely detached, survives this MCP server restarting
+    return {"job": job, "status": "started",
+            "note": "fetching + clipping in the background — use get_job_status to check progress "
+                     f"(fetch log: {fetch_log})"}
 
 
 def tool_get_job_status(args):
@@ -106,7 +161,7 @@ def tool_approve_job(args):
     if r.returncode != 0:
         return {"error": r.stderr}
     subprocess.Popen([os.path.join(ROOT, "run_pipeline.sh"), job, fmt],
-                      cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                      cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)  # real fix: genuinely detached, survives this MCP server restarting
     return {"job": job, "status": "resumed"}
 
 
@@ -138,7 +193,8 @@ def tool_publish_to_youtube(args):
     sys.path.insert(0, os.path.join(ROOT, "lib"))
     try:
         import doctor as doctor_mod
-        from youtube_publish import generate_title, generate_description, generate_tags, upload_video
+        from youtube_publish import (generate_title, generate_description, generate_tags, upload_video,
+                                      verify_content_type, check_duplicate_source_publish, mark_source_published)
     except ImportError as e:
         return {"error": f"publish libraries unavailable: {e}"}
 
@@ -149,14 +205,41 @@ def tool_publish_to_youtube(args):
     if not clip_meta:
         return {"error": f"no clip/montage metadata found for '{job}' — not a recognized clip or montage subjob"}
 
+    raw_text = clip_meta.get("text", "") or clip_meta.get("preview", "")
+    content_ok, content_reason, content_advisory = verify_content_type(job, content_type, raw_text, root=ROOT)
+    if not content_ok:
+        return {"error": content_reason}
+
+    dup_ok, dup_reason = check_duplicate_source_publish(job, root=ROOT)
+    if not dup_ok:
+        return {"error": dup_reason}
+
     title = generate_title(clip_meta, content_type)
     description = generate_description(clip_meta, source_title=clip_meta.get("source_title"))
     tags = generate_tags(clip_meta, content_type)
 
+    # Real thumbnail — free, already-tested extraction (the real audio
+    # transient inside this exact window, via ffmpeg), now reachable for
+    # best-windows jobs too since find_clip_metadata's fallback above
+    # gives this function a real window_index to work with. Confirmed
+    # directly: every real published video prior to this had NO custom
+    # thumbnail at all (this call never existed) — best-effort, never
+    # blocks the publish itself if it fails.
+    thumbnail_path = None
+    window_match = re.match(r"(.+)__window(\d+)$", job)
+    if window_match:
+        try:
+            thumbnail_path = doctor_mod.extract_thumbnail_for_window(
+                window_match.group(1), int(window_match.group(2)) - 1)
+        except Exception as thumb_err:
+            print(f"tool_publish_to_youtube: thumbnail generation failed for {job} (continuing without): {thumb_err}", file=sys.stderr)
+
     try:
-        result = upload_video(video_path, title, description, tags, privacy_status=privacy)
+        result = upload_video(video_path, title, description, tags, privacy_status=privacy,
+                               thumbnail_path=thumbnail_path)
     except Exception as e:
         return {"error": f"upload failed: {e}"}
+    mark_source_published(job, root=ROOT)
 
     job_json_path = os.path.join(ROOT, "projects", job, "job.json")
     if os.path.exists(job_json_path):
@@ -167,7 +250,10 @@ def tool_publish_to_youtube(args):
         with open(job_json_path, "w") as f:
             json.dump(job_data, f, indent=2)
 
-    return {"job": job, "title": title, "video_id": result.get("video_id"), "url": result.get("url")}
+    response = {"job": job, "title": title, "video_id": result.get("video_id"), "url": result.get("url")}
+    if content_advisory:
+        response["advisory"] = content_advisory
+    return response
 
 
 def _script_for_job(job):

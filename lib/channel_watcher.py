@@ -85,7 +85,7 @@ def _process_new_video(video, format_, clip_length, clip_count, content_type, mo
     log_path = os.path.join(ROOT, "logs", f"{job}.log")
     os.makedirs(os.path.dirname(log_path), exist_ok=True)
     with open(log_path, "w") as f:
-        result = subprocess.run(clip_args, stdout=f, stderr=subprocess.STDOUT, env=env)
+        result = subprocess.run(clip_args, stdout=f, stderr=subprocess.STDOUT, env=env, start_new_session=True)  # real fix: same class of bug as the poller — detach from dashboard.py, since this runs as a background thread inside it
 
     if result.returncode == 0:
         _log(f'clipped "{title}" — organizing output')

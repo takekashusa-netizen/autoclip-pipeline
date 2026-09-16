@@ -8,12 +8,12 @@
     ]
   },
   "graphics": {
-    "style": "hook card -> raw",
+    "style": "raw",
     "preset": "tiktok-raw-style",
-    "reframe": "crop"
+    "reframe": "letterbox"
   },
   "captions": {
-    "enabled": true,
+    "enabled": false,
     "position": "low, under face",
     "locked": false,
     "preset": "captions-style"

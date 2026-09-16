@@ -72,7 +72,7 @@ def channel_watch():
         if fetch.returncode != 0:
             continue
 
-        subprocess.Popen(args, cwd=ROOT)  # fire-and-forget; long-running
+        subprocess.Popen(args, cwd=ROOT, start_new_session=True)  # real fix: fire-and-forget, long-running, and now genuinely detached from this worker process
         queued.append({"job": job, "title": v["title"]})
         seen.add(v["id"])
 

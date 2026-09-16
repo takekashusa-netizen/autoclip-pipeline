@@ -91,6 +91,7 @@ def analyze(video_path, interval_sec=2.0):
         # if the cascade isn't available in this cv2 build — motion score
         # below still works either way)
         face_center = None
+        face_size = None
         all_faces = []
         if cascade is not None:
             faces = cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(40, 40))
@@ -99,6 +100,7 @@ def analyze(video_path, interval_sec=2.0):
                 # background extra) — bbox is (x, y, width, height)
                 fx, fy, fw, fh = max(faces, key=lambda b: b[2] * b[3])
                 face_center = [round((fx + fw / 2) / w, 4), round((fy + fh / 2) / h, 4)]
+                face_size = [round(fw / w, 4), round(fh / h, 4)]
                 # up to 2 largest faces, for split-screen dual-speaker
                 # tracking — face_center above stays as-is (existing
                 # single-speaker callers unaffected), all_faces is new
@@ -117,6 +119,7 @@ def analyze(video_path, interval_sec=2.0):
         is_loading_screen = classify_frame(gray)
 
         samples.append({"time": round(t, 2), "face_center": face_center,
+                         "face_size": face_size if face_center else None,
                          "all_faces": all_faces, "motion_score": motion_score,
                          "is_loading_screen": is_loading_screen})
         frame_idx += frame_interval

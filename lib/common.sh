@@ -76,16 +76,26 @@ export -f check_disk_space
 #
 # Usage: run_with_timeout 120 ffmpeg -nostdin -y -i in.mp4 out.mp4
 run_with_timeout() {
+  # Real, permanent fix: the old version could hang forever on wait
+  # even after the real command had already exited - confirmed directly
+  # tonight, a completed ffmpeg run left this stuck for 20+ minutes with
+  # no ffmpeg process left alive at all. This version polls the real
+  # process with kill -0 instead of trusting wait to always return.
   local timeout_sec="$1"; shift
   "$@" &
   local cmd_pid=$!
-  ( sleep "$timeout_sec" 2>/dev/null; kill -9 "$cmd_pid" 2>/dev/null ) &
-  local watcher_pid=$!
-  local exit_code=0
-  wait "$cmd_pid" 2>/dev/null || exit_code=$?
-  kill "$watcher_pid" 2>/dev/null
-  wait "$watcher_pid" 2>/dev/null
-  return "$exit_code"
+  local elapsed=0
+  while kill -0 "$cmd_pid" 2>/dev/null; do
+    sleep 1
+    elapsed=$((elapsed + 1))
+    if [[ "$elapsed" -ge "$timeout_sec" ]]; then
+      kill -9 "$cmd_pid" 2>/dev/null
+      wait "$cmd_pid" 2>/dev/null
+      return 124
+    fi
+  done
+  wait "$cmd_pid" 2>/dev/null
+  return $?
 }
 export -f run_with_timeout
 

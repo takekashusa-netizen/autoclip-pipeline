@@ -65,7 +65,7 @@ def run_ffmpeg(cmd, timeout_sec=600):
     processing a long segment can scale it further rather than being
     stuck with one fixed guess for every use of this shared helper."""
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout_sec)
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout_sec, stdin=subprocess.DEVNULL)
     except subprocess.TimeoutExpired as e:
         raise RuntimeError(f"ffmpeg timed out after {timeout_sec}s — likely a corrupted/truncated region of the source") from e
     if result.returncode != 0:
@@ -218,14 +218,17 @@ def build_face_tracked_video(rough_cut, face_segments, target_w, target_h, work_
     for i, seg in enumerate(face_segments):
         cx_px = seg["center_x"] * src_w
         cy_px = seg["center_y"] * src_h
-        x = max(0, min(src_w - crop_w, round(cx_px - crop_w / 2)))
-        y = max(0, min(src_h - crop_h, round(cy_px - crop_h / 2)))
+
+        seg_crop_w, seg_crop_h = crop_w, crop_h
+
+        x = max(0, min(src_w - seg_crop_w, round(cx_px - seg_crop_w / 2)))
+        y = max(0, min(src_h - seg_crop_h, round(cy_px - seg_crop_h / 2)))
 
         part_file = os.path.join(work_dir, f"facepart_{i:04d}.mp4")
         cmd = [
             "ffmpeg", "-nostdin", "-y", "-i", rough_cut,
             "-ss", str(seg["start"]), "-to", str(seg["end"]),
-            "-vf", f"crop={crop_w}:{crop_h}:{x}:{y},scale={target_w}:{target_h}",
+            "-vf", f"crop={seg_crop_w}:{seg_crop_h}:{x}:{y},scale={target_w}:{target_h}",
             "-c:v", "libx264", "-preset", "veryfast", "-c:a", "aac",
             part_file, "-loglevel", "error",
         ]
@@ -360,7 +363,7 @@ def main():
         cmd = [
             "ffmpeg", "-nostdin", "-y", "-i", rough_cut,
             "-vf", vf,
-            "-c:v", "libx264", "-preset", "veryfast",
+            "-c:v", "libx264", "-preset", "veryfast", "-pix_fmt", "yuv420p", "-color_range", "tv",
             "-c:a", "aac",
             out_path,
         ]

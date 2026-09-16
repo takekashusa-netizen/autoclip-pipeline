@@ -1,0 +1,92 @@
+[
+  {
+    "window": 1,
+    "hook": "That's it. That's it.",
+    "matched_title": null,
+    "score": 0
+  },
+  {
+    "window": 2,
+    "hook": "Alright, but...",
+    "matched_title": "\"ALRIGHT, BUT...\" - RANKED CLUTCH MOMENT | GtaxZombies Road to Ma",
+    "video_id": "DjRTgYSjgeM",
+    "status": "PUBLIC",
+    "score": 1.0
+  },
+  {
+    "window": 3,
+    "hook": "You back, you chilly?",
+    "matched_title": "\"YOU CHILLY?\" 30 SECONDS LEFT, LEVEL 2 MAG - GtaxZombies",
+    "video_id": "mzu9SxVKrc0",
+    "status": "PUBLIC",
+    "score": 0.75
+  },
+  {
+    "window": 4,
+    "hook": "I'll see where.",
+    "matched_title": null,
+    "score": 0
+  },
+  {
+    "window": 5,
+    "hook": "I'll turn around on the robot.",
+    "matched_title": null,
+    "score": 0.2
+  },
+  {
+    "window": 6,
+    "hook": "Jump.",
+    "matched_title": null,
+    "score": 0
+  },
+  {
+    "window": 7,
+    "hook": "Damn.",
+    "matched_title": null,
+    "score": 0
+  },
+  {
+    "window": 8,
+    "hook": "Far.",
+    "matched_title": null,
+    "score": 0
+  },
+  {
+    "window": 9,
+    "hook": "Well, we still got to go for rain. Bus city troll death. It does not control me",
+    "matched_title": null,
+    "score": 0.08
+  },
+  {
+    "window": 10,
+    "hook": "Oh no, hold on back up back up",
+    "matched_title": null,
+    "score": 0
+  },
+  {
+    "window": 11,
+    "hook": "Snickers a lot of chillin all in the world",
+    "matched_title": null,
+    "score": 0.17
+  },
+  {
+    "window": 12,
+    "hook": "I'm gonna",
+    "matched_title": "GONNA SMELL IT OUT - RANKED GRIND | ROAD TO MASTERS",
+    "video_id": "pCu_jMWEQug",
+    "status": "PUBLIC",
+    "score": 1.0
+  },
+  {
+    "window": 13,
+    "hook": "Double to fuck up, bro",
+    "matched_title": null,
+    "score": 0.33
+  },
+  {
+    "window": 14,
+    "hook": "I'm gonna smell it out. Yeah, I'm gonna go eat through",
+    "matched_title": null,
+    "score": 0
+  }
+]

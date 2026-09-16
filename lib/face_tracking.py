@@ -39,9 +39,17 @@ def compute_segments(analysis, segment_sec=8.0, min_samples_with_face=2):
         if len(in_window) >= min_samples_with_face:
             cx = sum(s["face_center"][0] for s in in_window) / len(in_window)
             cy = sum(s["face_center"][1] for s in in_window) / len(in_window)
+            sized = [s for s in in_window if s.get("face_size")]
+            if sized:
+                fw = sum(s["face_size"][0] for s in sized) / len(sized)
+                fh = sum(s["face_size"][1] for s in sized) / len(sized)
+            else:
+                fw, fh = None, None
         else:
             cx, cy = 0.5, 0.5  # not enough signal — fall back to center
-        segments.append({"start": t, "end": seg_end, "center_x": round(cx, 4), "center_y": round(cy, 4)})
+            fw, fh = None, None
+        segments.append({"start": t, "end": seg_end, "center_x": round(cx, 4), "center_y": round(cy, 4),
+                          "face_w": round(fw, 4) if fw else None, "face_h": round(fh, 4) if fh else None})
         t = seg_end
     return segments
 

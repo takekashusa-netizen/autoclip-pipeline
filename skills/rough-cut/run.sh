@@ -47,7 +47,7 @@ else
   # scales with the real, already-known duration of THIS source instead
   # of guessing a one-size-fits-all constant.
   audio_timeout="$(python3 -c "print(max(300, int(${src_duration:-0} * 0.5)))" 2>/dev/null || echo 1800)"
-  if ! run_with_timeout "$audio_timeout" ffmpeg -nostdin -y -i "$raw_video" -vn -ac 1 -ar 16000 "$audio_path" -loglevel error; then
+  if ! run_with_timeout "$audio_timeout" ffmpeg -nostdin -y -err_detect ignore_err -i "$raw_video" -vn -ac 1 -ar 16000 "$audio_path" -loglevel error; then
     echo "rough-cut: audio extraction timed out or failed (${audio_timeout}s) — likely a corrupted/truncated source" >&2
     exit 1
   fi

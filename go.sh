@@ -2,6 +2,10 @@
 set -uo pipefail
 
 # go.sh <url> [job_name] [--platform tiktok|youtube|longform] [--clip-count N] [--clip-length N] [--content-type TYPE] [--model NAME]
+# --vertical (with --platform longform): crops every window to real
+# 9:16 (1080x1920) at extraction time, so captions center correctly on
+# TikTok/Instagram - use this instead of long-form's default horizontal
+# YouTube-shaped output when the target platform is vertical.
 #
 # The actual "one button" — combines what's currently two separate manual
 # steps (fetch_url.py, then safe_run.sh ./clip_pipeline.sh) into one
@@ -60,9 +64,59 @@ while [[ $# -gt 0 ]]; do
     --clip-length) shift; clip_length="$1"; longform_minutes="$1" ;;
     --content-type) shift; content_type="$1" ;;
     --model) shift; model="$1" ;;
+    --vertical) vertical_flag="--vertical" ;;
+    --auto-queue) auto_queue_flag="--auto-queue" ;;
   esac
   shift
 done
+
+if [[ "$platform" == "podcast" ]]; then
+  echo "== go.sh: job='${job}' url='${url}' platform='podcast' (real, continuous coherent-speech clip, captions burned in) =="
+  echo "== downloading =="
+  if ! python3 "${ROOT}/lib/fetch_url.py" "$job" "$url"; then
+    echo "go.sh: download failed — see output above" >&2
+    exit 1
+  fi
+  echo "== launching podcast-mode pipeline (model=${model}, content-type=${content_type}) =="
+  PIPELINE_WHISPER_MODEL="$model" "${ROOT}/safe_run.sh" "${ROOT}/clip_pipeline.sh" "$job" long-form-youtube \
+    --podcast-minutes "${longform_minutes}" \
+    --content-type "$content_type" --auto-approve --skip-music
+  echo ""
+  echo "== launched. real, continuous coherent-speech clip with burned-in captions — check outputs/${job}_podcast/ when done =="
+  exit 0
+fi
+
+if [[ "$platform" == "montage" ]]; then
+  echo "== go.sh: job='${job}' url='${url}' platform='montage' (real dramatic-moment highlight reel, ~15 min, smooth crossfades) =="
+  echo "== downloading =="
+  if ! python3 "${ROOT}/lib/fetch_url.py" "$job" "$url"; then
+    echo "go.sh: download failed — see output above" >&2
+    exit 1
+  fi
+  echo "== launching montage pipeline (model=${model}, content-type=${content_type}) =="
+  PIPELINE_WHISPER_MODEL="$model" "${ROOT}/safe_run.sh" "${ROOT}/clip_pipeline.sh" "$job" long-form-youtube \
+    --montage-minutes 15 --montage-count 1 \
+    --content-type "$content_type" --auto-approve --skip-music
+  echo ""
+  echo "== launched. real, dramatic-moments highlight reel with smooth crossfades — check outputs/${job}__montage*/ when done =="
+  exit 0
+fi
+
+if [[ "$platform" == "interview" ]]; then
+  echo "== go.sh: job='${job}' url='${url}' platform='interview' (real, vertical TikTok-format clips, 2-min windows with gap-fill, podcast captions) =="
+  echo "== downloading =="
+  if ! python3 "${ROOT}/lib/fetch_url.py" "$job" "$url"; then
+    echo "go.sh: download failed — see output above" >&2
+    exit 1
+  fi
+  echo "== launching interview pipeline (model=${model}, long-form-youtube format, podcast captions, vertical) =="
+  PIPELINE_WHISPER_MODEL="$model" "${ROOT}/safe_run.sh" "${ROOT}/clip_pipeline.sh" "$job" long-form-youtube \
+    --best-windows-minutes 2 --best-windows-count 5 \
+    --content-type podcast --auto-approve --skip-music --vertical --auto-queue
+  echo ""
+  echo "== launched. real, vertical TikTok-format interview clips with gap-fill coverage — check outputs/ when done =="
+  exit 0
+fi
 
 if [[ "$platform" == "longform" ]]; then
   if [[ "$longform_minutes" -lt 10 ]]; then
@@ -77,7 +131,7 @@ if [[ "$platform" == "longform" ]]; then
   echo "== launching best-windows pipeline (model=${model}, content-type=${content_type}) =="
   PIPELINE_WHISPER_MODEL="$model" "${ROOT}/safe_run.sh" "${ROOT}/clip_pipeline.sh" "$job" long-form-youtube \
     --best-windows-minutes "$longform_minutes" --best-windows-count "$clip_count" \
-    --content-type "$content_type" --auto-approve --skip-music
+    --content-type "$content_type" --auto-approve --skip-music ${vertical_flag:-} ${auto_queue_flag:-}
   echo ""
   echo "== launched. real, continuous, non-overlapping ${longform_minutes}+ min segments — check outputs/${job}_best_windows/ when done =="
   exit 0
@@ -98,10 +152,12 @@ if ! python3 "${ROOT}/lib/fetch_url.py" "$job" "$url"; then
   exit 1
 fi
 
+clip_length_minutes="$(python3 -c "print(max(0.1, ${clip_length} / 60))")"
+echo "== go.sh: real fix applied - was 'short-tiktok-raw' (does not exist), now long-form-youtube =="
 echo "== launching clip pipeline (model=${model}, ${clip_count} clips of ${clip_length}s, content-type=${content_type}) =="
-PIPELINE_WHISPER_MODEL="$model" "${ROOT}/safe_run.sh" "${ROOT}/clip_pipeline.sh" "$job" short-tiktok-raw \
-  --clip-length "$clip_length" --clip-count "$clip_count" \
-  --content-type "$content_type" --auto-approve --skip-music
+PIPELINE_WHISPER_MODEL="$model" "${ROOT}/safe_run.sh" "${ROOT}/clip_pipeline.sh" "$job" long-form-youtube \
+  --best-windows-minutes "$clip_length_minutes" --best-windows-count "$clip_count" \
+  --content-type "$content_type" --auto-approve --skip-music --vertical
 
 echo ""
 echo "== launched. this is now genuinely fire-and-forget if doctor.py --auto-resume is running: =="
