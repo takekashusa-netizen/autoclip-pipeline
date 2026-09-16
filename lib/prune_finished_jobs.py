@@ -94,6 +94,17 @@ def prune(dry_run=False):
         elif "__" not in j and is_exported(j):
             targets.append(j)
 
+    # Older parent+__clipNN shape (no managed_by tag — only clip_pipeline.sh
+    # sets that) is invisible to the loop above without this pass, so those
+    # jobs would never get pruned. Confirmed as a real gap while building
+    # disk_audit.py (2026-09-16) — same fix applied there.
+    for j, d in job_info.items():
+        if "__" in j and d.get("managed_by") != "clip_pipeline":
+            parent = j.rsplit("__", 1)[0]
+            siblings = [c for c in job_info if c.startswith(parent + "__")]
+            if siblings and all(is_exported(c) for c in siblings):
+                targets.append(j)
+
     freed = 0
     touched = 0
     for j in sorted(set(targets)):

@@ -626,3 +626,17 @@ Per "delete pure trash old fixs patches an trial runs an anything the system doe
 **Added so this doesn't come back (the "perfect the process" part):** new `lib/prune_finished_jobs.py`, wired into `dashboard.py`'s `background_maintenance_loop` on a daily cadence (`prune_interval_sec=86400`, same pattern as the other periodic checks — imported and called in-process, not subprocess'd). Runs the exact same safe logic as this cleanup (only strips a job's intermediate media once it's fully exported *and* confirmed present in `outputs/`) automatically from now on, so `projects/` never silently balloons to 65GB again. Idempotent and safe at any frequency — verified with `--dry-run` immediately after this cleanup: correctly reports 0 GB / 0 jobs since there's nothing left to reclaim right now.
 
 **Needs you:** restart the dashboard (`./restart_dashboard.sh`) to pick up the prune wiring, same restart already needed for the ffmpeg/PATH and stale-lock fixes above — one restart covers all of it.
+
+## ⚡ ONE-SHOT DISK AUDIT SCRIPT — 2026-09-16 (later same day)
+
+The 2026-09-16 disk cleanup above took ~15 separate manual investigation steps (du breakdowns, per-job classification scripts, spot checks) run one at a time. New `lib/disk_audit.py` consolidates all of that into a single command:
+
+```
+python3 lib/disk_audit.py                        # report only
+python3 lib/disk_audit.py --clean                 # deletes RECLAIMABLE media + .bak/__pycache__/.DS_Store clutter
+python3 lib/disk_audit.py --clean --yes-abandoned  # also deletes zero-clip abandoned trial runs (needs explicit opt-in every time — never automatic)
+```
+
+Same RECLAIMABLE/NEEDED/ABANDONED classification as before, same safety rule (never deletes an ABANDONED job dir without `--yes-abandoned`, verifies against real `outputs/` files, always keeps `job.json`/`progress.json`/`thumbnail/`).
+
+**Also fixed a real gap found while writing it**: both this script and the daily `lib/prune_finished_jobs.py` were missing older-style `<job>__clipNN` jobs that don't carry a `managed_by: clip_pipeline` tag (that tag is only set by `clip_pipeline.sh`) — e.g. `b951cc787dc7`'s 5 clips would have been invisible to both scripts' classification and never reclaimed. Added a second classification pass to both for this shape. Confirmed while testing: `b951cc787dc7`'s clips 01–05 finished exporting successfully after the earlier dashboard restart (`doctor: removed stale lock for 'b951cc787dc7__clip05' (pid 50675 not running)` in `dashboard.log`) — the ffmpeg/PATH and stale-lock fixes from earlier today are confirmed working end-to-end.
