@@ -24,6 +24,21 @@ from audio_analysis import transient_beats  # noqa: E402
 
 PRIORITY = {"impact": 4, "action": 3, "highlight": 3, "hook": 2, "stat": 1, "list_item": 1, "question": 1}
 
+# 2026-09-17: user wants the WHOLE fight, not a fixed short slice — a real
+# engagement is now allowed to run this long if that's genuinely how long
+# it took (multiple squads, revives, repositioning). clip_length (from the
+# CLI, normally 30s) is still used as the FLOOR for a short/isolated beat
+# (padded up so it isn't a jarring few-second clip) but no longer caps a
+# real, sustained fight — only this ceiling does.
+MAX_ENGAGEMENT_SEC = 180.0  # ~3 minutes
+
+# Below this, a clip isn't worth publishing on its own — a single stray
+# loud blip with nothing to back it up. Raised 2026-09-17 per the user:
+# fewer, genuinely strong clips beats padding every video out to a fixed
+# clip count with marginal ones. A video with no engagement above this
+# bar simply yields fewer clips (or none) rather than forcing weak picks.
+QUALITY_FLOOR = 40
+
 
 def score(tags):
     return max((PRIORITY.get(t, 0) for t in tags), default=0)
@@ -56,6 +71,94 @@ def is_mostly_loading_screen(start, end, visual_analysis, threshold=0.6, motion_
     motion_scores = [s.get("motion_score", 0) for s in samples]
     avg_motion = sum(motion_scores) / len(motion_scores)
     return avg_motion < motion_threshold
+
+
+def motion_elevation(start, end, visual_analysis):
+    """How much higher the average on-screen motion is during [start,end)
+    versus this video's OWN overall average — a real, independently-
+    computed cross-check for an audio-detected engagement (a genuine
+    firefight usually also shows elevated motion: strafing, aiming,
+    getting hit; a loud one-off sound over an otherwise static screen is
+    weaker evidence). Returns 1.0 (no elevation, or no data) when it can't
+    be computed, never negative."""
+    if not visual_analysis:
+        return 1.0
+    all_samples = visual_analysis.get("samples", [])
+    if not all_samples:
+        return 1.0
+    window_samples = [s for s in all_samples if start <= s["time"] < end]
+    if not window_samples:
+        return 1.0
+    overall_avg = sum(s.get("motion_score", 0) for s in all_samples) / len(all_samples)
+    if overall_avg <= 0:
+        return 1.0
+    window_avg = sum(s.get("motion_score", 0) for s in window_samples) / len(window_samples)
+    return window_avg / overall_avg
+
+
+def trim_dead_tail(start, end, visual_analysis, max_trim_sec=10.0,
+                    static_motion_floor=0.015, min_duration=8.0):
+    """Real fix 2026-09-17: a clip's rendered end can land past the real
+    action into a squad-eliminated / respawn-menu screen that
+    classify_frame doesn't reliably flag as a 'loading screen' (it isn't
+    flat/spinner-like — it has UI text, a scoreboard, a map) but IS
+    visually static: almost nothing moves frame to frame while a player
+    sits there. Rather than keeping the dead seconds or throwing out the
+    whole clip over them, trim them off the end and keep the real content
+    that came before. Walks backward from the end while samples stay
+    dead (loading-screen-flagged or near-zero motion), stopping at the
+    first real sample, a max trim budget, or the minimum clip length —
+    whichever comes first."""
+    if not visual_analysis:
+        return start, end
+    samples = sorted(
+        (s for s in visual_analysis.get("samples", []) if start <= s["time"] < end),
+        key=lambda s: s["time"],
+    )
+    if len(samples) < 3:
+        return start, end
+
+    trimmed_end = end
+    for s in reversed(samples):
+        if end - s["time"] > max_trim_sec:
+            break
+        if trimmed_end - start <= min_duration:
+            break
+        is_dead = s.get("is_loading_screen") or s["motion_score"] < static_motion_floor
+        if not is_dead:
+            break
+        trimmed_end = s["time"]
+    return start, round(trimmed_end, 2)
+
+
+def audio_backed(start, end, audio_analysis, energy_mult=2.5):
+    """Cheap cross-modal check for motion-only beats: is there at least
+    one real loud audio transient inside this window, at the SAME bar
+    (energy >= this video's own median * energy_mult) that
+    transient_beats() itself requires to call something 'gunfire'?
+
+    Real fix 2026-09-17: verified against real cached data that
+    motion_beats() alone can't tell a real fight from someone clicking
+    through Battle Pass / ranked-ladder / lobby screens — full-screen
+    menu transitions produce the same kind of sustained, elevated
+    frame-to-frame motion as real on-screen chaos does. But those menu
+    clicks are audibly much quieter than a firefight (checked: ~0.02-0.09
+    energy in a real menu-browsing window here vs. ~0.24-0.39 for a real
+    gunfight in the SAME video). Requiring real loud audio alongside the
+    visual spike is a much stronger signal than motion alone, and costs
+    nothing extra to compute — the transient list is already cached.
+    Videos with no audio track/analysis available don't get penalized for
+    it (returns True) since this is a confirmation signal, not a
+    requirement when it can't be checked at all."""
+    if not audio_analysis:
+        return True
+    transients = audio_analysis.get("transients", [])
+    if not transients:
+        return True
+    import statistics
+    median_energy = statistics.median(t["energy"] for t in transients)
+    floor = median_energy * energy_mult
+    return any(start <= t["time"] <= end and t["energy"] >= floor for t in transients)
 
 
 def build_word_boundary_index(kept_segments):
@@ -154,16 +257,62 @@ def candidate_windows(kept_segments, clip_length, duration, visual_analysis=None
             start, end = lead_in_window(beat["start"])
             if is_mostly_loading_screen(start, end, visual_analysis):
                 continue
-            candidates.append({"start": start, "end": end, "score": score(beat["tags"]),
-                                "text": beat["text"]})
+            if audio_analysis and not audio_backed(start, end, audio_analysis):
+                continue  # visual chaos with no real loud audio behind it — likely menu navigation, not a fight
+            candidates.append({
+                "start": start, "end": end, "score": score(beat["tags"]),
+                "text": beat["text"],
+                # real evidence for engagement_score() — see there.
+                "motion_zscore": beat.get("motion_zscore"),
+                "sustained_neighbors": beat.get("sustained_neighbors"),
+            })
 
     if audio_analysis:
+        # Real fix 2026-09-17: audio beats now already carry their own
+        # genuine start/end span (see transient_beats in audio_analysis.py
+        # — it merges nearby loud hits into one beat covering the actual
+        # engagement). Previously this called lead_in_window(beat["start"])
+        # for every beat, which threw away that real span and re-forced a
+        # fixed clip_length window anchored on just one point — exactly
+        # what cut real gunfights short / missed their start. A short
+        # engagement is padded out to clip_length (symmetrically, so it
+        # doesn't turn into an arbitrarily short render); a longer one is
+        # kept in full rather than truncated, since preserving the whole
+        # fight (including its ending / knockdown) is the actual point.
         for beat in transient_beats(audio_analysis):
-            start, end = lead_in_window(beat["start"])
+            natural_span = beat["end"] - beat["start"]
+            start, end = beat["start"], beat["end"]
+            if end - start < clip_length:
+                # short/isolated hit — pad up to a watchable minimum
+                deficit = clip_length - (end - start)
+                start = max(0.0, start - deficit / 2)
+                end = min(duration, start + clip_length)
+                start = max(0.0, end - clip_length)
+            elif end - start > MAX_ENGAGEMENT_SEC:
+                # a genuinely sprawling engagement (or several fights
+                # merged by the generous MERGE_GAP_SEC) — trim symmetrically
+                # around its center rather than always keeping the start,
+                # so a long fight's real middle/end isn't the part that
+                # gets cut.
+                excess = (end - start) - MAX_ENGAGEMENT_SEC
+                start = start + excess / 2
+                end = start + MAX_ENGAGEMENT_SEC
+            end = min(duration, end)
             if is_mostly_loading_screen(start, end, visual_analysis):
                 continue
-            candidates.append({"start": start, "end": end, "score": score(beat["tags"]),
-                                "text": beat["text"]})
+            candidates.append({
+                "start": round(start, 2), "end": round(end, 2),
+                "score": score(beat["tags"]), "text": beat["text"],
+                # real evidence for engagement_score() — see there for how
+                # each of these is actually used, not just carried along.
+                "hit_count": beat.get("hit_count"),
+                "peak_ratio": beat.get("peak_ratio"),
+                "natural_span": round(natural_span, 2),
+                "motion_elevation": motion_elevation(start, end, visual_analysis),
+            })
+
+    for c in candidates:
+        c["start"], c["end"] = trim_dead_tail(c["start"], c["end"], visual_analysis)
 
     return candidates
 
@@ -211,12 +360,78 @@ def select_montage_segments(candidates, target_duration_sec, min_score_per_min=1
 def engagement_score(candidate, duration_sec=None):
     """A 0-100 heuristic engagement estimate, in the spirit of what
     'virality score' tools show — but honest about what it actually is:
-    a weighted composite of signals we can actually measure (tag
-    priority, word pace, text energy markers), NOT a trained model
-    calibrated against real retention/engagement data. Treat it as a
-    relative ranking aid between your own clips, not a prediction of
-    real-world performance.
+    a weighted composite of signals we can actually measure, NOT a
+    trained model calibrated against real retention/engagement data.
+    Treat it as a relative ranking aid between your own clips, not a
+    prediction of real-world performance.
+
+    Real fix 2026-09-17: for audio-detected picks (the vast majority of
+    this content — silent gameplay with no commentary), this used to be
+    ~flat at 60-61 for every single one, because 40 of the 100 possible
+    points came from spoken/caption text energy (word pace, "!"/"insane"/
+    etc.) and these clips only ever carry a generic placeholder string
+    ("(gunfire/impact detected)") with none of that — so real, meaningful
+    differences between a huge firefight and a marginal one were entirely
+    invisible in the score. When real per-event evidence is available
+    (hit_count, peak_ratio, motion_elevation — see candidate_windows()),
+    this now scores off THAT instead: how many loud hits, how sharp the
+    loudest one was relative to this video's own baseline, whether the
+    on-screen motion actually elevated too (an independent cross-check,
+    not just louder audio over a static screen), and how much of the
+    final clip is the real engagement versus padding. A genuinely dense,
+    loud, motion-confirmed fight can now legitimately land in the 90s; a
+    single marginal blip stays in the 40s-60s instead of both reading the
+    same "61".
     """
+    if candidate.get("motion_zscore") is not None:
+        # Real fix 2026-09-17: motion-only beats (no audio evidence) used
+        # to fall through to the generic tag-based formula below, which
+        # gave every single one an identical ~46 regardless of whether it
+        # was a genuine sustained visual event or (before motion_beats()
+        # was fixed to require sustained neighbors) a one-frame scene cut.
+        # Now scored on the beat's own real evidence: how far its peak
+        # stood out from this video's own motion baseline, and how many
+        # nearby samples were also elevated (sustained chaos, not a blip).
+        z = candidate["motion_zscore"]
+        sustained = candidate.get("sustained_neighbors", 0)
+
+        # z=2 is motion_beats()'s own detection floor (barely qualifies);
+        # z=6+ is a genuinely huge spike even by this video's own
+        # standards.
+        zscore_component = min(50, max(0.0, (z - 2) / 4 * 50))
+        # more sustained neighbors = more confidence this is a real,
+        # ongoing event rather than a single outsized frame.
+        sustain_component = min(30, sustained * 10)
+        # base credit for clearing detection at all (a bare-floor motion
+        # beat with no other evidence still stays under QUALITY_FLOOR).
+        total = 15 + zscore_component + sustain_component
+        return round(max(0, min(100, total)))
+
+    if candidate.get("hit_count") is not None:
+        hit_count = candidate["hit_count"]
+        peak_ratio = candidate.get("peak_ratio", 4.0)
+        motion_elev = candidate.get("motion_elevation", 1.0)
+        natural_span = candidate.get("natural_span", 0.0)
+
+        hit_component = min(40, hit_count * 8)  # 1 hit=8 ... 5+ hits=40
+
+        # ratio 4 is the detector's own floor (barely qualifies at all);
+        # ratio 25+ is a real standout even among already-loud events.
+        sharpness_component = min(30, max(0.0, (peak_ratio - 4) / 21 * 30))
+
+        # 1.0x = no elevation over this video's own average motion;
+        # 1.5x+ = strong independent confirmation this was real action,
+        # not just a loud sound over a static screen.
+        motion_component = min(20, max(0.0, (motion_elev - 1.0) * 40))
+
+        # reward engagements that fill the clip on their own merit rather
+        # than needing heavy padding to reach clip_length.
+        fill_ratio = (natural_span / duration_sec) if duration_sec else 0.0
+        clean_component = min(10, fill_ratio * 10)
+
+        total = hit_component + sharpness_component + motion_component + clean_component
+        return round(max(0, min(100, total)))
+
     tags_component = min(60, (candidate["score"] / 4.0) * 60)  # 0-60 from tag priority
 
     text = candidate.get("text", "")
@@ -244,7 +459,7 @@ def pick_non_overlapping(candidates, count, bonus_cap=None):
     windows beyond that count, since a strong kill/clutch/hype moment is
     worth clipping even if you only asked for N clips. Capped so a
     hype-heavy stream doesn't balloon into dozens of renders."""
-    candidates.sort(key=lambda c: (-c["score"], c["start"]))
+    candidates.sort(key=lambda c: (-c["score"], -c.get("engagement_score", 0), c["start"]))
     picked = []
     for c in candidates:
         if any(not (c["end"] <= p["start"] or c["start"] >= p["end"]) for p in picked):
@@ -311,12 +526,24 @@ def main():
     duration = script.get("source_duration_sec", 0)
 
     candidates = candidate_windows(kept, clip_length, duration, visual_analysis, audio_analysis)
+
+    # Real fix 2026-09-17, per user request: score every candidate up
+    # front (not just the ones that happened to get picked) and drop
+    # anything below QUALITY_FLOOR before selection even runs. This is
+    # what actually raises the bar rather than just measuring it — a
+    # video with no engagement strong enough clears the floor now yields
+    # fewer clips (or none) instead of padding out to clip_count/bonus_cap
+    # with marginal single-hit blips.
+    for c in candidates:
+        c["engagement_score"] = engagement_score(c, duration_sec=c["end"] - c["start"])
+    candidates = [c for c in candidates if c["engagement_score"] >= QUALITY_FLOOR]
+
     picked = pick_non_overlapping(candidates, clip_count, bonus_cap)
 
     clips = [
         {"id": f"clip{i+1:02d}", "start": c["start"], "end": c["end"],
          "score": c["score"], "bonus": c.get("bonus", False), "preview": c["text"][:80],
-         "engagement_score": engagement_score(c, duration_sec=c["end"] - c["start"])}
+         "engagement_score": c["engagement_score"]}
         for i, c in enumerate(picked)
     ]
     bonus_count = sum(1 for c in clips if c["bonus"])

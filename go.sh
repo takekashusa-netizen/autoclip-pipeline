@@ -62,7 +62,7 @@ while [[ $# -gt 0 ]]; do
     --platform) shift; platform="$1" ;;
     --clip-count) shift; clip_count="$1" ;;
     --clip-length) shift; clip_length="$1"; longform_minutes="$1" ;;
-    --content-type) shift; content_type="$1" ;;
+    --content-type) shift; content_type="$1"; content_type_explicit=1 ;;
     --model) shift; model="$1" ;;
     --vertical) vertical_flag="--vertical" ;;
     --auto-queue) auto_queue_flag="--auto-queue" ;;
@@ -121,6 +121,23 @@ fi
 if [[ "$platform" == "longform" ]]; then
   if [[ "$longform_minutes" -lt 10 ]]; then
     longform_minutes=10   # real floor — "10+ minutes" was the actual ask, never go below it silently
+  fi
+  # Real bug fixed 2026-09-17: this path is genuinely generic (per its own
+  # header comment — "podcast episodes, livestream VODs"), but content_type
+  # silently defaults to "gaming" up top unless --content-type is passed
+  # explicitly. Verified on a real job: a podcast/interview VOD run through
+  # here with no --content-type inherited the gaming default, and
+  # best_windows.py's dead-time penalty (tuned for FPS-style constant
+  # camera motion) then heavily penalized nearly the entire video — 16 of
+  # 19 windows scored deeply negative (down to -18,857) purely because a
+  # talking-head's naturally low frame-to-frame motion doesn't clear a
+  # threshold built for gameplay. Not silently changing the default (real
+  # gaming VODs still go through here too and should keep working
+  # unchanged) — just making the footgun visible instead of silent.
+  if [[ -z "${content_type_explicit:-}" && "$content_type" == "gaming" ]]; then
+    echo "== go.sh: WARNING — platform=longform with no --content-type given, defaulting to 'gaming'. =="
+    echo "==   If this source is a podcast/interview/talking-head video (not gameplay), re-run with"
+    echo "==   --content-type podcast — otherwise low-motion real content gets penalized as 'dead time'. =="
   fi
   echo "== go.sh: job='${job}' url='${url}' platform='longform' (${clip_count} real continuous segments, ${longform_minutes}+ min each) =="
   echo "== downloading =="

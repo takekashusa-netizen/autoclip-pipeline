@@ -117,18 +117,97 @@ def analyze(video_path, window_ms=20, **detect_kwargs):
     return {"duration": duration, "transients": events}
 
 
-def transient_beats(analysis, window_sec=3.0):
+# Real bug fixed 2026-09-17: every detected transient (footsteps, item-
+# pickup dings, inventory clicks, zipline sounds — anything with a sharp
+# attack) was being treated as its own "gunfire/impact" beat, with equal
+# weight to an actual firefight. Since ordinary Apex gameplay produces a
+# transient every 1-9 seconds on average, this meant nearly the entire
+# video qualified as "impact", and pick_non_overlapping's bonus mechanic
+# then grabbed sequential wall-to-wall ~30s chunks from the start of the
+# video — which is why most selected clips turned out to be "dropping in,
+# looting" rather than real gunfights, and the few real fights that DID
+# get caught were arbitrary 30s slices not aligned to the fight's actual
+# start/end (so knockdowns right after the last detected shot got cut
+# off).
+#
+# Fix: only transients LOUD relative to this recording's own typical
+# impulse level (footsteps/UI clicks cluster near the median; real gunfire
+# stands out well above it) count as real "impact" events. Qualifying
+# events within MERGE_GAP_SEC of each other are merged into ONE beat
+# spanning from just before the first hit to a few seconds after the last
+# — covering the real beginning of an engagement through its likely
+# follow-through (kill confirm / knockdown / looting the body), instead of
+# a fixed 30s window anchored on a single, possibly mid-fight, transient.
+#
+# These are heuristics tuned against real recovered Apex footage, not a
+# universal constant — if selection still needs adjusting after reviewing
+# a batch, these are the knobs to turn:
+LOUDNESS_MULT = 2.5   # a transient must be at least this many times the
+                       # video's own MEDIAN transient energy to count as
+                       # "loud" (raise to be pickier, lower to catch more)
+MERGE_GAP_SEC = 15.0   # loud events within this many seconds of each
+                       # other are treated as the same ongoing engagement.
+                       # Raised from 6.0 on 2026-09-17 (user wants the
+                       # WHOLE fight, up to ~3 minutes) — a real prolonged
+                       # engagement has natural lulls (reload, reposition,
+                       # a downed teammate) longer than 6s that shouldn't
+                       # fracture it into several separate short clips.
+LEAD_IN_SEC = 3.0      # buffer kept before the first loud hit
+TRAIL_SEC = 5.0        # buffer kept after the last loud hit (this is what
+                       # catches a knockdown/kill-confirm right after the
+                       # shooting stops)
+MIN_HITS_FOR_FIGHT = 2  # 2026-09-17, per user: a single loud bang (a
+                        # grenade, an explosion, one unanswered shot) is
+                        # not "a fight" — require at least this many loud
+                        # hits in the cluster before it counts as a real,
+                        # exchanged engagement at all.
+
+
+def transient_beats(analysis, loudness_mult=LOUDNESS_MULT, merge_gap_sec=MERGE_GAP_SEC,
+                     lead_in_sec=LEAD_IN_SEC, trail_sec=TRAIL_SEC):
     """Turns detected transients into beat-like dicts tagged 'impact' —
     same downstream shape as motion_beats/highlight beats, so clip-select
     and build_montage can treat a gunfire moment identically to a
-    transcript highlight or a visual action spike."""
+    transcript highlight or a visual action spike. See module comment
+    above for why this filters by relative loudness and merges nearby
+    events instead of treating every raw transient as its own beat."""
+    import statistics
+
+    raw = analysis.get("transients", [])
+    if not raw:
+        return []
+
+    median_energy = statistics.median(e["energy"] for e in raw)
+    loud_floor = median_energy * loudness_mult
+    loud = sorted((e for e in raw if e["energy"] >= loud_floor), key=lambda e: e["time"])
+
+    groups = []
+    current = []
+    for e in loud:
+        if current and e["time"] - current[-1]["time"] > merge_gap_sec:
+            groups.append(current)
+            current = []
+        current.append(e)
+    if current:
+        groups.append(current)
+
     beats = []
-    for e in analysis.get("transients", []):
-        start = max(0.0, e["time"] - window_sec / 3)
-        end = e["time"] + window_sec * 2 / 3
+    for g in groups:
+        if len(g) < MIN_HITS_FOR_FIGHT:
+            continue  # a single loud blip isn't a fight — see MIN_HITS_FOR_FIGHT
+        start = max(0.0, g[0]["time"] - lead_in_sec)
+        end = g[-1]["time"] + trail_sec
+        hits = len(g)
         beats.append({
             "start": round(start, 2), "end": round(end, 2),
-            "text": "(gunfire/impact detected)", "tags": ["impact"],
+            "text": f"(gunfire/impact detected — {hits} hit{'s' if hits != 1 else ''})",
+            "tags": ["impact"],
+            # real evidence behind this pick, carried through to
+            # engagement scoring so a dense/loud engagement can actually
+            # score higher than a marginal one instead of every "impact"
+            # beat getting the same flat value.
+            "hit_count": hits,
+            "peak_ratio": max(e["ratio"] for e in g),
         })
     return beats
 

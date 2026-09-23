@@ -130,7 +130,8 @@ def analyze(video_path, interval_sec=2.0):
     return {"samples": samples, "duration": duration, "interval_sec": interval_sec}
 
 
-def motion_beats(analysis, z_threshold=2.0, min_gap_sec=8, window_sec=4):
+def motion_beats(analysis, z_threshold=2.0, min_gap_sec=8, window_sec=4,
+                  sustain_z=1.0, min_sustain_neighbors=1, neighbor_radius_sec=None):
     """Turns motion-score spikes into beat-like dicts tagged 'action' — the
     actual answer to 'identify clip-able moments' independent of the
     transcript: a fight, a jump-scare, a fast camera pan all show up here
@@ -145,6 +146,24 @@ def motion_beats(analysis, z_threshold=2.0, min_gap_sec=8, window_sec=4):
     is relative to THIS video's own motion distribution, not an absolute
     number — a slow talking-head video and a fast-paced game have very
     different baselines.
+
+    Real fix 2026-09-17: this used to fire on ANY single sample above the
+    z-score threshold. Verified against real cached data that the single
+    biggest false-positive source in the whole pipeline was a ONE-FRAME
+    scene cut — the menu/loadout screen jumping straight to the in-game
+    view (or a death recap fading back to a menu) produces one huge
+    frame-to-frame diff, then drops straight back to near-zero on both
+    sides. That one artifact alone was landing a "highlight" clip built
+    entirely out of menu screens in 55% of a real batch, every one
+    scored identically because the old flat fallback couldn't tell a
+    scene-cut from real chaos. A real fight stays visually chaotic across
+    several consecutive samples, not one flash frame, so a spike now only
+    becomes a beat if at least one nearby sample is ALSO meaningfully
+    elevated, and any spike sitting next to a frame the loading-screen
+    classifier flagged is dropped outright (that's exactly the menu <->
+    gameplay boundary). Each surviving beat carries its own peak z-score
+    and sustained-neighbor count so clip_select can score it on real
+    evidence instead of a constant.
     """
     samples = analysis.get("samples", [])
     scores = [s["motion_score"] for s in samples]
@@ -158,19 +177,36 @@ def motion_beats(analysis, z_threshold=2.0, min_gap_sec=8, window_sec=4):
         return []  # perfectly uniform motion (or a static video) — nothing stands out
 
     threshold = mean + z_threshold * stdev
+    sustain_threshold = mean + sustain_z * stdev
+    radius = neighbor_radius_sec if neighbor_radius_sec is not None else window_sec
+    sorted_samples = sorted(samples, key=lambda s: s["time"])
 
     beats = []
     last_beat_end = -min_gap_sec
-    for s in samples:
+    for s in sorted_samples:
         if s["motion_score"] <= threshold:
             continue
         if s["time"] - last_beat_end < min_gap_sec:
             continue  # too close to the last flagged spike, avoid spam
+
+        neighbors = [o for o in sorted_samples
+                     if o is not s and abs(o["time"] - s["time"]) <= radius]
+
+        sustained = sum(1 for o in neighbors if o["motion_score"] >= sustain_threshold)
+        if sustained < min_sustain_neighbors:
+            continue  # isolated single-frame spike — a scene cut, not a fight
+
+        if s.get("is_loading_screen") or any(o.get("is_loading_screen") for o in neighbors):
+            continue  # sitting right on a menu/loading frame — the transition itself
+
         start = max(0, s["time"] - window_sec / 2)
         end = s["time"] + window_sec / 2
+        z_score = (s["motion_score"] - mean) / stdev
         beats.append({
             "start": round(start, 2), "end": round(end, 2),
             "text": "(visual action detected)", "tags": ["action"],
+            "motion_zscore": round(z_score, 2),
+            "sustained_neighbors": sustained,
         })
         last_beat_end = end
     return beats
