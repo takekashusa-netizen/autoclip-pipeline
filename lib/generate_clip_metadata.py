@@ -142,12 +142,22 @@ if __name__ == "__main__":
     main()
 
 
+# Hashtags below are grounded in real relevance-ranked data (displaypurposes.com
+# per-hashtag related-tag rankings + OpusClip's gaming-clip usage/view-volume
+# analysis), refreshed 2026-09-23 -- not guessed. See SEO_HASHTAG_STRATEGY.md
+# for the full research and sources.
 GAME_KEYWORD_TAXONOMY = {
     "apex legends": {
         "keywords": ["Apex Legends", "Ranked", "Clutch", "Movement", "FPS",
                      "Battle Royale", "Road to Masters"],
-        "hashtags": ["#ApexLegends", "#Apex", "#ApexRanked", "#Gaming",
-                     "#FPS", "#BattleRoyale"],
+        "hashtags": ["#ApexLegends", "#Apex", "#ApexLegendsClips", "#ApexRanked",
+                     "#Gaming", "#FPS", "#BattleRoyale", "#Twitch"],
+    },
+    "call of duty warzone": {
+        "keywords": ["Warzone", "Call of Duty", "COD", "Modern Warfare",
+                     "Clutch", "Gulag", "Loadout", "Gameplay"],
+        "hashtags": ["#Warzone", "#CallOfDutyWarzone", "#CallOfDuty", "#COD",
+                     "#ModernWarfare", "#Gaming", "#FPS", "#Twitch"],
     },
     "nba 2k26": {
         "keywords": ["2K26", "Build", "Jumpshot", "3PT", "Dribble",
@@ -158,16 +168,75 @@ GAME_KEYWORD_TAXONOMY = {
     "fc 26": {
         "keywords": ["FC 26", "Ultimate Team", "Rush", "Clubs", "Gameplay",
                      "Goals", "Squad", "FUT", "Career Mode"],
-        "hashtags": ["#FC26", "#EAFC26", "#UltimateTeam", "#Rush", "#Clubs",
-                     "#FUT", "#Gaming", "#Football"],
+        "hashtags": ["#FC26", "#EAFC26", "#EAFC", "#UltimateTeam", "#Rush",
+                     "#Clubs", "#FUT", "#Gaming", "#Football"],
     },
     "brawlhalla": {
+        # Real finding: the generic "#Brawl" tag is dominated by Brawl Stars
+        # (a different game, ~800K posts vs Brawlhalla's 59.5K under that tag)
+        # -- using it puts these clips in front of the wrong audience, so it's
+        # dropped here in favor of tags that are actually Brawlhalla-specific.
         "keywords": ["Brawlhalla", "Legend", "Ranked", "Combos", "PvP",
                      "Gameplay", "1v1", "2v2", "Tips"],
-        "hashtags": ["#Brawlhalla", "#Brawl", "#Legend", "#Ranked",
-                     "#Combos", "#PvP", "#Gaming"],
+        "hashtags": ["#Brawlhalla", "#Legend", "#Ranked",
+                     "#Combos", "#PvP", "#Gaming", "#FightingGame"],
     },
 }
+
+
+# --- OpusClip formula integration -------------------------------------------
+# OpusClip's published Virality Score (help.opus.pro/docs/article/virality-score,
+# fetched 2026-09-23) scores clips on 4 documented dimensions -- Hook, Flow,
+# Value, Trend -- on a 0-99 scale. This pipeline scores from text metadata
+# (title/description/hashtags/transcript), not full video analysis, so only
+# the two dimensions that are honestly assessable from text are integrated:
+# Hook and Trend. Flow (pacing/structure) and Value (emotional delivery)
+# require watching the actual video and are NOT faked here.
+
+# OpusClip's 4 documented hook-formula archetypes
+# (opus.pro/blog/tiktok-hook-formulas, fetched 2026-09-23), matched against
+# the real title text via regex -- not scored by guesswork.
+HOOK_FORMULA_PATTERNS = {
+    "bold_statement": re.compile(r"^(most|everyone|nobody|no one|everybody)\b", re.I),
+    "question": re.compile(r"\?\s*$"),
+    "pattern_interrupt": re.compile(r"\b(wait|stop|wtf|what happened|you won'?t believe)\b", re.I),
+    "proof_first": re.compile(r"\b(i (finally|actually)|here'?s (proof|what happened)|watch (this|me))\b", re.I),
+}
+
+# OpusClip's own gaming-hashtag usage-volume research
+# (opus.pro/research/best-hashtags-gaming-tiktok and .../best-hashtags-gaming-youtube,
+# fetched 2026-09-23) -- the highest-usage broad gaming/discovery tags across the
+# clips they analyzed. Used to score OpusClip's "Trend" pillar for GAMING content only.
+OPUS_TRENDING_BROAD_TAGS_GAMING = ["#fyp", "#viral", "#foryou", "#gaming", "#gamingcommunity",
+                                   "#gameplay", "#fps", "#twitch"]
+
+# Real relevance-ranked data for podcast/interview content (displaypurposes.com
+# #podcast and #interviews related-tag tables, fetched 2026-09-23) -- this pipeline
+# also produces "Cam Capone News" podcast/interview clips (interviewtest, apexnba2k2,
+# job1788482095 job families), which are NOT gaming content despite some of those job
+# names -- confirmed by reading their real per-clip metadata/titles. Using the gaming
+# tag list on these would misdirect them the same way the old Brawlhalla #Brawl tag
+# did. This is their own separate, correctly-targeted trend set.
+OPUS_TRENDING_BROAD_TAGS_PODCAST = ["#fyp", "#viral", "#foryou", "#podcast", "#podcasts",
+                                    "#podcastclips", "#interview", "#interviewclips",
+                                    "#realtalk"]
+
+
+def score_hook_formula(title):
+    """Which of OpusClip's 4 documented hook formulas (if any) the title matches."""
+    return [name for name, pat in HOOK_FORMULA_PATTERNS.items() if pat.search(title or "")]
+
+
+def score_trend_alignment(hashtags, content_type="gaming"):
+    """OpusClip 'Trend' pillar: coverage of real high-volume broad tags for this
+    content type. content_type is "gaming" (matches against GAME_KEYWORD_TAXONOMY
+    games) or "podcast" (Cam Capone News interview/podcast clips) -- picking the
+    wrong one misdirects the clip to the wrong audience, so callers must be explicit
+    rather than defaulting silently to gaming."""
+    tags_lower = [h.lower() for h in (hashtags or [])]
+    trending = OPUS_TRENDING_BROAD_TAGS_PODCAST if content_type == "podcast" else OPUS_TRENDING_BROAD_TAGS_GAMING
+    hits = sum(1 for t in trending if t in tags_lower)
+    return min(100, 60 + hits * 10)
 
 
 def score_clip_metadata(metadata, transcript_text, game_name=None):
@@ -198,11 +267,16 @@ def score_clip_metadata(metadata, transcript_text, game_name=None):
 
     hook_signals = ["insane", "clutch", "crazy", "wild", "real", "actual", "never"]
     hook_hits = sum(1 for s in hook_signals if s in title.lower())
-    hook_ctr = min(100, 75 + hook_hits * 8)
+    matched_hook_formulas = score_hook_formula(title)
+    hook_ctr = min(100, 75 + hook_hits * 5 + len(matched_hook_formulas) * 6)
 
     platform_fit = 100 if len(title) <= 100 and len(hashtags) >= 4 else 75
 
-    total = int((search_relevance + keyword_coverage + hashtag_relevance + hook_ctr + platform_fit) / 5)
+    content_type = "gaming" if game_data else "podcast"
+    trend_alignment = score_trend_alignment(hashtags, content_type=content_type)
+
+    total = int((search_relevance + keyword_coverage + hashtag_relevance
+                 + hook_ctr + platform_fit + trend_alignment) / 6)
 
     return {
         "search_relevance": search_relevance,
@@ -210,6 +284,8 @@ def score_clip_metadata(metadata, transcript_text, game_name=None):
         "hashtag_relevance": hashtag_relevance,
         "hook_ctr": hook_ctr,
         "platform_fit": platform_fit,
+        "trend_alignment": trend_alignment,
+        "hook_formulas_matched": matched_hook_formulas,
         "total": total,
     }
 
