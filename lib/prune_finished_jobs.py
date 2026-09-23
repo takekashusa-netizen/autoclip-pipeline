@@ -113,9 +113,38 @@ def prune(dry_run=False):
         for sub in STRIP_SUBDIRS:
             p = os.path.join(base, sub)
             if os.path.isdir(p):
-                job_freed += _dir_size(p)
-                if not dry_run:
-                    shutil.rmtree(p, ignore_errors=True)
+                if sub == "rough-cut":
+                    # 2026-09-23: never delete rough-cut/script.json here.
+                    # It's the ONLY real transcript source
+                    # generate_clip_metadata.py has (no fallback exists --
+                    # confirmed by reading that file in full). This dir
+                    # used to get wiped the moment export finished, but
+                    # metadata/caption generation can still be pending at
+                    # that point, which silently and permanently broke
+                    # captions for 14 real jobs the first time this ran
+                    # after a restart (see CONTENT_LEDGER.md 2026-09-23).
+                    # script.json is ~1KB; the real disk hog is
+                    # rough_cut.mp4 and friends, which this still strips.
+                    keep = os.path.join(p, "script.json")
+                    for name in os.listdir(p):
+                        fp = os.path.join(p, name)
+                        if fp == keep:
+                            continue
+                        try:
+                            if os.path.isdir(fp):
+                                job_freed += _dir_size(fp)
+                                if not dry_run:
+                                    shutil.rmtree(fp, ignore_errors=True)
+                            else:
+                                job_freed += os.path.getsize(fp)
+                                if not dry_run:
+                                    os.remove(fp)
+                        except OSError:
+                            pass
+                else:
+                    job_freed += _dir_size(p)
+                    if not dry_run:
+                        shutil.rmtree(p, ignore_errors=True)
         gdir = os.path.join(base, "graphics")
         if os.path.isdir(gdir):
             for f in os.listdir(gdir):
