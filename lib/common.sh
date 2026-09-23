@@ -39,7 +39,7 @@ export -f job_dir job_raw_dir job_work_dir job_render_dir
 # Find the raw source file for a job (first file in projects/<job>/raw/).
 job_raw_file() {
   local job="$1"
-  find "$(job_raw_dir "$job")" -maxdepth 1 -type f ! -name '.gitkeep' 2>/dev/null | head -n1 || true
+  find -L "$(job_raw_dir "$job")" -maxdepth 1 -type f ! -name '.gitkeep' 2>/dev/null | head -n1 || true
 }
 export -f job_raw_file
 
@@ -72,7 +72,7 @@ check_disk_space() {
   [[ -z "$raw" ]] && return 0
 
   local raw_bytes avail_bytes required_bytes
-  raw_bytes=$(stat -c%s "$raw" 2>/dev/null || stat -f%z "$raw")
+  raw_bytes=$(stat -L -c%s "$raw" 2>/dev/null || stat -L -f%z "$raw")
   avail_bytes=$(df -P "${PIPELINE_ROOT}" | awk 'NR==2{print $4*1024}')
   required_bytes=$(( raw_bytes * margin ))
 

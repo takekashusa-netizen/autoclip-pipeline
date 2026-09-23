@@ -237,7 +237,7 @@ elif python3 -c "import cv2" 2>/dev/null; then
   # analysis degrades to "no visual data" instead of taking down clips
   # that don't even depend on it (transcript-based selection still works).
   vis_exit=0
-  vis_result="$(python3 "${PIPELINE_ROOT}/lib/visual_analysis.py" "$rough_cut_video" "$visual_json" --interval 2.0 2>&1)" || vis_exit=$?
+  vis_result="$(run_with_timeout 180 python3 "${PIPELINE_ROOT}/lib/visual_analysis.py" "$rough_cut_video" "$visual_json" --interval 2.0 2>&1)" || vis_exit=$?
   if [[ $vis_exit -ne 0 ]]; then
     log "visual-analysis: FAILED (exit ${vis_exit}) — continuing WITHOUT visual data, transcript-based selection still works. Error was: $(echo "$vis_result" | tail -5)"
     visual_json=""
@@ -273,7 +273,7 @@ else
   # audio track or an ffmpeg extraction failure degrades to "no audio
   # data" instead of taking down the whole run
   audio_exit=0
-  audio_result="$(python3 "${PIPELINE_ROOT}/lib/audio_analysis.py" "$rough_cut_video" "$audio_json" 2>&1)" || audio_exit=$?
+  audio_result="$(run_with_timeout 120 python3 "${PIPELINE_ROOT}/lib/audio_analysis.py" "$rough_cut_video" "$audio_json" 2>&1)" || audio_exit=$?
   if [[ $audio_exit -ne 0 ]]; then
     log "audio-analysis: FAILED (exit ${audio_exit}) — continuing WITHOUT audio transient data. Error was: $(echo "$audio_result" | tail -5)"
     audio_json=""
