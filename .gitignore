@@ -3,6 +3,8 @@ projects/*/
 outputs/*
 !outputs/.gitkeep
 venv/
+.venv/
+venv_pipeline/
 __pycache__/
 *.pyc
 .DS_Store

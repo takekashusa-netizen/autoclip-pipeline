@@ -718,8 +718,9 @@
       "#RapHistory"
     ],
     "scheduled_time": "2026-09-16T13:00:00",
-    "status": "pending",
-    "content_type": "reaction"
+    "status": "error",
+    "content_type": "reaction",
+    "error": "No TikTok token found at /Users/Apple/autoclip-pipeline/lib/../tiktok_token.json. Run the OAuth flow first (see setup instructions in this file's docstring) to authorize an account."
   },
   {
     "platform": "instagram",
@@ -738,9 +739,10 @@
       "#HipHopPodcast"
     ],
     "scheduled_time": "2026-09-16T18:00:00",
-    "status": "pending",
+    "status": "error",
     "content_type": "reaction",
-    "public_url": "https://takekash.com/clips/apexnba2k2_window04_instagram.mp4"
+    "public_url": "https://takekash.com/clips/apexnba2k2_window04_instagram.mp4",
+    "error": "INSTAGRAM_ACCESS_TOKEN / INSTAGRAM_USER_ID not set in environment. See setup instructions in this file's docstring."
   },
   {
     "platform": "tiktok",
@@ -759,8 +761,9 @@
       "#PodcastClips"
     ],
     "scheduled_time": "2026-09-16T20:00:00",
-    "status": "pending",
-    "content_type": "reaction"
+    "status": "error",
+    "content_type": "reaction",
+    "error": "No TikTok token found at /Users/Apple/autoclip-pipeline/lib/../tiktok_token.json. Run the OAuth flow first (see setup instructions in this file's docstring) to authorize an account."
   },
   {
     "platform": "instagram",
@@ -779,9 +782,10 @@
       "#PodcastClips"
     ],
     "scheduled_time": "2026-09-17T09:00:00",
-    "status": "pending",
+    "status": "error",
     "content_type": "reaction",
-    "public_url": "https://takekash.com/clips/apexnba2k2_window05_instagram.mp4"
+    "public_url": "https://takekash.com/clips/apexnba2k2_window05_instagram.mp4",
+    "error": "INSTAGRAM_ACCESS_TOKEN / INSTAGRAM_USER_ID not set in environment. See setup instructions in this file's docstring."
   },
   {
     "platform": "tiktok",
@@ -800,8 +804,9 @@
       "#HipHopHistory"
     ],
     "scheduled_time": "2026-09-17T10:00:00",
-    "status": "pending",
-    "content_type": "reaction"
+    "status": "error",
+    "content_type": "reaction",
+    "error": "No TikTok token found at /Users/Apple/autoclip-pipeline/lib/../tiktok_token.json. Run the OAuth flow first (see setup instructions in this file's docstring) to authorize an account."
   },
   {
     "platform": "instagram",
@@ -820,9 +825,10 @@
       "#StreetMusic"
     ],
     "scheduled_time": "2026-09-17T12:00:00",
-    "status": "pending",
+    "status": "error",
     "content_type": "reaction",
-    "public_url": "https://takekash.com/clips/apexnba2k2_window06_instagram.mp4"
+    "public_url": "https://takekash.com/clips/apexnba2k2_window06_instagram.mp4",
+    "error": "INSTAGRAM_ACCESS_TOKEN / INSTAGRAM_USER_ID not set in environment. See setup instructions in this file's docstring."
   },
   {
     "platform": "tiktok",
@@ -841,8 +847,9 @@
       "#WestCoastHipHop"
     ],
     "scheduled_time": "2026-09-17T13:00:00",
-    "status": "pending",
-    "content_type": "reaction"
+    "status": "error",
+    "content_type": "reaction",
+    "error": "No TikTok token found at /Users/Apple/autoclip-pipeline/lib/../tiktok_token.json. Run the OAuth flow first (see setup instructions in this file's docstring) to authorize an account."
   },
   {
     "platform": "instagram",
@@ -861,9 +868,10 @@
       "#Freestyle"
     ],
     "scheduled_time": "2026-09-17T18:00:00",
-    "status": "pending",
+    "status": "error",
     "content_type": "reaction",
-    "public_url": "https://takekash.com/clips/apexnba2k2_window07_instagram.mp4"
+    "public_url": "https://takekash.com/clips/apexnba2k2_window07_instagram.mp4",
+    "error": "INSTAGRAM_ACCESS_TOKEN / INSTAGRAM_USER_ID not set in environment. See setup instructions in this file's docstring."
   },
   {
     "platform": "tiktok",
@@ -882,8 +890,9 @@
       "#Freestyle"
     ],
     "scheduled_time": "2026-09-17T20:00:00",
-    "status": "pending",
-    "content_type": "reaction"
+    "status": "error",
+    "content_type": "reaction",
+    "error": "No TikTok token found at /Users/Apple/autoclip-pipeline/lib/../tiktok_token.json. Run the OAuth flow first (see setup instructions in this file's docstring) to authorize an account."
   },
   {
     "platform": "instagram",
@@ -902,9 +911,10 @@
       "#MusicIndustryTalk"
     ],
     "scheduled_time": "2026-09-18T09:00:00",
-    "status": "pending",
+    "status": "error",
     "content_type": "reaction",
-    "public_url": "https://takekash.com/clips/apexnba2k2_window08_instagram.mp4"
+    "public_url": "https://takekash.com/clips/apexnba2k2_window08_instagram.mp4",
+    "error": "INSTAGRAM_ACCESS_TOKEN / INSTAGRAM_USER_ID not set in environment. See setup instructions in this file's docstring."
   },
   {
     "platform": "tiktok",
@@ -923,8 +933,9 @@
       "#InterviewClips"
     ],
     "scheduled_time": "2026-09-18T10:00:00",
-    "status": "pending",
-    "content_type": "reaction"
+    "status": "error",
+    "content_type": "reaction",
+    "error": "No TikTok token found at /Users/Apple/autoclip-pipeline/lib/../tiktok_token.json. Run the OAuth flow first (see setup instructions in this file's docstring) to authorize an account."
   },
   {
     "platform": "instagram",
@@ -943,9 +954,10 @@
       "#PodcastClips"
     ],
     "scheduled_time": "2026-09-18T12:00:00",
-    "status": "pending",
+    "status": "error",
     "content_type": "reaction",
-    "public_url": "https://takekash.com/clips/apexnba2k2_window09_instagram.mp4"
+    "public_url": "https://takekash.com/clips/apexnba2k2_window09_instagram.mp4",
+    "error": "INSTAGRAM_ACCESS_TOKEN / INSTAGRAM_USER_ID not set in environment. See setup instructions in this file's docstring."
   },
   {
     "platform": "tiktok",
@@ -964,8 +976,9 @@
       "#RapCulture"
     ],
     "scheduled_time": "2026-09-18T13:00:00",
-    "status": "pending",
-    "content_type": "reaction"
+    "status": "error",
+    "content_type": "reaction",
+    "error": "No TikTok token found at /Users/Apple/autoclip-pipeline/lib/../tiktok_token.json. Run the OAuth flow first (see setup instructions in this file's docstring) to authorize an account."
   },
   {
     "platform": "instagram",
@@ -984,9 +997,10 @@
       "#ArtistFeatures"
     ],
     "scheduled_time": "2026-09-18T18:00:00",
-    "status": "pending",
+    "status": "error",
     "content_type": "reaction",
-    "public_url": "https://takekash.com/clips/apexnba2k2_window10_instagram.mp4"
+    "public_url": "https://takekash.com/clips/apexnba2k2_window10_instagram.mp4",
+    "error": "INSTAGRAM_ACCESS_TOKEN / INSTAGRAM_USER_ID not set in environment. See setup instructions in this file's docstring."
   },
   {
     "platform": "tiktok",
@@ -1005,8 +1019,9 @@
       "#podcastclips"
     ],
     "scheduled_time": "2026-09-18T20:00:00",
-    "status": "pending",
-    "content_type": "reaction"
+    "status": "error",
+    "content_type": "reaction",
+    "error": "No TikTok token found at /Users/Apple/autoclip-pipeline/lib/../tiktok_token.json. Run the OAuth flow first (see setup instructions in this file's docstring) to authorize an account."
   },
   {
     "platform": "instagram",
@@ -1025,9 +1040,10 @@
       "#HipHopCulture"
     ],
     "scheduled_time": "2026-09-19T09:00:00",
-    "status": "pending",
+    "status": "error",
     "content_type": "reaction",
-    "public_url": "https://takekash.com/clips/apexnba2k2_window11_instagram.mp4"
+    "public_url": "https://takekash.com/clips/apexnba2k2_window11_instagram.mp4",
+    "error": "INSTAGRAM_ACCESS_TOKEN / INSTAGRAM_USER_ID not set in environment. See setup instructions in this file's docstring."
   },
   {
     "platform": "tiktok",
@@ -1046,8 +1062,9 @@
       "#viralclip"
     ],
     "scheduled_time": "2026-09-19T10:00:00",
-    "status": "pending",
-    "content_type": "reaction"
+    "status": "error",
+    "content_type": "reaction",
+    "error": "No TikTok token found at /Users/Apple/autoclip-pipeline/lib/../tiktok_token.json. Run the OAuth flow first (see setup instructions in this file's docstring) to authorize an account."
   },
   {
     "platform": "instagram",
@@ -1066,9 +1083,10 @@
       "#HipHopTalk"
     ],
     "scheduled_time": "2026-09-19T12:00:00",
-    "status": "pending",
+    "status": "error",
     "content_type": "reaction",
-    "public_url": "https://takekash.com/clips/apexnba2k2_window12_instagram.mp4"
+    "public_url": "https://takekash.com/clips/apexnba2k2_window12_instagram.mp4",
+    "error": "INSTAGRAM_ACCESS_TOKEN / INSTAGRAM_USER_ID not set in environment. See setup instructions in this file's docstring."
   },
   {
     "platform": "tiktok",
@@ -1087,8 +1105,9 @@
       "#Concussion"
     ],
     "scheduled_time": "2026-09-19T13:00:00",
-    "status": "pending",
-    "content_type": "reaction"
+    "status": "error",
+    "content_type": "reaction",
+    "error": "No TikTok token found at /Users/Apple/autoclip-pipeline/lib/../tiktok_token.json. Run the OAuth flow first (see setup instructions in this file's docstring) to authorize an account."
   },
   {
     "platform": "instagram",
@@ -1107,9 +1126,10 @@
       "#MusicIndustryTalk"
     ],
     "scheduled_time": "2026-09-19T18:00:00",
-    "status": "pending",
+    "status": "error",
     "content_type": "reaction",
-    "public_url": "https://takekash.com/clips/apexnba2k2_window13_instagram.mp4"
+    "public_url": "https://takekash.com/clips/apexnba2k2_window13_instagram.mp4",
+    "error": "INSTAGRAM_ACCESS_TOKEN / INSTAGRAM_USER_ID not set in environment. See setup instructions in this file's docstring."
   },
   {
     "platform": "tiktok",
@@ -1128,8 +1148,9 @@
       "#athletesturnedrappers"
     ],
     "scheduled_time": "2026-09-19T20:00:00",
-    "status": "pending",
-    "content_type": "reaction"
+    "status": "error",
+    "content_type": "reaction",
+    "error": "No TikTok token found at /Users/Apple/autoclip-pipeline/lib/../tiktok_token.json. Run the OAuth flow first (see setup instructions in this file's docstring) to authorize an account."
   },
   {
     "platform": "instagram",
@@ -1148,9 +1169,10 @@
       "#HipHopCommentary"
     ],
     "scheduled_time": "2026-09-20T09:00:00",
-    "status": "pending",
+    "status": "error",
     "content_type": "reaction",
-    "public_url": "https://takekash.com/clips/apexnba2k2_window14_instagram.mp4"
+    "public_url": "https://takekash.com/clips/apexnba2k2_window14_instagram.mp4",
+    "error": "INSTAGRAM_ACCESS_TOKEN / INSTAGRAM_USER_ID not set in environment. See setup instructions in this file's docstring."
   },
   {
     "platform": "tiktok",
@@ -1169,8 +1191,9 @@
       "#OnTheRun"
     ],
     "scheduled_time": "2026-09-20T10:00:00",
-    "status": "pending",
-    "content_type": "reaction"
+    "status": "error",
+    "content_type": "reaction",
+    "error": "No TikTok token found at /Users/Apple/autoclip-pipeline/lib/../tiktok_token.json. Run the OAuth flow first (see setup instructions in this file's docstring) to authorize an account."
   },
   {
     "platform": "instagram",
@@ -1189,9 +1212,10 @@
       "#RealTalkPodcast"
     ],
     "scheduled_time": "2026-09-20T12:00:00",
-    "status": "pending",
+    "status": "error",
     "content_type": "reaction",
-    "public_url": "https://takekash.com/clips/apexnba2k2_window15_instagram.mp4"
+    "public_url": "https://takekash.com/clips/apexnba2k2_window15_instagram.mp4",
+    "error": "INSTAGRAM_ACCESS_TOKEN / INSTAGRAM_USER_ID not set in environment. See setup instructions in this file's docstring."
   },
   {
     "platform": "tiktok",
@@ -1210,8 +1234,9 @@
       "#HipHopPodcast"
     ],
     "scheduled_time": "2026-09-20T13:00:00",
-    "status": "pending",
-    "content_type": "reaction"
+    "status": "error",
+    "content_type": "reaction",
+    "error": "No TikTok token found at /Users/Apple/autoclip-pipeline/lib/../tiktok_token.json. Run the OAuth flow first (see setup instructions in this file's docstring) to authorize an account."
   },
   {
     "platform": "instagram",
@@ -1230,9 +1255,10 @@
       "#menspeak"
     ],
     "scheduled_time": "2026-09-20T18:00:00",
-    "status": "pending",
+    "status": "error",
     "content_type": "reaction",
-    "public_url": "https://takekash.com/clips/apexnba2k2_window16_instagram.mp4"
+    "public_url": "https://takekash.com/clips/apexnba2k2_window16_instagram.mp4",
+    "error": "INSTAGRAM_ACCESS_TOKEN / INSTAGRAM_USER_ID not set in environment. See setup instructions in this file's docstring."
   },
   {
     "platform": "tiktok",
@@ -1251,8 +1277,9 @@
       "#culturetalk"
     ],
     "scheduled_time": "2026-09-20T20:00:00",
-    "status": "pending",
-    "content_type": "reaction"
+    "status": "error",
+    "content_type": "reaction",
+    "error": "No TikTok token found at /Users/Apple/autoclip-pipeline/lib/../tiktok_token.json. Run the OAuth flow first (see setup instructions in this file's docstring) to authorize an account."
   },
   {
     "platform": "instagram",
@@ -1271,9 +1298,10 @@
       "#streetjournalism"
     ],
     "scheduled_time": "2026-09-21T09:00:00",
-    "status": "pending",
+    "status": "error",
     "content_type": "reaction",
-    "public_url": "https://takekash.com/clips/apexnba2k2_window17_instagram.mp4"
+    "public_url": "https://takekash.com/clips/apexnba2k2_window17_instagram.mp4",
+    "error": "INSTAGRAM_ACCESS_TOKEN / INSTAGRAM_USER_ID not set in environment. See setup instructions in this file's docstring."
   },
   {
     "platform": "tiktok",
@@ -1292,8 +1320,9 @@
       "#realtalk"
     ],
     "scheduled_time": "2026-09-21T10:00:00",
-    "status": "pending",
-    "content_type": "reaction"
+    "status": "error",
+    "content_type": "reaction",
+    "error": "No TikTok token found at /Users/Apple/autoclip-pipeline/lib/../tiktok_token.json. Run the OAuth flow first (see setup instructions in this file's docstring) to authorize an account."
   },
   {
     "platform": "tiktok",
@@ -1312,8 +1341,9 @@
       "#Controversy"
     ],
     "scheduled_time": "2026-09-21T13:00:00",
-    "status": "pending",
-    "content_type": null
+    "status": "error",
+    "content_type": null,
+    "error": "No TikTok token found at /Users/Apple/autoclip-pipeline/lib/../tiktok_token.json. Run the OAuth flow first (see setup instructions in this file's docstring) to authorize an account."
   },
   {
     "platform": "instagram",
@@ -1332,9 +1362,10 @@
       "#culturewar"
     ],
     "scheduled_time": "2026-09-21T12:00:00",
-    "status": "pending",
+    "status": "error",
     "content_type": null,
-    "public_url": "https://takekash.com/clips/job1788482095_window01_instagram.mp4"
+    "public_url": "https://takekash.com/clips/job1788482095_window01_instagram.mp4",
+    "error": "INSTAGRAM_ACCESS_TOKEN / INSTAGRAM_USER_ID not set in environment. See setup instructions in this file's docstring."
   },
   {
     "platform": "tiktok",
@@ -1353,8 +1384,9 @@
       "#Deplatformed"
     ],
     "scheduled_time": "2026-09-21T20:00:00",
-    "status": "pending",
-    "content_type": null
+    "status": "error",
+    "content_type": null,
+    "error": "No TikTok token found at /Users/Apple/autoclip-pipeline/lib/../tiktok_token.json. Run the OAuth flow first (see setup instructions in this file's docstring) to authorize an account."
   },
   {
     "platform": "instagram",
@@ -1373,9 +1405,10 @@
       "#DeplatformedOnline"
     ],
     "scheduled_time": "2026-09-21T18:00:00",
-    "status": "pending",
+    "status": "error",
     "content_type": null,
-    "public_url": "https://takekash.com/clips/job1788482095_window02_instagram.mp4"
+    "public_url": "https://takekash.com/clips/job1788482095_window02_instagram.mp4",
+    "error": "INSTAGRAM_ACCESS_TOKEN / INSTAGRAM_USER_ID not set in environment. See setup instructions in this file's docstring."
   },
   {
     "platform": "tiktok",
@@ -1394,8 +1427,9 @@
       "#Controversial"
     ],
     "scheduled_time": "2026-09-22T10:00:00",
-    "status": "pending",
-    "content_type": null
+    "status": "error",
+    "content_type": null,
+    "error": "No TikTok token found at /Users/Apple/autoclip-pipeline/lib/../tiktok_token.json. Run the OAuth flow first (see setup instructions in this file's docstring) to authorize an account."
   },
   {
     "platform": "instagram",
@@ -1414,9 +1448,10 @@
       "#SocialMediaCensorship"
     ],
     "scheduled_time": "2026-09-22T09:00:00",
-    "status": "pending",
+    "status": "error",
     "content_type": null,
-    "public_url": "https://takekash.com/clips/job1788482095_window03_instagram.mp4"
+    "public_url": "https://takekash.com/clips/job1788482095_window03_instagram.mp4",
+    "error": "INSTAGRAM_ACCESS_TOKEN / INSTAGRAM_USER_ID not set in environment. See setup instructions in this file's docstring."
   },
   {
     "platform": "tiktok",
@@ -1435,8 +1470,9 @@
       "#politicaltactics"
     ],
     "scheduled_time": "2026-09-22T13:00:00",
-    "status": "pending",
-    "content_type": null
+    "status": "error",
+    "content_type": null,
+    "error": "No TikTok token found at /Users/Apple/autoclip-pipeline/lib/../tiktok_token.json. Run the OAuth flow first (see setup instructions in this file's docstring) to authorize an account."
   },
   {
     "platform": "instagram",
@@ -1455,9 +1491,10 @@
       "#minnesota"
     ],
     "scheduled_time": "2026-09-22T12:00:00",
-    "status": "pending",
+    "status": "error",
     "content_type": null,
-    "public_url": "https://takekash.com/clips/job1788482095_window04_instagram.mp4"
+    "public_url": "https://takekash.com/clips/job1788482095_window04_instagram.mp4",
+    "error": "INSTAGRAM_ACCESS_TOKEN / INSTAGRAM_USER_ID not set in environment. See setup instructions in this file's docstring."
   },
   {
     "platform": "tiktok",
@@ -1476,8 +1513,9 @@
       "#courtroom"
     ],
     "scheduled_time": "2026-09-22T20:00:00",
-    "status": "pending",
-    "content_type": null
+    "status": "error",
+    "content_type": null,
+    "error": "No TikTok token found at /Users/Apple/autoclip-pipeline/lib/../tiktok_token.json. Run the OAuth flow first (see setup instructions in this file's docstring) to authorize an account."
   },
   {
     "platform": "instagram",
@@ -1496,9 +1534,10 @@
       "#policeencounter"
     ],
     "scheduled_time": "2026-09-22T18:00:00",
-    "status": "pending",
+    "status": "error",
     "content_type": null,
-    "public_url": "https://takekash.com/clips/job1788482095_window05_instagram.mp4"
+    "public_url": "https://takekash.com/clips/job1788482095_window05_instagram.mp4",
+    "error": "INSTAGRAM_ACCESS_TOKEN / INSTAGRAM_USER_ID not set in environment. See setup instructions in this file's docstring."
   },
   {
     "platform": "tiktok",
@@ -1517,8 +1556,9 @@
       "#legaltiktok"
     ],
     "scheduled_time": "2026-09-23T10:00:00",
-    "status": "pending",
-    "content_type": null
+    "status": "error",
+    "content_type": null,
+    "error": "No TikTok token found at /Users/Apple/autoclip-pipeline/lib/../tiktok_token.json. Run the OAuth flow first (see setup instructions in this file's docstring) to authorize an account."
   },
   {
     "platform": "instagram",
@@ -1537,9 +1577,10 @@
       "#legalanalysis"
     ],
     "scheduled_time": "2026-09-23T09:00:00",
-    "status": "pending",
+    "status": "error",
     "content_type": null,
-    "public_url": "https://takekash.com/clips/job1788482095_window06_instagram.mp4"
+    "public_url": "https://takekash.com/clips/job1788482095_window06_instagram.mp4",
+    "error": "INSTAGRAM_ACCESS_TOKEN / INSTAGRAM_USER_ID not set in environment. See setup instructions in this file's docstring."
   },
   {
     "platform": "tiktok",
@@ -1558,8 +1599,9 @@
       "#learnfromhistory"
     ],
     "scheduled_time": "2026-09-23T13:00:00",
-    "status": "pending",
-    "content_type": null
+    "status": "error",
+    "content_type": null,
+    "error": "No TikTok token found at /Users/Apple/autoclip-pipeline/lib/../tiktok_token.json. Run the OAuth flow first (see setup instructions in this file's docstring) to authorize an account."
   },
   {
     "platform": "instagram",
@@ -1578,9 +1620,10 @@
       "#SelfCriticism"
     ],
     "scheduled_time": "2026-09-23T12:00:00",
-    "status": "pending",
+    "status": "error",
     "content_type": null,
-    "public_url": "https://takekash.com/clips/job1788482095_window07_instagram.mp4"
+    "public_url": "https://takekash.com/clips/job1788482095_window07_instagram.mp4",
+    "error": "INSTAGRAM_ACCESS_TOKEN / INSTAGRAM_USER_ID not set in environment. See setup instructions in this file's docstring."
   },
   {
     "platform": "tiktok",
@@ -1619,9 +1662,10 @@
       "#EntertainmentIndustry"
     ],
     "scheduled_time": "2026-09-23T18:00:00",
-    "status": "pending",
+    "status": "error",
     "content_type": null,
-    "public_url": "https://takekash.com/clips/job1788482095_window08_instagram.mp4"
+    "public_url": "https://takekash.com/clips/job1788482095_window08_instagram.mp4",
+    "error": "INSTAGRAM_ACCESS_TOKEN / INSTAGRAM_USER_ID not set in environment. See setup instructions in this file's docstring."
   },
   {
     "platform": "tiktok",

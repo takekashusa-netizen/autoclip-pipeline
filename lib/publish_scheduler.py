@@ -29,6 +29,11 @@ from datetime import datetime, timedelta
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 QUEUE_FILE = os.path.join(ROOT, "publish_schedule.json")
+# Real, permanent fix added 2026-09-22 ("make this mandatory from now on",
+# after camcapone_window01 sat with no real metadata for days with nothing
+# but a console print recording why): every metadata-generation or
+# pre-publish-refresh failure lands here, durably, instead of just stdout.
+FAILURES_FILE = os.path.join(ROOT, "metadata_failures.json")
 
 # Real, research-backed default slots (local time, 24h clock)
 DEFAULT_SLOTS = {
@@ -48,6 +53,64 @@ def _load_queue():
 def _save_queue(queue):
     with open(QUEUE_FILE, "w") as f:
         json.dump(queue, f, indent=2)
+
+
+def _load_failures():
+    if not os.path.exists(FAILURES_FILE):
+        return []
+    try:
+        with open(FAILURES_FILE) as f:
+            return json.load(f)
+    except Exception:
+        return []
+
+
+def _save_failures(failures):
+    with open(FAILURES_FILE, "w") as f:
+        json.dump(failures, f, indent=2)
+
+
+def _record_metadata_failure(sub_job, job_name, video_path, platform, error, kind="generation"):
+    """Real, durable replacement for the old `print(...); continue`
+    pattern. kind="generation" means a window never got real metadata in
+    the first place (enqueue_best_windows_job); kind="refresh" means it
+    had metadata already but the mandatory pre-publish refresh failed
+    (process_due_items). Either way this survives restarts, log
+    rotation, and just not being noticed — which is exactly how
+    camcapone_window01 went unnoticed for days."""
+    failures = _load_failures()
+    now = datetime.now().isoformat()
+    for entry in failures:
+        if entry.get("sub_job") == sub_job and entry.get("kind", "generation") == kind:
+            entry["attempts"] = entry.get("attempts", 1) + 1
+            entry["last_attempt_at"] = now
+            entry["error"] = str(error)
+            entry["resolved"] = False
+            _save_failures(failures)
+            return entry
+    entry = {
+        "sub_job": sub_job,
+        "job_name": job_name,
+        "video_path": video_path,
+        "platform": platform,
+        "kind": kind,
+        "error": str(error),
+        "first_failed_at": now,
+        "last_attempt_at": now,
+        "attempts": 1,
+        "resolved": False,
+    }
+    failures.append(entry)
+    _save_failures(failures)
+    return entry
+
+
+def _clear_metadata_failure(sub_job, kind="generation"):
+    failures = _load_failures()
+    remaining = [e for e in failures
+                 if not (e.get("sub_job") == sub_job and e.get("kind", "generation") == kind)]
+    if len(remaining) != len(failures):
+        _save_failures(remaining)
 
 
 def _next_available_slot(platform, queue, slots=None):
@@ -82,7 +145,21 @@ def enqueue(platform, content_id, video_path, title, description="", tags=None, 
     apexnba2k2 incident) without guessing: a None here means "genre
     unknown/not asserted" and the gate is skipped for this item, exactly
     like the existing interviewtest queue entries that predate this
-    field and are already correctly labeled as non-gaming."""
+    field and are already correctly labeled as non-gaming.
+
+    Real, permanent fix ("make this mandatory from now on", 2026-09-22):
+    this is the one real chokepoint every publish path — best-windows,
+    apex, and anything else — funnels through to get scheduled, so it's
+    the one place a hard gate actually closes the door for good. Nothing
+    with a fabricated/blank title or a missing video can get queued
+    here, regardless of which caller forgot to check first."""
+    if not title or not str(title).strip():
+        raise ValueError(
+            f"refusing to enqueue {content_id!r} for {platform} — no real "
+            f"title/metadata given (mandatory since 2026-09-22)"
+        )
+    if not video_path:
+        raise ValueError(f"refusing to enqueue {content_id!r} for {platform} — no video_path given")
     queue = _load_queue()
     scheduled_time = _next_available_slot(platform, queue)
     item = {
@@ -133,12 +210,55 @@ def enqueue_best_windows_job(job_name, platform="youtube", content_type=None):
         try:
             meta = generate_clip_metadata(sub_job, platform)
         except Exception as meta_err:
-            print(f"publish_scheduler: could not generate real metadata for {sub_job}, skipping: {meta_err}")
+            # Real, permanent fix (2026-09-22): this used to just print and
+            # move on, which is exactly why camcapone_window01 sat with no
+            # real metadata for days — nothing durable ever recorded that
+            # generation failed for it. Now it's written to
+            # metadata_failures.json so retry_metadata_failures() (wired
+            # into the background maintenance loop) can keep retrying it
+            # automatically, and so it shows up if anyone looks, instead of
+            # depending on someone noticing a missing file by hand.
+            _record_metadata_failure(sub_job, job_name, video_path, platform, meta_err, kind="generation")
+            print(f"publish_scheduler: could not generate real metadata for {sub_job}, "
+                  f"recorded in metadata_failures.json for automatic retry, skipping for now: {meta_err}", flush=True)
             continue
+        _clear_metadata_failure(sub_job, kind="generation")
         item = enqueue(platform, sub_job, video_path, meta["title"], meta["description"],
                         meta.get("hashtags", []), content_type=content_type)
         queued.append(item)
     return queued
+
+
+def retry_metadata_failures():
+    """Real automatic retry for the durable failures enqueue_best_windows_job
+    records above — meant to be called on an interval from the background
+    maintenance loop (same pattern as process_due_items), so a window that
+    failed metadata generation gets picked back up on its own instead of
+    needing someone to notice metadata_failures.json and re-run something
+    by hand, which is exactly what didn't happen for camcapone_window01."""
+    import sys
+    sys.path.insert(0, ROOT)
+    from generate_clip_metadata import generate_clip_metadata
+
+    failures = _load_failures()
+    pending = [e for e in failures if not e.get("resolved") and e.get("kind", "generation") == "generation"]
+    recovered = 0
+    still_failing = 0
+    for entry in pending:
+        sub_job = entry["sub_job"]
+        platform = entry.get("platform", "youtube")
+        try:
+            meta = generate_clip_metadata(sub_job, platform)
+            enqueue(platform, sub_job, entry["video_path"], meta["title"], meta["description"],
+                    meta.get("hashtags", []))
+        except Exception as retry_err:
+            _record_metadata_failure(sub_job, entry["job_name"], entry["video_path"], platform,
+                                      retry_err, kind="generation")
+            still_failing += 1
+            continue
+        _clear_metadata_failure(sub_job, kind="generation")
+        recovered += 1
+    return {"retried": len(pending), "recovered": recovered, "still_failing": still_failing}
 
 
 def process_due_items():
@@ -148,6 +268,19 @@ def process_due_items():
     just once."""
     import sys
     sys.path.insert(0, ROOT)
+    try:
+        import doctor as doctor_mod
+    except Exception:
+        # Real bug fixed 2026-09-22: this was referenced below (for
+        # captions/thumbnails) but never actually imported in this
+        # function, so it would have raised NameError the moment it was
+        # reached. It never was reached before, because the old numeric-
+        # only regex below never matched a real best-windows content_id
+        # (those are built with a double underscore, "__window", not the
+        # single-underscore "job123_window05" shape the old pattern
+        # expected) — so this was a live, latent crash waiting for the
+        # regex gap to be closed. Fixed here, not just worked around.
+        doctor_mod = None
 
     queue = _load_queue()
     now = datetime.now()
@@ -170,25 +303,50 @@ def process_due_items():
             # generation applies automatically to everything still pending,
             # not just newly-enqueued items.
             content_id = item.get("content_id", "")
-            match = re.match(r"(job\d+)_window(\d+)", content_id)
-            if match:
-                # Real, permanent fix: this refresh step used to call
-                # the confirmed-broken generate_window_metadata,
-                # silently overwriting good metadata with raw transcript
-                # garbage right before publish - this is what actually
-                # corrupted a real, already-published job overnight.
-                # generate_clip_metadata is the same real, grounded
-                # generator enqueue_best_windows_job already uses.
-                try:
-                    from generate_clip_metadata import generate_clip_metadata
-                    sub_job = f"{match.group(1)}__window{int(match.group(2)):02d}"
-                    fresh_meta = generate_clip_metadata(sub_job, item.get("platform", "youtube"))
-                    if fresh_meta:
-                        item["title"] = fresh_meta["title"]
-                        item["description"] = fresh_meta["description"]
-                        item["tags"] = fresh_meta.get("hashtags", [])
-                except Exception as regen_err:
-                    print(f"publish_scheduler: could not refresh metadata for {content_id} (using cached): {regen_err}")
+
+            # Real, permanent fix (2026-09-22 — "make this mandatory from
+            # now on"): the refresh below used to only fire for content_ids
+            # matching the numeric "job123_window05" shape, silently
+            # skipping every named job (interviewtest, apexnba2k2,
+            # gtaxlong1, ...) — the exact safety net added after the
+            # stale-slur incident simply didn't apply to a whole category
+            # of real content, which is how camcapone_window01 could have
+            # gone out on stale/no metadata even after enqueue. content_id
+            # IS already the real project directory name —
+            # enqueue_best_windows_job builds it as "<job_name>__window<NN>"
+            # and passes it straight through as content_id — so there is no
+            # need to regex-reconstruct it at all. Passing it straight to
+            # generate_clip_metadata works for every job, numeric or named,
+            # and can't develop this kind of coverage gap again. This now
+            # runs unconditionally for every due item, not just ones that
+            # happen to match a naming pattern.
+            try:
+                from generate_clip_metadata import generate_clip_metadata
+                fresh_meta = generate_clip_metadata(content_id, item.get("platform", "youtube"))
+                if fresh_meta:
+                    item["title"] = fresh_meta["title"]
+                    item["description"] = fresh_meta["description"]
+                    item["tags"] = fresh_meta.get("hashtags", [])
+                    _clear_metadata_failure(content_id, kind="refresh")
+            except Exception as regen_err:
+                # Real, permanent fix: this used to be just a print — now
+                # it's durably recorded too, same as a generation failure,
+                # so a clip whose refresh keeps failing shows up somewhere
+                # real instead of only in a log line. Publish still
+                # proceeds with the last-known-good cached metadata (which
+                # already passed the content-safety gate below), rather
+                # than blocking on a refresh hiccup.
+                _record_metadata_failure(content_id, content_id, item.get("video_path", ""),
+                                          item.get("platform", "youtube"), regen_err, kind="refresh")
+                print(f"publish_scheduler: could not refresh metadata for {content_id} "
+                      f"(using cached, recorded in metadata_failures.json): {regen_err}", flush=True)
+
+            # Real parser for the "<job_name>__window<NN>" shape every
+            # best-windows content_id actually uses (see
+            # enqueue_best_windows_job) — used below for captions/
+            # thumbnails, which need the parent job name and a real
+            # 0-indexed window number, not the full sub_job id.
+            sub_window_match = re.match(r"^(.+)__window(\d+)$", content_id)
 
             if item["platform"] == "youtube":
                 from youtube_publish import (upload_video, verify_content_type,
@@ -242,15 +400,15 @@ def process_due_items():
 
                 srt_path = None
                 thumbnail_path = None
-                if match and doctor_mod:
+                if sub_window_match and doctor_mod:
                     try:
-                        srt_path = doctor_mod.generate_srt_for_window(match.group(1), int(match.group(2)) - 1)
+                        srt_path = doctor_mod.generate_srt_for_window(sub_window_match.group(1), int(sub_window_match.group(2)) - 1)
                     except Exception as srt_err:
-                        print(f"publish_scheduler: caption generation failed for {content_id} (continuing without): {srt_err}")
+                        print(f"publish_scheduler: caption generation failed for {content_id} (continuing without): {srt_err}", flush=True)
                     try:
-                        thumbnail_path = doctor_mod.extract_thumbnail_for_window(match.group(1), int(match.group(2)) - 1)
+                        thumbnail_path = doctor_mod.extract_thumbnail_for_window(sub_window_match.group(1), int(sub_window_match.group(2)) - 1)
                     except Exception as thumb_err:
-                        print(f"publish_scheduler: thumbnail generation failed for {content_id} (continuing without): {thumb_err}")
+                        print(f"publish_scheduler: thumbnail generation failed for {content_id} (continuing without): {thumb_err}", flush=True)
                 result = upload_video(item["video_path"], item["title"], item["description"],
                                        item["tags"], privacy_status="private",
                                        srt_path=srt_path, thumbnail_path=thumbnail_path)

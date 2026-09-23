@@ -241,7 +241,8 @@ def list_best_windows_jobs():
 
 def background_maintenance_loop(interval_sec=60, resume_interval_sec=600, publish_interval_sec=300,
                                  metadata_interval_sec=60, schedule_interval_sec=60,
-                                 prune_interval_sec=86400,
+                                 prune_interval_sec=86400, log_rotate_interval_sec=3600,
+                                 metadata_retry_interval_sec=600,
                                  auto_publish=False, content_type="gaming"):
     """The real consolidation: doctor.py's auto-resume and auto-publish
     logic, running as a thread INSIDE this same server process instead
@@ -268,21 +269,29 @@ def background_maintenance_loop(interval_sec=60, resume_interval_sec=600, publis
         generate_metadata_for_all_finished_jobs = None
         print(f"dashboard: auto-metadata unavailable — {e}", flush=True)
     try:
-        from publish_scheduler import process_due_items
+        from publish_scheduler import process_due_items, retry_metadata_failures
     except ImportError as e:
         process_due_items = None
+        retry_metadata_failures = None
         print(f"dashboard: publish scheduler unavailable — {e}", flush=True)
     try:
         from prune_finished_jobs import prune as prune_finished_jobs
     except ImportError as e:
         prune_finished_jobs = None
         print(f"dashboard: finished-job pruning unavailable — {e}", flush=True)
+    try:
+        from log_rotate import rotate_if_needed
+    except ImportError as e:
+        rotate_if_needed = None
+        print(f"dashboard: log rotation unavailable — {e}", flush=True)
 
     last_resume = 0.0
     last_publish = 0.0
     last_metadata = 0.0
     last_schedule = 0.0
     last_prune = 0.0
+    last_log_rotate = 0.0
+    last_metadata_retry = 0.0
     while True:
         try:
             if time.time() - last_resume >= resume_interval_sec:
@@ -334,6 +343,40 @@ def background_maintenance_loop(interval_sec=60, resume_interval_sec=600, publis
                 if touched:
                     print(f"dashboard: pruned {freed/1e9:.2f} GB of finished-job media across {touched} job dir(s)", flush=True)
                 last_prune = time.time()
+            if rotate_if_needed and time.time() - last_log_rotate >= log_rotate_interval_sec:
+                # Real, permanent fix added 2026-09-22 after a watchdog-timeout
+                # kernel panic: dashboard.log/poller.log are plain launchd-
+                # redirected stdout/stderr with no rotation of their own, so
+                # they'd otherwise grow forever. Caps each at ~20MB, truncated
+                # in place (see lib/log_rotate.py for why in-place, not
+                # rename) so the still-running launchd process keeps writing
+                # correctly with no restart needed.
+                for log_name in ("dashboard.log", "poller.log"):
+                    try:
+                        if rotate_if_needed(os.path.join(ROOT, log_name)):
+                            print(f"dashboard: rotated {log_name} (exceeded size cap)", flush=True)
+                    except Exception as rotate_err:
+                        print(f"dashboard: log rotation of {log_name} failed (non-fatal): {rotate_err}", flush=True)
+                last_log_rotate = time.time()
+            if retry_metadata_failures and time.time() - last_metadata_retry >= metadata_retry_interval_sec:
+                # Real, permanent fix added 2026-09-22 ("make this mandatory
+                # from now on"): a window whose real metadata generation
+                # failed used to just print a line and vanish — nothing
+                # ever retried it, which is exactly how camcapone_window01
+                # sat with no real caption for days until it was found by
+                # hand. Every failure now lands in metadata_failures.json
+                # (see lib/publish_scheduler.py) and gets retried
+                # automatically here, on its own, without needing anyone
+                # to notice.
+                try:
+                    retry_result = retry_metadata_failures()
+                    if retry_result.get("retried"):
+                        print(f"dashboard: metadata-failure retry — recovered "
+                              f"{retry_result['recovered']}/{retry_result['retried']} "
+                              f"(still failing: {retry_result['still_failing']})", flush=True)
+                except Exception as retry_err:
+                    print(f"dashboard: metadata-failure retry pass failed (non-fatal): {retry_err}", flush=True)
+                last_metadata_retry = time.time()
             if auto_publish and time.time() - last_publish >= publish_interval_sec:
                 doctor_mod.publish_pending_jobs()
                 last_publish = time.time()
