@@ -210,16 +210,22 @@ HOOK_FORMULA_PATTERNS = {
 OPUS_TRENDING_BROAD_TAGS_GAMING = ["#fyp", "#viral", "#foryou", "#gaming", "#gamingcommunity",
                                    "#gameplay", "#fps", "#twitch"]
 
-# Real relevance-ranked data for podcast/interview content (displaypurposes.com
-# #podcast and #interviews related-tag tables, fetched 2026-09-23) -- this pipeline
-# also produces "Cam Capone News" podcast/interview clips (interviewtest, apexnba2k2,
-# job1788482095 job families), which are NOT gaming content despite some of those job
-# names -- confirmed by reading their real per-clip metadata/titles. Using the gaming
-# tag list on these would misdirect them the same way the old Brawlhalla #Brawl tag
-# did. This is their own separate, correctly-targeted trend set.
-OPUS_TRENDING_BROAD_TAGS_PODCAST = ["#fyp", "#viral", "#foryou", "#podcast", "#podcasts",
-                                    "#podcastclips", "#interview", "#interviewclips",
-                                    "#realtalk"]
+# Retired 2026-09-24: this used to be a fixed tag list
+# (#podcast/#podcasts/#podcastclips/#interview/#interviewclips/#realtalk/
+# #fyp/#viral/#foryou) that score_trend_alignment checked podcast hashtags
+# against. Real evidence killed it: checked 3 actual "Cam Capone News"
+# TikTok posts live (@takekashgaming, 2026-09-24) spanning three
+# completely different episode topics -- space/free-energy conspiracy
+# (238K views), forgotten-history/UFOs (166K views), and personal
+# finance/wealth-building (153K views). All three real, high-performing
+# posts used ZERO generic tags from this list -- not even #podcast or
+# #interview -- and 100% topic-specific ones instead (#ConspiracyTheory,
+# #ForgottenHistory, #WealthBuilding, etc.), because the show's subject
+# changes every episode. There is no honest fixed "podcast hashtag
+# vocabulary" to score against; this list was actively penalizing the
+# exact real clips proven to work. See score_trend_alignment below for
+# the real, calculable replacement: whether the clip's own hashtags are
+# actually grounded in its own transcript.
 
 
 def score_hook_formula(title):
@@ -227,15 +233,32 @@ def score_hook_formula(title):
     return [name for name, pat in HOOK_FORMULA_PATTERNS.items() if pat.search(title or "")]
 
 
-def score_trend_alignment(hashtags, content_type="gaming"):
-    """OpusClip 'Trend' pillar: coverage of real high-volume broad tags for this
-    content type. content_type is "gaming" (matches against GAME_KEYWORD_TAXONOMY
-    games) or "podcast" (Cam Capone News interview/podcast clips) -- picking the
-    wrong one misdirects the clip to the wrong audience, so callers must be explicit
-    rather than defaulting silently to gaming."""
+def _tag_words(tag):
+    """Split a hashtag into its real component words for a transcript-grounding
+    check -- e.g. '#ForgottenHistory' -> ['forgotten', 'history'], '#UFOs' ->
+    ['ufos']. Words of length <= 2 are dropped (too likely to false-match)."""
+    bare = tag.lstrip("#")
+    parts = re.findall(r"[A-Z]?[a-z0-9]+|[A-Z]+(?=[A-Z]|$)", bare)
+    return [p.lower() for p in parts if len(p) > 2]
+
+
+def score_trend_alignment(hashtags, content_type="gaming", transcript_text=""):
+    """OpusClip 'Trend' pillar. Gaming content: coverage of real high-volume
+    broad gaming tags -- a stable, evergreen vocabulary for a single game, so
+    a fixed list is honest here. Podcast/interview content: NOT scored
+    against any fixed tag list (see the retirement note above for why) --
+    instead scores whether the clip's own hashtags are actually grounded in
+    that clip's own real transcript, the real signal the 3 checked examples
+    had in common. Same 60-plus-scaled-bonus shape used by keyword_coverage/
+    hashtag_relevance elsewhere in this file, for consistency."""
+    if content_type == "podcast":
+        if not hashtags:
+            return 60
+        text_lower = (transcript_text or "").lower()
+        grounded = sum(1 for h in hashtags if any(w in text_lower for w in _tag_words(h)))
+        return min(100, int(60 + 40 * (grounded / len(hashtags))))
     tags_lower = [h.lower() for h in (hashtags or [])]
-    trending = OPUS_TRENDING_BROAD_TAGS_PODCAST if content_type == "podcast" else OPUS_TRENDING_BROAD_TAGS_GAMING
-    hits = sum(1 for t in trending if t in tags_lower)
+    hits = sum(1 for t in OPUS_TRENDING_BROAD_TAGS_GAMING if t in tags_lower)
     return min(100, 60 + hits * 10)
 
 
@@ -273,7 +296,7 @@ def score_clip_metadata(metadata, transcript_text, game_name=None):
     platform_fit = 100 if len(title) <= 100 and len(hashtags) >= 4 else 75
 
     content_type = "gaming" if game_data else "podcast"
-    trend_alignment = score_trend_alignment(hashtags, content_type=content_type)
+    trend_alignment = score_trend_alignment(hashtags, content_type=content_type, transcript_text=transcript_text)
 
     total = int((search_relevance + keyword_coverage + hashtag_relevance
                  + hook_ctr + platform_fit + trend_alignment) / 6)

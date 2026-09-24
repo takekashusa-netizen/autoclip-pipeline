@@ -202,7 +202,6 @@ print('regenerated')
 fi
 
 report_web_status "visual-analysis" 2
-echo "-- analyzing visual content (action/motion detection) --"
 visual_json="$(job_dir "$job")/rough-cut/visual-analysis.json"
 # Real fix: this used to re-run the expensive (and, on this machine,
 # sometimes-interrupted-for-unknown-reasons) visual analysis pass on
@@ -224,33 +223,7 @@ except Exception:
   fi
 fi
 
-if [[ "$cached_valid" == true ]]; then
-  log "visual-analysis: reusing existing visual-analysis.json (delete it manually to force a fresh re-analysis)"
-elif python3 -c "import cv2" 2>/dev/null; then
-  # Real bug fixed: visual analysis is supposed to be optional/best-effort
-  # — but under set -euo pipefail, if visual_analysis.py exited non-zero
-  # for ANY reason (a crash, an OOM kill, anything), this assignment's own
-  # failure silently killed the ENTIRE clip_pipeline.sh run with zero
-  # visible error, since the captured stderr never got a chance to print
-  # before the script died. The `|| vis_exit=$?` pattern below prevents
-  # set -e from treating this as fatal, so a broken/crashed visual
-  # analysis degrades to "no visual data" instead of taking down clips
-  # that don't even depend on it (transcript-based selection still works).
-  vis_exit=0
-  vis_result="$(run_with_timeout 180 python3 "${PIPELINE_ROOT}/lib/visual_analysis.py" "$rough_cut_video" "$visual_json" --interval 2.0 2>&1)" || vis_exit=$?
-  if [[ $vis_exit -ne 0 ]]; then
-    log "visual-analysis: FAILED (exit ${vis_exit}) — continuing WITHOUT visual data, transcript-based selection still works. Error was: $(echo "$vis_result" | tail -5)"
-    visual_json=""
-  else
-    log "visual-analysis: ${vis_result}"
-  fi
-else
-  log "visual-analysis: opencv not installed — skipping action-moment detection (pip install opencv-python-headless to enable). Transcript-based selection still works normally."
-  visual_json=""
-fi
-
 report_web_status "audio-analysis" 3
-echo "-- analyzing audio content (gunfire/impact detection) --"
 audio_json="$(job_dir "$job")/rough-cut/audio-analysis.json"
 audio_cached_valid=false
 if [[ -f "$audio_json" ]]; then
@@ -266,14 +239,68 @@ except Exception:
   fi
 fi
 
+echo "-- analyzing visual content (action/motion detection) + audio content (gunfire/impact detection) in parallel --"
+# Real speed fix: visual-analysis and audio-analysis are two independent,
+# read-only passes over the same rough_cut_video -- visual samples video
+# frames via cv2, audio extracts the audio track via its own ffmpeg pipe
+# straight to stdout (no temp file, confirmed in audio_analysis.py's own
+# docstring) -- no shared state, no shared temp paths, no data dependency
+# either direction. They used to run strictly back-to-back (up to
+# 180s + 120s = 5 min of wall-clock per clip) for no real reason. Now
+# launched concurrently and awaited together -- wall-clock cost drops to
+# roughly whichever one actually takes longer, not the sum of both.
+vis_started=false
+aud_started=false
+
+if [[ "$cached_valid" == true ]]; then
+  log "visual-analysis: reusing existing visual-analysis.json (delete it manually to force a fresh re-analysis)"
+elif python3 -c "import cv2" 2>/dev/null; then
+  # Real bug fixed: visual analysis is supposed to be optional/best-effort
+  # — but under set -euo pipefail, if visual_analysis.py exited non-zero
+  # for ANY reason (a crash, an OOM kill, anything), this assignment's own
+  # failure silently killed the ENTIRE clip_pipeline.sh run with zero
+  # visible error, since the captured stderr never got a chance to print
+  # before the script died. Backgrounding + explicit `wait`/exit-code
+  # capture below preserves that same set -e resilience.
+  vis_out="$(job_dir "$job")/rough-cut/.visual-analysis.stdout.tmp"
+  run_with_timeout 180 python3 "${PIPELINE_ROOT}/lib/visual_analysis.py" "$rough_cut_video" "$visual_json" --interval 2.0 > "$vis_out" 2>&1 &
+  vis_pid=$!
+  vis_started=true
+else
+  log "visual-analysis: opencv not installed — skipping action-moment detection (pip install opencv-python-headless to enable). Transcript-based selection still works normally."
+  visual_json=""
+fi
+
 if [[ "$audio_cached_valid" == true ]]; then
   log "audio-analysis: reusing existing audio-analysis.json (delete it manually to force a fresh re-analysis)"
 else
   # same crash-resilience pattern as visual analysis above — a broken
   # audio track or an ffmpeg extraction failure degrades to "no audio
   # data" instead of taking down the whole run
+  aud_out="$(job_dir "$job")/rough-cut/.audio-analysis.stdout.tmp"
+  run_with_timeout 120 python3 "${PIPELINE_ROOT}/lib/audio_analysis.py" "$rough_cut_video" "$audio_json" > "$aud_out" 2>&1 &
+  aud_pid=$!
+  aud_started=true
+fi
+
+if [[ "$vis_started" == true ]]; then
+  vis_exit=0
+  wait "$vis_pid" || vis_exit=$?
+  vis_result="$(cat "$vis_out" 2>/dev/null)"
+  rm -f "$vis_out"
+  if [[ $vis_exit -ne 0 ]]; then
+    log "visual-analysis: FAILED (exit ${vis_exit}) — continuing WITHOUT visual data, transcript-based selection still works. Error was: $(echo "$vis_result" | tail -5)"
+    visual_json=""
+  else
+    log "visual-analysis: ${vis_result}"
+  fi
+fi
+
+if [[ "$aud_started" == true ]]; then
   audio_exit=0
-  audio_result="$(run_with_timeout 120 python3 "${PIPELINE_ROOT}/lib/audio_analysis.py" "$rough_cut_video" "$audio_json" 2>&1)" || audio_exit=$?
+  wait "$aud_pid" || audio_exit=$?
+  audio_result="$(cat "$aud_out" 2>/dev/null)"
+  rm -f "$aud_out"
   if [[ $audio_exit -ne 0 ]]; then
     log "audio-analysis: FAILED (exit ${audio_exit}) — continuing WITHOUT audio transient data. Error was: $(echo "$audio_result" | tail -5)"
     audio_json=""

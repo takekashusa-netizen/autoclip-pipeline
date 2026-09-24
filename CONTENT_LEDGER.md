@@ -1661,3 +1661,163 @@ createScheduledPost for them via Metricool (same-day, not "just in case"
 ahead of time), and delete the Drive copy right after Metricool has ingested
 it or the clip is confirmed posted. Anything posted manually via the TikTok
 app never needs a Drive copy at all -- post directly from its outputs/ path.
+
+## 2026-09-24 — Pipeline speed fix: parallelized visual + audio analysis
+
+Verified (by reading the code, not guessing) that `visual_analysis.py` and
+`audio_analysis.py` are fully independent read-only passes over the same
+`rough_cut_video`: visual samples frames via cv2, audio extracts the audio
+track via its own ffmpeg pipe straight to stdout (confirmed via its own
+docstring — no shared temp files, no shared state, no data dependency
+either direction). `clip_pipeline.sh` was running them strictly back to
+back (up to 180s + 120s = 5 min of wall-clock budget per clip) for no
+real reason.
+
+Patched `clip_pipeline.sh` (backup: `clip_pipeline.sh.bak_20260924_002826`)
+to launch both as background jobs and await both, instead of sequentially.
+Preserved every existing behavior exactly: the disk-cache reuse check for
+each, the `set -euo pipefail`-safe crash resilience (a failed/timed-out
+analysis degrades to "no data" instead of killing the whole run), and the
+identical log/error messages — only the scheduling changed. Verified with
+`bash -n` (syntax) and a full diff review against the backup.
+
+Real effect: every clip that goes through the standard rough-cut path
+(not just backlog re-transcription) now spends roughly max(actual visual
+time, actual audio time) on this stage instead of the sum of both — up to
+~2 minutes/clip saved when both steps actually use close to their full
+budget. Not yet committed to git or tested against a live run — flagging
+here so it's not silently in the tree; recommend running one real clip
+through `clip_pipeline.sh` to confirm before committing, since this is
+the shared code path for every clip in the pipeline.
+
+Status: applied, uncommitted, awaiting a real test run + explicit commit
+approval.
+
+## 2026-09-24 — Real caption-style reference: @takekashgaming conspiracy/space clip
+
+User-provided real post (theirs), pulled live via browser — not fabricated:
+https://www.tiktok.com/@takekashgaming/video/7669079398703762701
+
+- Account: @takekashgaming (displays as "Gtaxzombies")
+- Posted: 8-1 (Aug 1, 2026)
+- Length: 5:19 — long-form, not a short clip
+- Real measured performance: 19.5K likes / 513 comments / 4547 saves / 3555 shares
+- Save rate ~23% of likes, share rate ~18% of likes — both unusually high; saves/shares
+  this high relative to likes signal "reference/discuss later" content, not just a
+  quick-watch reaction.
+
+Caption (verbatim): "Is the sun our secret free energy source? Advanced beings using
+it as a 'gas station' for massive ships. This knowledge could be the key to 'leaving'
+Earth."
+
+Hashtags (verbatim): #ConspiracyTheory #FreeEnergy #HiddenTruth #Space #TikTokSecrets
+— all niche/topical, zero generic broad tags (#fyp/#viral/#foryou).
+
+Real structural pattern observed (3-beat caption):
+1. Open with a provocative rhetorical QUESTION ("Is the sun our secret free energy
+   source?") — but note: it does NOT end in "?", the sentence continues after the
+   question clause. This is a real gap in the pipeline's current hook-formula
+   detector (`score_hook_formula` in lib/generate_clip_metadata.py): its "question"
+   regex only matches a "?" at the END of the string, so it would MISS this exact
+   real, high-performing pattern. Flagging as a genuine bug to fix, not guessing at
+   a rewrite yet — want more than n=1 example before changing the regex.
+2. Bold, specific claim as the hook payload ("Advanced beings using it as a 'gas
+   station'") — matches the bold_statement/pattern_interrupt archetypes already
+   implemented.
+3. Close on a stakes/curiosity tease, not a CTA ("could be the key to 'leaving'
+   Earth") — open loop, not "link in bio"/"follow for more".
+
+This is a THIRD content vertical distinct from the two the pipeline currently knows
+about (gaming: Apex/Warzone/FC26/NBA2K; podcast: Cam Capone interviews) — call it
+conspiracy/mystery/educational. Its real high-performing hashtags
+(#ConspiracyTheory/#FreeEnergy/#HiddenTruth/#Space/#TikTokSecrets) don't overlap at
+all with either existing OPUS_TRENDING_BROAD_TAGS_* list. Not yet added to
+generate_clip_metadata.py as a third content_type — holding until it's confirmed
+this is a recurring content line (not a one-off) and whether it runs through this
+pipeline at all, since it doesn't look like a Twitch VOD gaming clip or a Cam Capone
+podcast clip.
+
+### Correction (same day): it's a Cam Capone interview, not a 3rd vertical
+
+User clarified: the "sun/free energy" clip above is another Cam Capone News
+interview episode (content_type="podcast" in the existing scoring system), not a
+separate conspiracy/space content line. Retracting the "third content vertical"
+read above.
+
+Real implication, though, and it's a genuine one: this episode's topic (space/
+conspiracy theories) is nothing like other Cam Capone episodes seen so far
+(interviewtest job family), and its real high-performing tags
+(#ConspiracyTheory #FreeEnergy #HiddenTruth #Space #TikTokSecrets) are 100%
+topic-specific to THIS episode's subject matter -- none of them are generic show-
+branding tags. That's a mismatch with how `OPUS_TRENDING_BROAD_TAGS_PODCAST` is
+currently built in lib/generate_clip_metadata.py: a fixed, static list
+(#podcast/#podcasts/#podcastclips/#interview/#interviewclips/#realtalk) applied
+to every podcast clip regardless of what the episode is actually about. If Cam
+Capone covers varied topics episode to episode (this one proves at least one
+does), a static generic tag list will systematically under-tag every episode's
+actual best-performing hashtags -- the real winners here were topical, not
+show-branding.
+
+Not changed in code yet -- this is one real example, and the user's own standing
+rule is not to guess/generalize off n=1. Flagging as the next real thing to
+investigate: whether transcript-derived, per-episode topical tags (extracted from
+the actual episode content, not a static list) should replace or supplement the
+current static PODCAST tag set. Would need to look at a few more real Cam Capone
+episodes' actual posted hashtags/performance before changing the scorer.
+
+## 2026-09-24 — Real fix implemented: podcast trend_alignment scoring
+
+Following up the sun/free-energy clip and its correction (it's a Cam Capone
+interview, not a new vertical): pulled 2 more real Cam Capone posts live from
+@takekashgaming's TikTok to test the hypothesis before changing anything.
+
+Real data, 3 episodes total, all pulled live 2026-09-24:
+1. Space/free-energy conspiracy — 238.1K views, 19.5K likes — tags: #ConspiracyTheory
+   #FreeEnergy #HiddenTruth #Space #TikTokSecrets
+2. Forgotten history/UFOs — 166.4K views, 18.9K likes — tags: #ForgottenHistory
+   #UFOs #Conspiracy #AncientAliens #HistoryFacts
+3. Personal finance/wealth-building — 152.8K views, 5.9K likes — tags: #Finance
+   #WealthBuilding #Investing #FinancialLiteracy #BusinessTips
+
+All 3 real top-performing episodes: zero generic tags (no #podcast, #interview,
+#fyp, #viral in any of them), 100% topic-specific tags, and three completely
+different subjects episode to episode. Confirms the show's topic isn't fixed --
+also independently confirmed by pulling a real re-transcribed backlog transcript
+(interviewtest__window12), which turned out to be about a rapper/music industry
+topic -- a 4th distinct subject.
+
+Also discovered while investigating: `lib/generate_clip_metadata.py` already
+calls Claude (claude-sonnet-5) per clip to write real, transcript-grounded
+title/description/hashtags -- it explicitly instructs the model to identify
+the real content type and never default to gaming tags for non-gaming content.
+Generation was never the problem. The bug was downstream, in
+`score_trend_alignment`: it scored podcast hashtags against a fixed generic
+list (#podcast/#interview/#realtalk/etc.) that the real evidence shows doesn't
+match how any of these actual high-performing episodes are tagged -- meaning
+the scorer was silently marking down exactly the real clips proven to work.
+
+Fix applied to `lib/generate_clip_metadata.py` (backup:
+generate_clip_metadata.py.bak_20260924_011049): retired
+`OPUS_TRENDING_BROAD_TAGS_PODCAST` for podcast content. `score_trend_alignment`
+now takes `transcript_text` and, for podcast clips, scores whether each
+hashtag's real component words (e.g. "#ForgottenHistory" -> forgotten/history)
+actually appear in that clip's own transcript -- a real, calculable proxy for
+topical grounding, not a guess. Gaming scoring is untouched (a fixed list is
+legitimate there -- one game's vocabulary doesn't change clip to clip).
+
+Caught and fixed a real bug in my own patch before shipping it: the first pass
+of the edit accidentally dropped the `return` statement from the gaming
+branch, which would have made every gaming clip's trend_alignment score
+silently `None` and broken `score_clip_metadata`'s averaging. Caught by
+actually running the function against real data (interviewtest__window12's
+real transcript) instead of trusting a syntax check alone -- `bash -n`/`ast.parse`
+only confirm the file parses, not that the logic is right. Re-tested after the
+fix: gaming path now returns real numbers again (80 for 2/8 real tag hits, 60
+for zero hits), podcast path returns sensible grounded-vs-generic scores (73
+for topic-grounded tags vs 70 for an all-generic set, 60 floor for no tags),
+and a full `score_clip_metadata()` run for both a podcast and a gaming clip
+both produced complete, correct results.
+
+Status: applied, tested against real transcript data, uncommitted -- awaiting
+explicit commit approval, same as the clip_pipeline.sh parallelization fix
+logged earlier today.
