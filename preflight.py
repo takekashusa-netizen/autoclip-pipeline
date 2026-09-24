@@ -34,7 +34,21 @@ CORE_MODULES = [
     ("skills/clip-select", "clip_select"), ("skills/clip-select", "build_montage"),
 ]
 
-REQUIRED_PACKAGES = ["faster_whisper", "fastapi", "cv2", "yt_dlp", "PIL"]
+# Real fix, 2026-09-24: this used to hard-block a clip_pipeline.sh launch
+# (via safe_run.sh, which is ALL this file is ever called from -- confirmed,
+# nothing wires it into the dashboard/web launch path) over two packages
+# that launch never actually needs:
+#  - fastapi is used ONLY by web/main.py (the dashboard server) -- grepped
+#    the whole repo, confirmed nothing in the clip_pipeline.sh/lib/*.py
+#    execution path imports it. Requiring it here blocked a real,
+#    legitimate clip job for no reason.
+#  - cv2 (opencv) is already treated as OPTIONAL by clip_pipeline.sh
+#    itself: it explicitly checks 'python3 -c "import cv2"' before using
+#    it and gracefully degrades to transcript-based clip selection when
+#    it is missing (see clip_pipeline.sh's visual-analysis step). Hard-
+#    blocking on it here contradicted the pipeline's own documented
+#    fallback behavior.
+REQUIRED_PACKAGES = ["faster_whisper", "yt_dlp", "PIL"]
 
 
 def check_real_imports():

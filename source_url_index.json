@@ -1,4 +1,15 @@
 {
+  "https://kick.com/saucewalka102/videos/01a0c253-c140-7399-aec3-a434edc144ab": {
+    "canonical_id": null,
+    "duration_sec": null,
+    "error": "\u001b[0;31mERROR:\u001b[0m [kick:vod] 01a0c253-c140-7399-aec3-a434edc144ab: Unable to download JSON metadata: HTTP Error 404: Not Found (caused by <HTTPError 404: Not Found>)",
+    "extractor": "streamlink:kick",
+    "job": "kick_test_01",
+    "resolved_at": "2026-09-24T04:25:57Z",
+    "status": "done",
+    "submitted_at": "2026-09-24T02:36:39Z",
+    "title": ""
+  },
   "https://www.twitch.tv/videos/2863359232": {
     "canonical_id": null,
     "duration_sec": null,

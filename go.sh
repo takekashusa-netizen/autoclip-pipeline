@@ -78,9 +78,12 @@ if [[ "$platform" == "podcast" ]]; then
     exit 1
   fi
   echo "== launching podcast-mode pipeline (model=${model}, content-type=${content_type}) =="
-  PIPELINE_WHISPER_MODEL="$model" "${ROOT}/safe_run.sh" "${ROOT}/clip_pipeline.sh" "$job" long-form-youtube \
+  if ! PIPELINE_WHISPER_MODEL="$model" "${ROOT}/safe_run.sh" "${ROOT}/clip_pipeline.sh" "$job" long-form-youtube \
     --podcast-minutes "${longform_minutes}" \
-    --content-type "$content_type" --auto-approve --skip-music
+    --content-type "$content_type" --auto-approve --skip-music; then
+    echo "go.sh: pipeline launch failed — safe_run.sh refused to start (see its output above). Nothing was launched." >&2
+    exit 1
+  fi
   echo ""
   echo "== launched. real, continuous coherent-speech clip with burned-in captions — check outputs/${job}_podcast/ when done =="
   exit 0
@@ -94,9 +97,12 @@ if [[ "$platform" == "montage" ]]; then
     exit 1
   fi
   echo "== launching montage pipeline (model=${model}, content-type=${content_type}) =="
-  PIPELINE_WHISPER_MODEL="$model" "${ROOT}/safe_run.sh" "${ROOT}/clip_pipeline.sh" "$job" long-form-youtube \
+  if ! PIPELINE_WHISPER_MODEL="$model" "${ROOT}/safe_run.sh" "${ROOT}/clip_pipeline.sh" "$job" long-form-youtube \
     --montage-minutes 15 --montage-count 1 \
-    --content-type "$content_type" --auto-approve --skip-music
+    --content-type "$content_type" --auto-approve --skip-music; then
+    echo "go.sh: pipeline launch failed — safe_run.sh refused to start (see its output above). Nothing was launched." >&2
+    exit 1
+  fi
   echo ""
   echo "== launched. real, dramatic-moments highlight reel with smooth crossfades — check outputs/${job}__montage*/ when done =="
   exit 0
@@ -110,9 +116,12 @@ if [[ "$platform" == "interview" ]]; then
     exit 1
   fi
   echo "== launching interview pipeline (model=${model}, long-form-youtube format, podcast captions, vertical) =="
-  PIPELINE_WHISPER_MODEL="$model" "${ROOT}/safe_run.sh" "${ROOT}/clip_pipeline.sh" "$job" long-form-youtube \
+  if ! PIPELINE_WHISPER_MODEL="$model" "${ROOT}/safe_run.sh" "${ROOT}/clip_pipeline.sh" "$job" long-form-youtube \
     --best-windows-minutes 2 --best-windows-count 5 \
-    --content-type podcast --auto-approve --skip-music --vertical --auto-queue
+    --content-type podcast --auto-approve --skip-music --vertical --auto-queue; then
+    echo "go.sh: pipeline launch failed — safe_run.sh refused to start (see its output above). Nothing was launched." >&2
+    exit 1
+  fi
   echo ""
   echo "== launched. real, vertical TikTok-format interview clips with gap-fill coverage — check outputs/ when done =="
   exit 0
@@ -146,9 +155,12 @@ if [[ "$platform" == "longform" ]]; then
     exit 1
   fi
   echo "== launching best-windows pipeline (model=${model}, content-type=${content_type}) =="
-  PIPELINE_WHISPER_MODEL="$model" "${ROOT}/safe_run.sh" "${ROOT}/clip_pipeline.sh" "$job" long-form-youtube \
+  if ! PIPELINE_WHISPER_MODEL="$model" "${ROOT}/safe_run.sh" "${ROOT}/clip_pipeline.sh" "$job" long-form-youtube \
     --best-windows-minutes "$longform_minutes" --best-windows-count "$clip_count" \
-    --content-type "$content_type" --auto-approve --skip-music ${vertical_flag:-} ${auto_queue_flag:-}
+    --content-type "$content_type" --auto-approve --skip-music ${vertical_flag:-} ${auto_queue_flag:-}; then
+    echo "go.sh: pipeline launch failed — safe_run.sh refused to start (see its output above). Nothing was launched." >&2
+    exit 1
+  fi
   echo ""
   echo "== launched. real, continuous, non-overlapping ${longform_minutes}+ min segments — check outputs/${job}_best_windows/ when done =="
   exit 0
@@ -172,9 +184,12 @@ fi
 clip_length_minutes="$(python3 -c "print(max(0.1, ${clip_length} / 60))")"
 echo "== go.sh: real fix applied - was 'short-tiktok-raw' (does not exist), now long-form-youtube =="
 echo "== launching clip pipeline (model=${model}, ${clip_count} clips of ${clip_length}s, content-type=${content_type}) =="
-PIPELINE_WHISPER_MODEL="$model" "${ROOT}/safe_run.sh" "${ROOT}/clip_pipeline.sh" "$job" long-form-youtube \
+if ! PIPELINE_WHISPER_MODEL="$model" "${ROOT}/safe_run.sh" "${ROOT}/clip_pipeline.sh" "$job" long-form-youtube \
   --best-windows-minutes "$clip_length_minutes" --best-windows-count "$clip_count" \
-  --content-type "$content_type" --auto-approve --skip-music --vertical
+  --content-type "$content_type" --auto-approve --skip-music --vertical; then
+  echo "go.sh: pipeline launch failed — safe_run.sh refused to start (see its output above). Nothing was launched." >&2
+  exit 1
+fi
 
 echo ""
 echo "== launched. this is now genuinely fire-and-forget if doctor.py --auto-resume is running: =="

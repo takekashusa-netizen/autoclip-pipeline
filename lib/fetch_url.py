@@ -11,12 +11,82 @@ otherwise yt-dlp will wait/retry per its own live-from-start behavior.
 """
 import json
 import os
+import shutil
+import subprocess
 import sys
+from urllib.parse import urlparse
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from url_index import record_resolved, record_error
 COOKIE_BROWSER = os.environ.get("PIPELINE_COOKIE_BROWSER", "chrome")
+
+
+def _is_kick_url(url):
+    try:
+        host = urlparse(url).netloc.lower()
+    except Exception:
+        return False
+    return host == "kick.com" or host.endswith(".kick.com")
+
+
+def _find_streamlink():
+    """Look for the streamlink console script next to the running
+    interpreter first (same venv as this script, works regardless of
+    whether that venv is active on PATH), then fall back to PATH."""
+    candidate = os.path.join(os.path.dirname(sys.executable), "streamlink")
+    if os.path.isfile(candidate) and os.access(candidate, os.X_OK):
+        return candidate
+    return shutil.which("streamlink")
+
+
+def _fetch_via_streamlink(url, raw_dir):
+    """Real fix, 2026-09-24: yt-dlp's kick:vod extractor is broken for
+    VOD URLs right now -- confirmed against this exact URL shape via two
+    open upstream issues (yt-dlp/yt-dlp#17284, #17428): Kick changed how
+    VOD URLs/metadata are generated, the old /v1/video/{id} endpoint
+    404s, and yt-dlp hasn't shipped a fix yet (PR open, not merged).
+    Confirmed the VOD itself is real and public by loading the exact
+    failing URL in a real browser (title/views/age all present).
+    streamlink fixed this exact "VOD URLs without channel name now
+    return 404" case in streamlink/streamlink#7108, merged 2026-09-11,
+    included in the 8.6.1 release (2026-09-16) -- so for kick.com URLs
+    specifically, fall back to streamlink instead of failing outright.
+    Only engages for kick.com; every other site keeps using yt-dlp
+    exactly as before."""
+    streamlink_bin = _find_streamlink()
+    if not streamlink_bin:
+        return None, "streamlink not installed — run: pip install streamlink"
+
+    out_path = os.path.join(raw_dir, "source.mp4")
+    cmd = [streamlink_bin, "--force", "-o", out_path, url, "best"]
+    proc = subprocess.run(cmd, capture_output=True, text=True)
+    if proc.returncode != 0 or not os.path.isfile(out_path):
+        detail = (proc.stderr or proc.stdout or "").strip()[-500:]
+        return None, f"streamlink fallback also failed: {detail}"
+
+    # streamlink doesn't hand back title/duration the way yt-dlp does --
+    # duration is measured for real via ffprobe on the actual downloaded
+    # file rather than guessed; title is left blank rather than invented.
+    duration_sec = None
+    try:
+        probe = subprocess.run(
+            ["ffprobe", "-v", "error", "-show_entries", "format=duration",
+             "-of", "default=noprint_wrapper=1:nokey=1", out_path],
+            capture_output=True, text=True, timeout=30,
+        )
+        duration_sec = float(probe.stdout.strip())
+    except Exception:
+        pass
+
+    return {
+        "path": out_path,
+        "title": "",
+        "duration_sec": duration_sec,
+        "was_live": False,
+        "extractor": "streamlink:kick",
+        "id": None,
+    }, None
 
 
 def main():
@@ -59,45 +129,80 @@ def main():
         # supports --live-from-start (site-dependent, not forced here)
     }
 
+    info = None
+    fallback_result = None
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         try:
             info = ydl.extract_info(url, download=True)
         except yt_dlp.utils.DownloadError as e:
             msg = str(e)
-            if "Unsupported URL" in msg:
+            if _is_kick_url(url) and ("404" in msg or "Unable to download JSON metadata" in msg):
+                fallback_result, fallback_err = _fetch_via_streamlink(url, raw_dir)
+                if fallback_result is None:
+                    print(json.dumps({
+                        "error": f"yt-dlp failed ({msg[:200]}) and the kick.com streamlink "
+                                  f"fallback also failed: {fallback_err}"
+                    }))
+                    record_error(url, job, f"{msg} | streamlink fallback: {fallback_err}")
+                    sys.exit(1)
+            elif "Unsupported URL" in msg:
                 print(json.dumps({
                     "error": "unsupported site/URL — yt-dlp doesn't recognize this link"
                 }))
+                record_error(url, job, msg)
+                sys.exit(1)
             elif "Sign in" in msg or "login" in msg.lower() or "cookies" in msg.lower():
                 print(json.dumps({
                     "error": "this content requires login/cookies (private, age-restricted, or "
                               "subscriber-only) — not supported without authentication"
                 }))
+                record_error(url, job, msg)
+                sys.exit(1)
             elif "Private video" in msg or "unavailable" in msg.lower():
                 print(json.dumps({"error": "video is private or unavailable"}))
+                record_error(url, job, msg)
+                sys.exit(1)
             else:
                 print(json.dumps({"error": msg[:500]}))
-            # Real fix: record the failure in the shared URL index too,
-            # not just print it — otherwise a URL that failed here stays
-            # stuck at status "fetching" forever, permanently blocking a
-            # legitimate retry of the same link.
-            record_error(url, job, msg)
-            sys.exit(1)
-        downloaded = ydl.prepare_filename(info)
-        if info.get("requested_downloads"):
-            downloaded = info["requested_downloads"][0].get("filepath", downloaded)
+                # Real fix: record the failure in the shared URL index too,
+                # not just print it — otherwise a URL that failed here stays
+                # stuck at status "fetching" forever, permanently blocking a
+                # legitimate retry of the same link.
+                record_error(url, job, msg)
+                sys.exit(1)
+        else:
+            downloaded = ydl.prepare_filename(info)
+            if info.get("requested_downloads"):
+                downloaded = info["requested_downloads"][0].get("filepath", downloaded)
+            # normalize to source.mp4 regardless of what extension yt-dlp landed on
+            final_path = os.path.join(raw_dir, "source.mp4")
+            if os.path.abspath(downloaded) != os.path.abspath(final_path):
+                os.replace(downloaded, final_path)
 
-    # normalize to source.mp4 regardless of what extension yt-dlp landed on
-    final_path = os.path.join(raw_dir, "source.mp4")
-    if os.path.abspath(downloaded) != os.path.abspath(final_path):
-        os.replace(downloaded, final_path)
-
-    print(json.dumps({
-        "path": final_path,
-        "title": info.get("title", ""),
-        "duration_sec": info.get("duration"),
-        "was_live": bool(info.get("is_live") or info.get("was_live")),
-    }))
+    if fallback_result is not None:
+        info = {
+            "title": fallback_result["title"],
+            "duration": fallback_result["duration_sec"],
+            "is_live": False,
+            "was_live": False,
+            "id": fallback_result["id"],
+            "extractor_key": fallback_result["extractor"],
+        }
+        print(json.dumps({
+            "path": fallback_result["path"],
+            "title": info["title"],
+            "duration_sec": info["duration"],
+            "was_live": False,
+            "note": "downloaded via streamlink fallback — yt-dlp's kick:vod extractor is "
+                     "currently broken upstream (yt-dlp/yt-dlp#17284/#17428)",
+        }))
+    else:
+        print(json.dumps({
+            "path": final_path,
+            "title": info.get("title", ""),
+            "duration_sec": info.get("duration"),
+            "was_live": bool(info.get("is_live") or info.get("was_live")),
+        }))
 
     # Real gap fixed: the source URL was never saved anywhere, so once a
     # job's raw source got cleaned up (or corrupted), it was permanently

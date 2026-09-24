@@ -1,41 +1,5 @@
 [
   {
-    "content_id": "apexnba2k2_window17_tiktok",
-    "video_path": "/Users/Apple/autoclip-pipeline/outputs/apexnba2k2_vertical/apexnba2k2_window17.mp4",
-    "filename": "apexnba2k2_window17.mp4",
-    "title": "\"We Need Trump Back\" - Street Interview Goes There \ud83d\udc40",
-    "description": "Random street interview takes a wild turn from Trump and PPP loans to vaccine mandates and Kobe Bryant's loyalty. Pure unfiltered opinions caught on camera.",
-    "tags": [
-      "#streetinterview",
-      "#trump2024",
-      "#vaccinemandate",
-      "#kobebryant",
-      "#PPPloans",
-      "#unfiltered",
-      "#viralinterview",
-      "#realtalk",
-      "#CamCaponeNews",
-      "#podcastclips"
-    ],
-    "old_status": "error",
-    "scheduled_date": "2026-10-01",
-    "scheduled_time": "10:00:00",
-    "publicationDate": "2026-10-01T10:00:00",
-    "local_path": "/sessions/rcw-01rq2cgb3ignd2b2phd66quu/mnt/autoclip-pipeline/outputs/apexnba2k2_vertical/apexnba2k2_window17.mp4",
-    "exists": true,
-    "size": 162025247,
-    "seo_score": {
-      "search_relevance": 70,
-      "keyword_coverage": 80,
-      "hashtag_relevance": 80,
-      "hook_ctr": 75,
-      "platform_fit": 100,
-      "trend_alignment": 80,
-      "hook_formulas_matched": [],
-      "total": 80
-    }
-  },
-  {
     "content_id": "job1788482095_window01_tiktok",
     "video_path": "/Users/Apple/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window01.mp4",
     "filename": "job1788482095_window01.mp4",
@@ -55,22 +19,22 @@
     ],
     "old_status": "error",
     "scheduled_date": "2026-10-01",
-    "scheduled_time": "12:00:00",
-    "publicationDate": "2026-10-01T12:00:00",
+    "scheduled_time": "10:00:00",
+    "publicationDate": "2026-10-01T10:00:00",
     "local_path": "/sessions/rcw-01rq2cgb3ignd2b2phd66quu/mnt/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window01.mp4",
     "exists": true,
     "size": 44547044,
     "seo_score": {
-      "search_relevance": 70,
+      "search_relevance": 78,
       "keyword_coverage": 80,
       "hashtag_relevance": 80,
       "hook_ctr": 81,
       "platform_fit": 100,
-      "trend_alignment": 70,
+      "trend_alignment": 80,
       "hook_formulas_matched": [
         "question"
       ],
-      "total": 80
+      "total": 83
     }
   },
   {
@@ -93,20 +57,20 @@
     ],
     "old_status": "error",
     "scheduled_date": "2026-10-01",
-    "scheduled_time": "16:00:00",
-    "publicationDate": "2026-10-01T16:00:00",
+    "scheduled_time": "12:00:00",
+    "publicationDate": "2026-10-01T12:00:00",
     "local_path": "/sessions/rcw-01rq2cgb3ignd2b2phd66quu/mnt/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window02.mp4",
     "exists": true,
     "size": 3923612,
     "seo_score": {
-      "search_relevance": 70,
+      "search_relevance": 94,
       "keyword_coverage": 80,
       "hashtag_relevance": 80,
       "hook_ctr": 75,
       "platform_fit": 100,
-      "trend_alignment": 70,
+      "trend_alignment": 72,
       "hook_formulas_matched": [],
-      "total": 79
+      "total": 83
     }
   },
   {
@@ -129,20 +93,56 @@
     ],
     "old_status": "error",
     "scheduled_date": "2026-10-01",
-    "scheduled_time": "18:00:00",
-    "publicationDate": "2026-10-01T18:00:00",
+    "scheduled_time": "16:00:00",
+    "publicationDate": "2026-10-01T16:00:00",
     "local_path": "/sessions/rcw-01rq2cgb3ignd2b2phd66quu/mnt/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window03.mp4",
     "exists": true,
     "size": 21945463,
     "seo_score": {
-      "search_relevance": 70,
+      "search_relevance": 77,
       "keyword_coverage": 80,
       "hashtag_relevance": 80,
       "hook_ctr": 75,
       "platform_fit": 100,
-      "trend_alignment": 70,
+      "trend_alignment": 84,
       "hook_formulas_matched": [],
-      "total": 79
+      "total": 82
+    }
+  },
+  {
+    "content_id": "apexnba2k2_window17_tiktok",
+    "video_path": "/Users/Apple/autoclip-pipeline/outputs/apexnba2k2_vertical/apexnba2k2_window17.mp4",
+    "filename": "apexnba2k2_window17.mp4",
+    "title": "\"We Need Trump Back\" - Street Interview Goes There \ud83d\udc40",
+    "description": "Random street interview takes a wild turn from Trump and PPP loans to vaccine mandates and Kobe Bryant's loyalty. Pure unfiltered opinions caught on camera.",
+    "tags": [
+      "#streetinterview",
+      "#trump2024",
+      "#vaccinemandate",
+      "#kobebryant",
+      "#PPPloans",
+      "#unfiltered",
+      "#viralinterview",
+      "#realtalk",
+      "#CamCaponeNews",
+      "#podcastclips"
+    ],
+    "old_status": "error",
+    "scheduled_date": "2026-10-01",
+    "scheduled_time": "18:00:00",
+    "publicationDate": "2026-10-01T18:00:00",
+    "local_path": "/sessions/rcw-01rq2cgb3ignd2b2phd66quu/mnt/autoclip-pipeline/outputs/apexnba2k2_vertical/apexnba2k2_window17.mp4",
+    "exists": true,
+    "size": 162025247,
+    "seo_score": {
+      "search_relevance": 91,
+      "keyword_coverage": 80,
+      "hashtag_relevance": 80,
+      "hook_ctr": 75,
+      "platform_fit": 100,
+      "trend_alignment": 60,
+      "hook_formulas_matched": [],
+      "total": 81
     }
   },
   {
@@ -171,50 +171,14 @@
     "exists": true,
     "size": 51148579,
     "seo_score": {
-      "search_relevance": 70,
+      "search_relevance": 81,
       "keyword_coverage": 80,
       "hashtag_relevance": 80,
       "hook_ctr": 75,
       "platform_fit": 100,
-      "trend_alignment": 70,
+      "trend_alignment": 80,
       "hook_formulas_matched": [],
-      "total": 79
-    }
-  },
-  {
-    "content_id": "job1788482095_window05_tiktok",
-    "video_path": "/Users/Apple/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window05.mp4",
-    "filename": "job1788482095_window05.mp4",
-    "title": "Self-Defense Law Explained: Apprehension vs Fear (Legal Breakdown)",
-    "description": "A legal analysis of self-defense standards when confronting law enforcement\u2014why 'reasonable apprehension' isn't the same as fear in the eyes of the law. Real jury instruction language explained.",
-    "tags": [
-      "#selfdefenselaw",
-      "#lawenforcement",
-      "#legalanalysis",
-      "#knowyourrights",
-      "#reasonableapprehension",
-      "#lawtok",
-      "#legaleducation",
-      "#courtroom",
-      "#CamCaponeNews",
-      "#podcastclips"
-    ],
-    "old_status": "error",
-    "scheduled_date": "2026-10-02",
-    "scheduled_time": "12:00:00",
-    "publicationDate": "2026-10-02T12:00:00",
-    "local_path": "/sessions/rcw-01rq2cgb3ignd2b2phd66quu/mnt/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window05.mp4",
-    "exists": true,
-    "size": 50825536,
-    "seo_score": {
-      "search_relevance": 70,
-      "keyword_coverage": 80,
-      "hashtag_relevance": 80,
-      "hook_ctr": 75,
-      "platform_fit": 100,
-      "trend_alignment": 70,
-      "hook_formulas_matched": [],
-      "total": 79
+      "total": 82
     }
   },
   {
@@ -237,20 +201,20 @@
     ],
     "old_status": "error",
     "scheduled_date": "2026-10-02",
-    "scheduled_time": "16:00:00",
-    "publicationDate": "2026-10-02T16:00:00",
+    "scheduled_time": "12:00:00",
+    "publicationDate": "2026-10-02T12:00:00",
     "local_path": "/sessions/rcw-01rq2cgb3ignd2b2phd66quu/mnt/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window06.mp4",
     "exists": true,
     "size": 44728832,
     "seo_score": {
-      "search_relevance": 70,
+      "search_relevance": 92,
       "keyword_coverage": 80,
       "hashtag_relevance": 80,
       "hook_ctr": 75,
       "platform_fit": 100,
-      "trend_alignment": 70,
+      "trend_alignment": 64,
       "hook_formulas_matched": [],
-      "total": 79
+      "total": 81
     }
   },
   {
@@ -273,37 +237,73 @@
     ],
     "old_status": "error",
     "scheduled_date": "2026-10-02",
-    "scheduled_time": "18:00:00",
-    "publicationDate": "2026-10-02T18:00:00",
+    "scheduled_time": "16:00:00",
+    "publicationDate": "2026-10-02T16:00:00",
     "local_path": "/sessions/rcw-01rq2cgb3ignd2b2phd66quu/mnt/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window07.mp4",
     "exists": true,
     "size": 27826895,
     "seo_score": {
-      "search_relevance": 70,
+      "search_relevance": 85,
       "keyword_coverage": 80,
       "hashtag_relevance": 80,
       "hook_ctr": 75,
       "platform_fit": 100,
-      "trend_alignment": 70,
+      "trend_alignment": 68,
       "hook_formulas_matched": [],
-      "total": 79
+      "total": 81
     }
   },
   {
-    "content_id": "job1788482095_window08_tiktok",
-    "video_path": "/Users/Apple/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window08.mp4",
-    "filename": "job1788482095_window08.mp4",
-    "title": "He Got Blackmail Info for 15 Years... \"Self Defense\"?",
-    "description": "A raw take on why the villain gets glorified and why blackmail becomes \"self defense\" when you're surrounded by freaky acquaintances. Don't build your identity on people who live in fantasy and fiction.",
+    "content_id": "job1788482095_window05_tiktok",
+    "video_path": "/Users/Apple/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window05.mp4",
+    "filename": "job1788482095_window05.mp4",
+    "title": "Self-Defense Law Explained: Apprehension vs Fear (Legal Breakdown)",
+    "description": "A legal analysis of self-defense standards when confronting law enforcement\u2014why 'reasonable apprehension' isn't the same as fear in the eyes of the law. Real jury instruction language explained.",
     "tags": [
-      "#fyp",
-      "#viral",
-      "#celebritynews",
-      "#blackmail",
-      "#medialiteracy",
-      "#hollywoodexposed",
-      "#selfdefense",
-      "#realtalk",
+      "#selfdefenselaw",
+      "#lawenforcement",
+      "#legalanalysis",
+      "#knowyourrights",
+      "#reasonableapprehension",
+      "#lawtok",
+      "#legaleducation",
+      "#courtroom",
+      "#CamCaponeNews",
+      "#podcastclips"
+    ],
+    "old_status": "error",
+    "scheduled_date": "2026-10-02",
+    "scheduled_time": "18:00:00",
+    "publicationDate": "2026-10-02T18:00:00",
+    "local_path": "/sessions/rcw-01rq2cgb3ignd2b2phd66quu/mnt/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window05.mp4",
+    "exists": true,
+    "size": 50825536,
+    "seo_score": {
+      "search_relevance": 85,
+      "keyword_coverage": 80,
+      "hashtag_relevance": 80,
+      "hook_ctr": 75,
+      "platform_fit": 100,
+      "trend_alignment": 60,
+      "hook_formulas_matched": [],
+      "total": 80
+    }
+  },
+  {
+    "content_id": "job1788482095_window11_tiktok",
+    "video_path": "/Users/Apple/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window11.mp4",
+    "filename": "job1788482095_window11.mp4",
+    "title": "Trump, Lawfare & Jackson Mississippi's Corruption Scandal",
+    "description": "Why attacks on Trump don't stick anymore, plus the Jackson, MS mayor and city council corruption allegations mirroring Memphis.",
+    "tags": [
+      "#Trump",
+      "#Lawfare",
+      "#JacksonMississippi",
+      "#Corruption",
+      "#Politics",
+      "#Memphis",
+      "#BillOfRights",
+      "#PoliticalCommentary",
       "#CamCaponeNews",
       "#podcastclips"
     ],
@@ -311,20 +311,18 @@
     "scheduled_date": "2026-10-03",
     "scheduled_time": "10:00:00",
     "publicationDate": "2026-10-03T10:00:00",
-    "local_path": "/sessions/rcw-01rq2cgb3ignd2b2phd66quu/mnt/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window08.mp4",
+    "local_path": "/sessions/rcw-01rq2cgb3ignd2b2phd66quu/mnt/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window11.mp4",
     "exists": true,
-    "size": 13919154,
+    "size": 42094376,
     "seo_score": {
-      "search_relevance": 70,
+      "search_relevance": 85,
       "keyword_coverage": 80,
       "hashtag_relevance": 80,
-      "hook_ctr": 81,
+      "hook_ctr": 75,
       "platform_fit": 100,
-      "trend_alignment": 100,
-      "hook_formulas_matched": [
-        "question"
-      ],
-      "total": 85
+      "trend_alignment": 84,
+      "hook_formulas_matched": [],
+      "total": 84
     }
   },
   {
@@ -353,14 +351,14 @@
     "exists": true,
     "size": 37516750,
     "seo_score": {
-      "search_relevance": 70,
+      "search_relevance": 80,
       "keyword_coverage": 80,
       "hashtag_relevance": 80,
       "hook_ctr": 80,
       "platform_fit": 100,
-      "trend_alignment": 70,
+      "trend_alignment": 80,
       "hook_formulas_matched": [],
-      "total": 80
+      "total": 83
     }
   },
   {
@@ -394,26 +392,26 @@
       "hashtag_relevance": 80,
       "hook_ctr": 75,
       "platform_fit": 100,
-      "trend_alignment": 70,
+      "trend_alignment": 88,
       "hook_formulas_matched": [],
-      "total": 79
+      "total": 82
     }
   },
   {
-    "content_id": "job1788482095_window11_tiktok",
-    "video_path": "/Users/Apple/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window11.mp4",
-    "filename": "job1788482095_window11.mp4",
-    "title": "Trump, Lawfare & Jackson Mississippi's Corruption Scandal",
-    "description": "Why attacks on Trump don't stick anymore, plus the Jackson, MS mayor and city council corruption allegations mirroring Memphis.",
+    "content_id": "job1788482095_window08_tiktok",
+    "video_path": "/Users/Apple/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window08.mp4",
+    "filename": "job1788482095_window08.mp4",
+    "title": "He Got Blackmail Info for 15 Years... \"Self Defense\"?",
+    "description": "A raw take on why the villain gets glorified and why blackmail becomes \"self defense\" when you're surrounded by freaky acquaintances. Don't build your identity on people who live in fantasy and fiction.",
     "tags": [
-      "#Trump",
-      "#Lawfare",
-      "#JacksonMississippi",
-      "#Corruption",
-      "#Politics",
-      "#Memphis",
-      "#BillOfRights",
-      "#PoliticalCommentary",
+      "#fyp",
+      "#viral",
+      "#celebritynews",
+      "#blackmail",
+      "#medialiteracy",
+      "#hollywoodexposed",
+      "#selfdefense",
+      "#realtalk",
       "#CamCaponeNews",
       "#podcastclips"
     ],
@@ -421,54 +419,20 @@
     "scheduled_date": "2026-10-03",
     "scheduled_time": "18:00:00",
     "publicationDate": "2026-10-03T18:00:00",
-    "local_path": "/sessions/rcw-01rq2cgb3ignd2b2phd66quu/mnt/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window11.mp4",
+    "local_path": "/sessions/rcw-01rq2cgb3ignd2b2phd66quu/mnt/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window08.mp4",
     "exists": true,
-    "size": 42094376,
+    "size": 13919154,
     "seo_score": {
-      "search_relevance": 70,
+      "search_relevance": 82,
       "keyword_coverage": 80,
       "hashtag_relevance": 80,
-      "hook_ctr": 75,
+      "hook_ctr": 81,
       "platform_fit": 100,
-      "trend_alignment": 70,
-      "hook_formulas_matched": [],
-      "total": 79
-    }
-  },
-  {
-    "content_id": "job1788482095_window15_tiktok",
-    "video_path": "/Users/Apple/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window15.mp4",
-    "filename": "job1788482095_window15.mp4",
-    "title": "They Offered Her $2,000 to Sign a False Accusation Against Me",
-    "description": "He explains the smear campaign, the setup, and why he says he was never really \"part of Hollywood.\" Wild industry story.",
-    "tags": [
-      "#storytime",
-      "#hollywood",
-      "#scandal",
-      "#publicrelations",
-      "#dallascowboys",
-      "#exposed",
-      "#interviewclips",
-      "#celebritynews",
-      "#CamCaponeNews",
-      "#podcastclips"
-    ],
-    "old_status": "pending",
-    "scheduled_date": "2026-10-04",
-    "scheduled_time": "10:00:00",
-    "publicationDate": "2026-10-04T10:00:00",
-    "local_path": "/sessions/rcw-01rq2cgb3ignd2b2phd66quu/mnt/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window15.mp4",
-    "exists": true,
-    "size": 9424726,
-    "seo_score": {
-      "search_relevance": 70,
-      "keyword_coverage": 80,
-      "hashtag_relevance": 80,
-      "hook_ctr": 75,
-      "platform_fit": 100,
-      "trend_alignment": 80,
-      "hook_formulas_matched": [],
-      "total": 80
+      "trend_alignment": 64,
+      "hook_formulas_matched": [
+        "question"
+      ],
+      "total": 81
     }
   },
   {
@@ -491,20 +455,20 @@
     ],
     "old_status": "pending",
     "scheduled_date": "2026-10-04",
-    "scheduled_time": "12:00:00",
-    "publicationDate": "2026-10-04T12:00:00",
+    "scheduled_time": "10:00:00",
+    "publicationDate": "2026-10-04T10:00:00",
     "local_path": "/sessions/rcw-01rq2cgb3ignd2b2phd66quu/mnt/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window12.mp4",
     "exists": true,
     "size": 43064476,
     "seo_score": {
-      "search_relevance": 70,
+      "search_relevance": 91,
       "keyword_coverage": 80,
       "hashtag_relevance": 80,
       "hook_ctr": 75,
       "platform_fit": 100,
-      "trend_alignment": 70,
+      "trend_alignment": 92,
       "hook_formulas_matched": [],
-      "total": 79
+      "total": 86
     }
   },
   {
@@ -527,20 +491,20 @@
     ],
     "old_status": "pending",
     "scheduled_date": "2026-10-04",
-    "scheduled_time": "16:00:00",
-    "publicationDate": "2026-10-04T16:00:00",
+    "scheduled_time": "12:00:00",
+    "publicationDate": "2026-10-04T12:00:00",
     "local_path": "/sessions/rcw-01rq2cgb3ignd2b2phd66quu/mnt/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window13.mp4",
     "exists": true,
     "size": 36736954,
     "seo_score": {
-      "search_relevance": 70,
+      "search_relevance": 85,
       "keyword_coverage": 80,
       "hashtag_relevance": 80,
       "hook_ctr": 75,
       "platform_fit": 100,
-      "trend_alignment": 70,
+      "trend_alignment": 92,
       "hook_formulas_matched": [],
-      "total": 79
+      "total": 85
     }
   },
   {
@@ -563,18 +527,54 @@
     ],
     "old_status": "pending",
     "scheduled_date": "2026-10-04",
-    "scheduled_time": "18:00:00",
-    "publicationDate": "2026-10-04T18:00:00",
+    "scheduled_time": "16:00:00",
+    "publicationDate": "2026-10-04T16:00:00",
     "local_path": "/sessions/rcw-01rq2cgb3ignd2b2phd66quu/mnt/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window14.mp4",
     "exists": true,
     "size": 33981973,
     "seo_score": {
-      "search_relevance": 70,
+      "search_relevance": 88,
       "keyword_coverage": 80,
       "hashtag_relevance": 80,
       "hook_ctr": 75,
       "platform_fit": 100,
-      "trend_alignment": 70,
+      "trend_alignment": 92,
+      "hook_formulas_matched": [],
+      "total": 85
+    }
+  },
+  {
+    "content_id": "job1788482095_window15_tiktok",
+    "video_path": "/Users/Apple/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window15.mp4",
+    "filename": "job1788482095_window15.mp4",
+    "title": "They Offered Her $2,000 to Sign a False Accusation Against Me",
+    "description": "He explains the smear campaign, the setup, and why he says he was never really \"part of Hollywood.\" Wild industry story.",
+    "tags": [
+      "#storytime",
+      "#hollywood",
+      "#scandal",
+      "#publicrelations",
+      "#dallascowboys",
+      "#exposed",
+      "#interviewclips",
+      "#celebritynews",
+      "#CamCaponeNews",
+      "#podcastclips"
+    ],
+    "old_status": "pending",
+    "scheduled_date": "2026-10-04",
+    "scheduled_time": "18:00:00",
+    "publicationDate": "2026-10-04T18:00:00",
+    "local_path": "/sessions/rcw-01rq2cgb3ignd2b2phd66quu/mnt/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window15.mp4",
+    "exists": true,
+    "size": 9424726,
+    "seo_score": {
+      "search_relevance": 78,
+      "keyword_coverage": 80,
+      "hashtag_relevance": 80,
+      "hook_ctr": 75,
+      "platform_fit": 100,
+      "trend_alignment": 64,
       "hook_formulas_matched": [],
       "total": 79
     }
@@ -605,31 +605,31 @@
     "exists": true,
     "size": 12799098,
     "seo_score": {
-      "search_relevance": 70,
+      "search_relevance": 80,
       "keyword_coverage": 80,
       "hashtag_relevance": 80,
       "hook_ctr": 80,
       "platform_fit": 100,
-      "trend_alignment": 70,
+      "trend_alignment": 88,
       "hook_formulas_matched": [],
-      "total": 80
+      "total": 84
     }
   },
   {
-    "content_id": "job1788482095_window17_tiktok",
-    "video_path": "/Users/Apple/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window17.mp4",
-    "filename": "job1788482095_window17.mp4",
-    "title": "TV Judge Exposes Chop Shop, Arson-for-Profit & Welfare Fraud Rings",
-    "description": "A former court show judge reveals how his 'real' arbitration cases uncovered a stolen car chop shop, a California arson-for-development scheme, and a massive welfare fraud bust in Indianapolis.",
+    "content_id": "job1788482095_window19_tiktok",
+    "video_path": "/Users/Apple/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window19.mp4",
+    "filename": "job1788482095_window19.mp4",
+    "title": "Shirley Temple's Secret Agency & Wonder Woman's Dark Origin Story",
+    "description": "The wild claim about Shirley Temple's ambassador post, the polygraph inventor who based Wonder Woman on his real-life dominatrix, and preachers running the same game as street pimps.",
     "tags": [
-      "#courtshow",
-      "#truecrime",
-      "#chopshop",
-      "#welfarefraud",
-      "#arsonforprofit",
-      "#judgemathis",
-      "#realcourtcases",
-      "#corruption",
+      "#ShirleyTemple",
+      "#WonderWoman",
+      "#Polygraph",
+      "#HollywoodSecrets",
+      "#ConspiracyTheory",
+      "#DarkHollywood",
+      "#ChurchCorruption",
+      "#HiddenHistory",
       "#CamCaponeNews",
       "#podcastclips"
     ],
@@ -637,18 +637,18 @@
     "scheduled_date": "2026-10-05",
     "scheduled_time": "12:00:00",
     "publicationDate": "2026-10-05T12:00:00",
-    "local_path": "/sessions/rcw-01rq2cgb3ignd2b2phd66quu/mnt/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window17.mp4",
+    "local_path": "/sessions/rcw-01rq2cgb3ignd2b2phd66quu/mnt/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window19.mp4",
     "exists": true,
-    "size": 39412067,
+    "size": 42797739,
     "seo_score": {
-      "search_relevance": 70,
+      "search_relevance": 80,
       "keyword_coverage": 80,
       "hashtag_relevance": 80,
       "hook_ctr": 75,
       "platform_fit": 100,
-      "trend_alignment": 70,
+      "trend_alignment": 84,
       "hook_formulas_matched": [],
-      "total": 79
+      "total": 83
     }
   },
   {
@@ -677,31 +677,31 @@
     "exists": true,
     "size": 20945172,
     "seo_score": {
-      "search_relevance": 70,
+      "search_relevance": 81,
       "keyword_coverage": 80,
       "hashtag_relevance": 80,
       "hook_ctr": 75,
       "platform_fit": 100,
-      "trend_alignment": 70,
+      "trend_alignment": 76,
       "hook_formulas_matched": [],
-      "total": 79
+      "total": 82
     }
   },
   {
-    "content_id": "job1788482095_window19_tiktok",
-    "video_path": "/Users/Apple/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window19.mp4",
-    "filename": "job1788482095_window19.mp4",
-    "title": "Shirley Temple's Secret Agency & Wonder Woman's Dark Origin Story",
-    "description": "The wild claim about Shirley Temple's ambassador post, the polygraph inventor who based Wonder Woman on his real-life dominatrix, and preachers running the same game as street pimps.",
+    "content_id": "job1788482095_window17_tiktok",
+    "video_path": "/Users/Apple/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window17.mp4",
+    "filename": "job1788482095_window17.mp4",
+    "title": "TV Judge Exposes Chop Shop, Arson-for-Profit & Welfare Fraud Rings",
+    "description": "A former court show judge reveals how his 'real' arbitration cases uncovered a stolen car chop shop, a California arson-for-development scheme, and a massive welfare fraud bust in Indianapolis.",
     "tags": [
-      "#ShirleyTemple",
-      "#WonderWoman",
-      "#Polygraph",
-      "#HollywoodSecrets",
-      "#ConspiracyTheory",
-      "#DarkHollywood",
-      "#ChurchCorruption",
-      "#HiddenHistory",
+      "#courtshow",
+      "#truecrime",
+      "#chopshop",
+      "#welfarefraud",
+      "#arsonforprofit",
+      "#judgemathis",
+      "#realcourtcases",
+      "#corruption",
       "#CamCaponeNews",
       "#podcastclips"
     ],
@@ -709,54 +709,18 @@
     "scheduled_date": "2026-10-05",
     "scheduled_time": "18:00:00",
     "publicationDate": "2026-10-05T18:00:00",
-    "local_path": "/sessions/rcw-01rq2cgb3ignd2b2phd66quu/mnt/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window19.mp4",
+    "local_path": "/sessions/rcw-01rq2cgb3ignd2b2phd66quu/mnt/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window17.mp4",
     "exists": true,
-    "size": 42797739,
+    "size": 39412067,
     "seo_score": {
-      "search_relevance": 70,
+      "search_relevance": 85,
       "keyword_coverage": 80,
       "hashtag_relevance": 80,
       "hook_ctr": 75,
       "platform_fit": 100,
-      "trend_alignment": 70,
+      "trend_alignment": 64,
       "hook_formulas_matched": [],
-      "total": 79
-    }
-  },
-  {
-    "content_id": "job1788482095_window20_tiktok",
-    "video_path": "/Users/Apple/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window20.mp4",
-    "filename": "job1788482095_window20.mp4",
-    "title": "Love Offerings, TV Preachers & the Slave Preacher Breeding History",
-    "description": "A firsthand look at church 'love offering' collections and preacher greed, tracing back to disturbing slavery-era practices of using slave preachers as breeding studs.",
-    "tags": [
-      "#churchtok",
-      "#blackhistory",
-      "#slaveryhistory",
-      "#tvpreachers",
-      "#loveoffering",
-      "#bishopmason",
-      "#churchcorruption",
-      "#COGIC",
-      "#CamCaponeNews",
-      "#podcastclips"
-    ],
-    "old_status": "pending",
-    "scheduled_date": "2026-10-06",
-    "scheduled_time": "10:00:00",
-    "publicationDate": "2026-10-06T10:00:00",
-    "local_path": "/sessions/rcw-01rq2cgb3ignd2b2phd66quu/mnt/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window20.mp4",
-    "exists": true,
-    "size": 36870162,
-    "seo_score": {
-      "search_relevance": 70,
-      "keyword_coverage": 80,
-      "hashtag_relevance": 80,
-      "hook_ctr": 75,
-      "platform_fit": 100,
-      "trend_alignment": 70,
-      "hook_formulas_matched": [],
-      "total": 79
+      "total": 80
     }
   },
   {
@@ -779,20 +743,56 @@
     ],
     "old_status": "pending",
     "scheduled_date": "2026-10-06",
-    "scheduled_time": "12:00:00",
-    "publicationDate": "2026-10-06T12:00:00",
+    "scheduled_time": "10:00:00",
+    "publicationDate": "2026-10-06T10:00:00",
     "local_path": "/sessions/rcw-01rq2cgb3ignd2b2phd66quu/mnt/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window21.mp4",
     "exists": true,
     "size": 36706995,
     "seo_score": {
-      "search_relevance": 70,
+      "search_relevance": 88,
       "keyword_coverage": 80,
       "hashtag_relevance": 80,
       "hook_ctr": 75,
       "platform_fit": 100,
-      "trend_alignment": 70,
+      "trend_alignment": 88,
       "hook_formulas_matched": [],
-      "total": 79
+      "total": 85
+    }
+  },
+  {
+    "content_id": "job1788482095_window23_tiktok",
+    "video_path": "/Users/Apple/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window23.mp4",
+    "filename": "job1788482095_window23.mp4",
+    "title": "Monica Lewinsky, Bush & the Zapata Oil/Halliburton Secret Exposed",
+    "description": "A wild ride from the Monica Lewinsky scandal to border security fears to George H.W. Bush's Zapata Oil and Halliburton mineral rights scheme.",
+    "tags": [
+      "#MonicaLewinsky",
+      "#GeorgeBush",
+      "#Halliburton",
+      "#ZapataOil",
+      "#Conspiracy",
+      "#Politics",
+      "#911",
+      "#History",
+      "#CamCaponeNews",
+      "#podcastclips"
+    ],
+    "old_status": "pending",
+    "scheduled_date": "2026-10-06",
+    "scheduled_time": "12:00:00",
+    "publicationDate": "2026-10-06T12:00:00",
+    "local_path": "/sessions/rcw-01rq2cgb3ignd2b2phd66quu/mnt/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window23.mp4",
+    "exists": true,
+    "size": 42241040,
+    "seo_score": {
+      "search_relevance": 87,
+      "keyword_coverage": 80,
+      "hashtag_relevance": 80,
+      "hook_ctr": 75,
+      "platform_fit": 100,
+      "trend_alignment": 80,
+      "hook_formulas_matched": [],
+      "total": 83
     }
   },
   {
@@ -821,31 +821,31 @@
     "exists": true,
     "size": 40230821,
     "seo_score": {
-      "search_relevance": 70,
+      "search_relevance": 78,
       "keyword_coverage": 80,
       "hashtag_relevance": 80,
       "hook_ctr": 75,
       "platform_fit": 100,
-      "trend_alignment": 70,
+      "trend_alignment": 80,
       "hook_formulas_matched": [],
-      "total": 79
+      "total": 82
     }
   },
   {
-    "content_id": "job1788482095_window23_tiktok",
-    "video_path": "/Users/Apple/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window23.mp4",
-    "filename": "job1788482095_window23.mp4",
-    "title": "Monica Lewinsky, Bush & the Zapata Oil/Halliburton Secret Exposed",
-    "description": "A wild ride from the Monica Lewinsky scandal to border security fears to George H.W. Bush's Zapata Oil and Halliburton mineral rights scheme.",
+    "content_id": "job1788482095_window20_tiktok",
+    "video_path": "/Users/Apple/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window20.mp4",
+    "filename": "job1788482095_window20.mp4",
+    "title": "Love Offerings, TV Preachers & the Slave Preacher Breeding History",
+    "description": "A firsthand look at church 'love offering' collections and preacher greed, tracing back to disturbing slavery-era practices of using slave preachers as breeding studs.",
     "tags": [
-      "#MonicaLewinsky",
-      "#GeorgeBush",
-      "#Halliburton",
-      "#ZapataOil",
-      "#Conspiracy",
-      "#Politics",
-      "#911",
-      "#History",
+      "#churchtok",
+      "#blackhistory",
+      "#slaveryhistory",
+      "#tvpreachers",
+      "#loveoffering",
+      "#bishopmason",
+      "#churchcorruption",
+      "#COGIC",
       "#CamCaponeNews",
       "#podcastclips"
     ],
@@ -853,56 +853,18 @@
     "scheduled_date": "2026-10-06",
     "scheduled_time": "18:00:00",
     "publicationDate": "2026-10-06T18:00:00",
-    "local_path": "/sessions/rcw-01rq2cgb3ignd2b2phd66quu/mnt/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window23.mp4",
+    "local_path": "/sessions/rcw-01rq2cgb3ignd2b2phd66quu/mnt/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window20.mp4",
     "exists": true,
-    "size": 42241040,
+    "size": 36870162,
     "seo_score": {
-      "search_relevance": 70,
+      "search_relevance": 91,
       "keyword_coverage": 80,
       "hashtag_relevance": 80,
       "hook_ctr": 75,
       "platform_fit": 100,
-      "trend_alignment": 70,
+      "trend_alignment": 60,
       "hook_formulas_matched": [],
-      "total": 79
-    }
-  },
-  {
-    "content_id": "job1788482095_window27_tiktok",
-    "video_path": "/Users/Apple/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window27.mp4",
-    "filename": "job1788482095_window27.mp4",
-    "title": "Don King Picked Tyson's Lawyer... On Purpose?",
-    "description": "Claims Don King chose a lawyer with zero criminal law experience to defend Mike Tyson, plus wild takes on Michael Jackson's death and surgeries.",
-    "tags": [
-      "#MikeTyson",
-      "#DonKing",
-      "#MichaelJackson",
-      "#TrueCrime",
-      "#Boxing",
-      "#CourtroomDrama",
-      "#CelebrityGossip",
-      "#CrimeTok",
-      "#CamCaponeNews",
-      "#podcastclips"
-    ],
-    "old_status": "pending",
-    "scheduled_date": "2026-10-07",
-    "scheduled_time": "10:00:00",
-    "publicationDate": "2026-10-07T10:00:00",
-    "local_path": "/sessions/rcw-01rq2cgb3ignd2b2phd66quu/mnt/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window27.mp4",
-    "exists": true,
-    "size": 43531141,
-    "seo_score": {
-      "search_relevance": 70,
-      "keyword_coverage": 80,
-      "hashtag_relevance": 80,
-      "hook_ctr": 81,
-      "platform_fit": 100,
-      "trend_alignment": 70,
-      "hook_formulas_matched": [
-        "question"
-      ],
-      "total": 80
+      "total": 81
     }
   },
   {
@@ -925,20 +887,58 @@
     ],
     "old_status": "pending",
     "scheduled_date": "2026-10-07",
-    "scheduled_time": "12:00:00",
-    "publicationDate": "2026-10-07T12:00:00",
+    "scheduled_time": "10:00:00",
+    "publicationDate": "2026-10-07T10:00:00",
     "local_path": "/sessions/rcw-01rq2cgb3ignd2b2phd66quu/mnt/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window24.mp4",
     "exists": true,
     "size": 36204525,
     "seo_score": {
-      "search_relevance": 70,
+      "search_relevance": 100,
       "keyword_coverage": 80,
       "hashtag_relevance": 80,
       "hook_ctr": 75,
       "platform_fit": 100,
-      "trend_alignment": 70,
+      "trend_alignment": 88,
       "hook_formulas_matched": [],
-      "total": 79
+      "total": 87
+    }
+  },
+  {
+    "content_id": "job1788482095_window27_tiktok",
+    "video_path": "/Users/Apple/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window27.mp4",
+    "filename": "job1788482095_window27.mp4",
+    "title": "Don King Picked Tyson's Lawyer... On Purpose?",
+    "description": "Claims Don King chose a lawyer with zero criminal law experience to defend Mike Tyson, plus wild takes on Michael Jackson's death and surgeries.",
+    "tags": [
+      "#MikeTyson",
+      "#DonKing",
+      "#MichaelJackson",
+      "#TrueCrime",
+      "#Boxing",
+      "#CourtroomDrama",
+      "#CelebrityGossip",
+      "#CrimeTok",
+      "#CamCaponeNews",
+      "#podcastclips"
+    ],
+    "old_status": "pending",
+    "scheduled_date": "2026-10-07",
+    "scheduled_time": "12:00:00",
+    "publicationDate": "2026-10-07T12:00:00",
+    "local_path": "/sessions/rcw-01rq2cgb3ignd2b2phd66quu/mnt/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window27.mp4",
+    "exists": true,
+    "size": 43531141,
+    "seo_score": {
+      "search_relevance": 100,
+      "keyword_coverage": 80,
+      "hashtag_relevance": 80,
+      "hook_ctr": 81,
+      "platform_fit": 100,
+      "trend_alignment": 80,
+      "hook_formulas_matched": [
+        "question"
+      ],
+      "total": 86
     }
   },
   {
@@ -967,14 +967,14 @@
     "exists": true,
     "size": 42461214,
     "seo_score": {
-      "search_relevance": 70,
+      "search_relevance": 92,
       "keyword_coverage": 80,
       "hashtag_relevance": 80,
       "hook_ctr": 75,
       "platform_fit": 100,
-      "trend_alignment": 70,
+      "trend_alignment": 88,
       "hook_formulas_matched": [],
-      "total": 79
+      "total": 85
     }
   },
   {
@@ -1003,14 +1003,50 @@
     "exists": true,
     "size": 48839117,
     "seo_score": {
-      "search_relevance": 70,
+      "search_relevance": 85,
       "keyword_coverage": 80,
       "hashtag_relevance": 80,
       "hook_ctr": 75,
       "platform_fit": 100,
-      "trend_alignment": 70,
+      "trend_alignment": 92,
       "hook_formulas_matched": [],
-      "total": 79
+      "total": 85
+    }
+  },
+  {
+    "content_id": "job1788482095_window30_tiktok",
+    "video_path": "/Users/Apple/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window30.mp4",
+    "filename": "job1788482095_window30.mp4",
+    "title": "Marvin Gaye's Final Concert, Joe Jackson & the Motown Mob Story",
+    "description": "A neighbor's insider account: Marvin Gaye forgetting his own lyrics before his death, plus how a gangster allegedly took 15% off Motown's top and the real story behind the first Jackson 5 talent show win in 1966.",
+    "tags": [
+      "#MarvinGaye",
+      "#MotownHistory",
+      "#JacksonFive",
+      "#JoeJackson",
+      "#MusicHistory",
+      "#EntertainmentIndustry",
+      "#TrueStory",
+      "#LGBTQIA",
+      "#CamCaponeNews",
+      "#podcastclips"
+    ],
+    "old_status": "pending",
+    "scheduled_date": "2026-10-08",
+    "scheduled_time": "10:00:00",
+    "publicationDate": "2026-10-08T10:00:00",
+    "local_path": "/sessions/rcw-01rq2cgb3ignd2b2phd66quu/mnt/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window30.mp4",
+    "exists": true,
+    "size": 41959725,
+    "seo_score": {
+      "search_relevance": 91,
+      "keyword_coverage": 80,
+      "hashtag_relevance": 80,
+      "hook_ctr": 75,
+      "platform_fit": 100,
+      "trend_alignment": 96,
+      "hook_formulas_matched": [],
+      "total": 87
     }
   },
   {
@@ -1033,53 +1069,20 @@
     ],
     "old_status": "pending",
     "scheduled_date": "2026-10-08",
-    "scheduled_time": "10:00:00",
-    "publicationDate": "2026-10-08T10:00:00",
+    "scheduled_time": "12:00:00",
+    "publicationDate": "2026-10-08T12:00:00",
     "local_path": "/sessions/rcw-01rq2cgb3ignd2b2phd66quu/mnt/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window31.mp4",
     "exists": true,
     "size": 39148391,
     "seo_score": {
-      "search_relevance": 70,
+      "search_relevance": 85,
       "keyword_coverage": 80,
       "hashtag_relevance": 80,
       "hook_ctr": 80,
       "platform_fit": 100,
-      "trend_alignment": 70,
+      "trend_alignment": 92,
       "hook_formulas_matched": [],
-      "total": 80
-    }
-  },
-  {
-    "content_id": "job1788482095_window28_tiktok",
-    "video_path": "/Users/Apple/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window28.mp4",
-    "filename": "job1788482095_window28.mp4",
-    "title": "The Hidden Pattern Behind Michael Jackson, Prince & Elvis's Deaths",
-    "description": "Breaking down how the deaths of Michael Jackson, Prince, Elvis & Marvin Gaye connect to a hidden pattern most people never talk about.",
-    "tags": [
-      "#mentalhealthawareness",
-      "#drugabuse",
-      "#michaeljackson",
-      "#princemusic",
-      "#overdose",
-      "#CamCaponeNews",
-      "#podcastclips"
-    ],
-    "old_status": "pending",
-    "scheduled_date": "2026-10-08",
-    "scheduled_time": "12:00:00",
-    "publicationDate": "2026-10-08T12:00:00",
-    "local_path": "/sessions/rcw-01rq2cgb3ignd2b2phd66quu/mnt/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window28.mp4",
-    "exists": true,
-    "size": 51299415,
-    "seo_score": {
-      "search_relevance": 70,
-      "keyword_coverage": 80,
-      "hashtag_relevance": 80,
-      "hook_ctr": 75,
-      "platform_fit": 100,
-      "trend_alignment": 70,
-      "hook_formulas_matched": [],
-      "total": 79
+      "total": 86
     }
   },
   {
@@ -1108,31 +1111,28 @@
     "exists": true,
     "size": 45266037,
     "seo_score": {
-      "search_relevance": 70,
+      "search_relevance": 85,
       "keyword_coverage": 80,
       "hashtag_relevance": 80,
       "hook_ctr": 75,
       "platform_fit": 100,
-      "trend_alignment": 70,
+      "trend_alignment": 68,
       "hook_formulas_matched": [],
-      "total": 79
+      "total": 81
     }
   },
   {
-    "content_id": "job1788482095_window30_tiktok",
-    "video_path": "/Users/Apple/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window30.mp4",
-    "filename": "job1788482095_window30.mp4",
-    "title": "Marvin Gaye's Final Concert, Joe Jackson & the Motown Mob Story",
-    "description": "A neighbor's insider account: Marvin Gaye forgetting his own lyrics before his death, plus how a gangster allegedly took 15% off Motown's top and the real story behind the first Jackson 5 talent show win in 1966.",
+    "content_id": "job1788482095_window28_tiktok",
+    "video_path": "/Users/Apple/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window28.mp4",
+    "filename": "job1788482095_window28.mp4",
+    "title": "The Hidden Pattern Behind Michael Jackson, Prince & Elvis's Deaths",
+    "description": "Breaking down how the deaths of Michael Jackson, Prince, Elvis & Marvin Gaye connect to a hidden pattern most people never talk about.",
     "tags": [
-      "#MarvinGaye",
-      "#MotownHistory",
-      "#JacksonFive",
-      "#JoeJackson",
-      "#MusicHistory",
-      "#EntertainmentIndustry",
-      "#TrueStory",
-      "#LGBTQIA",
+      "#mentalhealthawareness",
+      "#drugabuse",
+      "#michaeljackson",
+      "#princemusic",
+      "#overdose",
       "#CamCaponeNews",
       "#podcastclips"
     ],
@@ -1140,18 +1140,18 @@
     "scheduled_date": "2026-10-08",
     "scheduled_time": "18:00:00",
     "publicationDate": "2026-10-08T18:00:00",
-    "local_path": "/sessions/rcw-01rq2cgb3ignd2b2phd66quu/mnt/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window30.mp4",
+    "local_path": "/sessions/rcw-01rq2cgb3ignd2b2phd66quu/mnt/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window28.mp4",
     "exists": true,
-    "size": 41959725,
+    "size": 51299415,
     "seo_score": {
-      "search_relevance": 70,
+      "search_relevance": 81,
       "keyword_coverage": 80,
       "hashtag_relevance": 80,
       "hook_ctr": 75,
       "platform_fit": 100,
-      "trend_alignment": 70,
+      "trend_alignment": 65,
       "hook_formulas_matched": [],
-      "total": 79
+      "total": 80
     }
   },
   {
@@ -1180,52 +1180,16 @@
     "exists": true,
     "size": 43906041,
     "seo_score": {
-      "search_relevance": 70,
+      "search_relevance": 95,
       "keyword_coverage": 80,
       "hashtag_relevance": 80,
       "hook_ctr": 81,
       "platform_fit": 100,
-      "trend_alignment": 70,
+      "trend_alignment": 96,
       "hook_formulas_matched": [
         "question"
       ],
-      "total": 80
-    }
-  },
-  {
-    "content_id": "job1788482095_window32_tiktok",
-    "video_path": "/Users/Apple/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window32.mp4",
-    "filename": "job1788482095_window32.mp4",
-    "title": "James Cameron's Secret Cold War Dives Behind Titanic & Bismarck",
-    "description": "The real story of how a Navy-linked deep-sea explorer inspired Titanic's most iconic scene, plus why Hollywood's real badasses like Isaiah Washington and Arnold Schwarzenegger don't get enough credit.",
-    "tags": [
-      "#JamesCameron",
-      "#Titanic",
-      "#ColdWar",
-      "#Bismarck",
-      "#IsaiahWashington",
-      "#ArnoldSchwarzenegger",
-      "#TookieWilliams",
-      "#HollywoodSecrets",
-      "#CamCaponeNews",
-      "#podcastclips"
-    ],
-    "old_status": "pending",
-    "scheduled_date": "2026-10-09",
-    "scheduled_time": "12:00:00",
-    "publicationDate": "2026-10-09T12:00:00",
-    "local_path": "/sessions/rcw-01rq2cgb3ignd2b2phd66quu/mnt/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window32.mp4",
-    "exists": true,
-    "size": 39933888,
-    "seo_score": {
-      "search_relevance": 70,
-      "keyword_coverage": 80,
-      "hashtag_relevance": 80,
-      "hook_ctr": 75,
-      "platform_fit": 100,
-      "trend_alignment": 70,
-      "hook_formulas_matched": [],
-      "total": 79
+      "total": 88
     }
   },
   {
@@ -1248,20 +1212,56 @@
     ],
     "old_status": "pending",
     "scheduled_date": "2026-10-09",
-    "scheduled_time": "16:00:00",
-    "publicationDate": "2026-10-09T16:00:00",
+    "scheduled_time": "12:00:00",
+    "publicationDate": "2026-10-09T12:00:00",
     "local_path": "/sessions/rcw-01rq2cgb3ignd2b2phd66quu/mnt/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window33.mp4",
     "exists": true,
     "size": 17917130,
     "seo_score": {
-      "search_relevance": 70,
+      "search_relevance": 92,
       "keyword_coverage": 80,
       "hashtag_relevance": 80,
       "hook_ctr": 75,
       "platform_fit": 100,
-      "trend_alignment": 70,
+      "trend_alignment": 88,
       "hook_formulas_matched": [],
-      "total": 79
+      "total": 85
+    }
+  },
+  {
+    "content_id": "job1788482095_window32_tiktok",
+    "video_path": "/Users/Apple/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window32.mp4",
+    "filename": "job1788482095_window32.mp4",
+    "title": "James Cameron's Secret Cold War Dives Behind Titanic & Bismarck",
+    "description": "The real story of how a Navy-linked deep-sea explorer inspired Titanic's most iconic scene, plus why Hollywood's real badasses like Isaiah Washington and Arnold Schwarzenegger don't get enough credit.",
+    "tags": [
+      "#JamesCameron",
+      "#Titanic",
+      "#ColdWar",
+      "#Bismarck",
+      "#IsaiahWashington",
+      "#ArnoldSchwarzenegger",
+      "#TookieWilliams",
+      "#HollywoodSecrets",
+      "#CamCaponeNews",
+      "#podcastclips"
+    ],
+    "old_status": "pending",
+    "scheduled_date": "2026-10-09",
+    "scheduled_time": "16:00:00",
+    "publicationDate": "2026-10-09T16:00:00",
+    "local_path": "/sessions/rcw-01rq2cgb3ignd2b2phd66quu/mnt/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window32.mp4",
+    "exists": true,
+    "size": 39933888,
+    "seo_score": {
+      "search_relevance": 81,
+      "keyword_coverage": 80,
+      "hashtag_relevance": 80,
+      "hook_ctr": 75,
+      "platform_fit": 100,
+      "trend_alignment": 92,
+      "hook_formulas_matched": [],
+      "total": 84
     }
   },
   {
@@ -1290,14 +1290,14 @@
     "exists": true,
     "size": 40790946,
     "seo_score": {
-      "search_relevance": 70,
+      "search_relevance": 76,
       "keyword_coverage": 80,
       "hashtag_relevance": 80,
       "hook_ctr": 75,
       "platform_fit": 100,
-      "trend_alignment": 70,
+      "trend_alignment": 80,
       "hook_formulas_matched": [],
-      "total": 79
+      "total": 81
     }
   },
   {
@@ -1326,14 +1326,14 @@
     "exists": true,
     "size": 27162878,
     "seo_score": {
-      "search_relevance": 70,
+      "search_relevance": 92,
       "keyword_coverage": 80,
       "hashtag_relevance": 80,
       "hook_ctr": 75,
       "platform_fit": 100,
-      "trend_alignment": 70,
+      "trend_alignment": 80,
       "hook_formulas_matched": [],
-      "total": 79
+      "total": 84
     }
   }
 ]
