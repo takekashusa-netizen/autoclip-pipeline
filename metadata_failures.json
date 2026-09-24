@@ -346,5 +346,17 @@
     "last_attempt_at": "2026-09-23T18:00:40.596730",
     "attempts": 1,
     "resolved": false
+  },
+  {
+    "sub_job": "job1788482095_window08_tiktok",
+    "job_name": "job1788482095_window08_tiktok",
+    "video_path": "/Users/Apple/autoclip-pipeline/outputs/job1788482095_vertical/job1788482095_window08.mp4",
+    "platform": "tiktok",
+    "kind": "refresh",
+    "error": "no real transcript found at /Users/Apple/autoclip-pipeline/projects/job1788482095_window08_tiktok/rough-cut/script.json",
+    "first_failed_at": "2026-09-23T20:00:00.375645",
+    "last_attempt_at": "2026-09-23T20:00:00.375645",
+    "attempts": 1,
+    "resolved": false
   }
 ]

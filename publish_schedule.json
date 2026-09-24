@@ -1642,8 +1642,9 @@
       "#realtalk"
     ],
     "scheduled_time": "2026-09-23T20:00:00",
-    "status": "pending",
-    "content_type": null
+    "status": "error",
+    "content_type": null,
+    "error": "No TikTok token found at /Users/Apple/autoclip-pipeline/lib/../tiktok_token.json. Run the OAuth flow first (see setup instructions in this file's docstring) to authorize an account."
   },
   {
     "platform": "instagram",
