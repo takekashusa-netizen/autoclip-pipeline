@@ -108,7 +108,10 @@ def burn_captions_ass(input_path, word_groups, out_path, timeout_sec=None,
     word count."""
     import subprocess
 
-    ass_path = out_path.rsplit(".", 1)[0] + "_captions.ass"
+    import os as _os
+    _captions_dir = _os.path.join(_os.path.dirname(out_path), "captions")
+    _os.makedirs(_captions_dir, exist_ok=True)
+    ass_path = _os.path.join(_captions_dir, _os.path.basename(out_path).rsplit(".", 1)[0] + "_captions.ass")
     generate_ass_file(word_groups, ass_path, video_width=video_width, video_height=video_height)
 
     # Real, permanent fix: a fixed 1800s (30 min) default meant a real

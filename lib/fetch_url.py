@@ -11,6 +11,7 @@ otherwise yt-dlp will wait/retry per its own live-from-start behavior.
 """
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -40,20 +41,108 @@ def _find_streamlink():
     return shutil.which("streamlink")
 
 
-def _fetch_via_streamlink(url, raw_dir):
-    """Real fix, 2026-09-24: yt-dlp's kick:vod extractor is broken for
-    VOD URLs right now -- confirmed against this exact URL shape via two
-    open upstream issues (yt-dlp/yt-dlp#17284, #17428): Kick changed how
-    VOD URLs/metadata are generated, the old /v1/video/{id} endpoint
-    404s, and yt-dlp hasn't shipped a fix yet (PR open, not merged).
-    Confirmed the VOD itself is real and public by loading the exact
-    failing URL in a real browser (title/views/age all present).
-    streamlink fixed this exact "VOD URLs without channel name now
-    return 404" case in streamlink/streamlink#7108, merged 2026-09-11,
-    included in the 8.6.1 release (2026-09-16) -- so for kick.com URLs
-    specifically, fall back to streamlink instead of failing outright.
+_KICK_HEADERS = {
+    # Real, measured requirement: these two endpoints are Kick's own real
+    # frontend API (verified live, 2026-09-24 -- see _fetch_via_kick_api's
+    # docstring) sitting behind Kasada bot-protection on other parts of
+    # the site. A generic Python User-Agent risks getting blocked where a
+    # browser-shaped request succeeds; sending real browser-like headers
+    # is cheap insurance, not a guess -- the actual verification (see
+    # ledger) was done through a real browser session.
+    "User-Agent": ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                    "AppleWebKit/537.36 (KHTML, like Gecko) "
+                    "Chrome/128.0.0.0 Safari/537.36"),
+    "Accept": "application/json, text/plain, */*",
+    "Referer": "https://kick.com/",
+}
+
+
+def _fetch_via_kick_api(url, raw_dir):
+    """Real, permanent fix, 2026-09-24: both yt-dlp's kick:vod extractor
+    AND streamlink's kick plugin fail on this channel's VODs -- yt-dlp
+    hits a 404 on its old /v1/video/{id} endpoint (Kick changed VOD URL
+    generation; open upstream, yt-dlp/yt-dlp#17284/#17428), and
+    streamlink (even the 8.6.1 release that fixed the 404 case,
+    streamlink/streamlink#7108) reports "No playable streams found" --
+    this channel's VODs are stored via Amazon IVS under Kick's own
+    stream.kick.com domain, a shape neither tool's plugin handles.
+    Rather than keep chasing whichever third-party extractor is broken
+    this week, this calls Kick's own real API directly -- verified live
+    against the exact failing VOD, not guessed:
+      1. GET https://kick.com/api/v2/channels/{slug} -> real numeric
+         channel id (confirmed: id=108426821 for saucewalka102, HTTP 200)
+      2. GET https://web.kick.com/api/v1/channels/{channel_id}/videos/{video_id}
+         -> real VOD JSON; "data.recording_url" is a direct, UNSIGNED
+         master.m3u8 (confirmed: HTTP 200, content-type
+         application/x-mpegURL, real multi-quality HLS body -- no token
+         needed, unlike the channel's *live* playback_url which is
+         JWT-signed)
+      3. ffmpeg downloads that master.m3u8 directly (HLS support is
+         built into ffmpeg, already a hard dependency of this pipeline --
+         no new dependency needed for this path at all)
     Only engages for kick.com; every other site keeps using yt-dlp
-    exactly as before."""
+    exactly as before, and streamlink is kept as a last-resort fallback
+    below this one for whatever this doesn't cover (e.g. genuinely
+    private/sub-only VODs, which need real auth either way)."""
+    try:
+        import requests
+    except ImportError:
+        return None, "requests not installed — run: pip install requests"
+
+    m = re.match(r"^/([^/]+)/videos/([0-9a-fA-F-]+)/?$", urlparse(url).path)
+    if not m:
+        return None, f"URL doesn't match kick.com/<channel>/videos/<id> shape: {url}"
+    slug, video_id = m.group(1), m.group(2)
+
+    try:
+        chan_resp = requests.get(
+            f"https://kick.com/api/v2/channels/{slug}",
+            headers=_KICK_HEADERS, timeout=20,
+        )
+        chan_resp.raise_for_status()
+        channel_id = chan_resp.json()["id"]
+    except Exception as e:
+        return None, f"kick channel-id lookup failed: {e}"
+
+    try:
+        vod_resp = requests.get(
+            f"https://web.kick.com/api/v1/channels/{channel_id}/videos/{video_id}",
+            headers=_KICK_HEADERS, timeout=20,
+        )
+        vod_resp.raise_for_status()
+        vod_data = vod_resp.json().get("data", {})
+        recording_url = vod_data.get("recording_url")
+        if not recording_url:
+            return None, f"kick VOD lookup succeeded but had no recording_url: {vod_resp.text[:300]}"
+    except Exception as e:
+        return None, f"kick VOD metadata lookup failed: {e}"
+
+    out_path = os.path.join(raw_dir, "source.mp4")
+    proc = subprocess.run(
+        ["ffmpeg", "-y", "-i", recording_url, "-c", "copy", out_path],
+        capture_output=True, text=True,
+    )
+    if proc.returncode != 0 or not os.path.isfile(out_path):
+        detail = (proc.stderr or "").strip()[-500:]
+        return None, f"ffmpeg download of the real kick recording_url failed: {detail}"
+
+    return {
+        "path": out_path,
+        "title": vod_data.get("title", ""),
+        "duration_sec": vod_data.get("duration"),
+        "was_live": False,
+        "extractor": "kick-api-direct",
+        "id": video_id,
+    }, None
+
+
+def _fetch_via_streamlink(url, raw_dir):
+    """Last-resort kick.com fallback, kept behind _fetch_via_kick_api
+    above (2026-09-24: streamlink's kick plugin failed with "No playable
+    streams found" on the one real VOD this was tested against, an
+    IVS-backed channel the direct-API path above handles instead) --
+    still worth trying for whatever shape of kick content the direct API
+    path doesn't cover."""
     streamlink_bin = _find_streamlink()
     if not streamlink_bin:
         return None, "streamlink not installed — run: pip install streamlink"
@@ -65,9 +154,6 @@ def _fetch_via_streamlink(url, raw_dir):
         detail = (proc.stderr or proc.stdout or "").strip()[-500:]
         return None, f"streamlink fallback also failed: {detail}"
 
-    # streamlink doesn't hand back title/duration the way yt-dlp does --
-    # duration is measured for real via ffprobe on the actual downloaded
-    # file rather than guessed; title is left blank rather than invented.
     duration_sec = None
     try:
         probe = subprocess.run(
@@ -87,6 +173,20 @@ def _fetch_via_streamlink(url, raw_dir):
         "extractor": "streamlink:kick",
         "id": None,
     }, None
+
+
+def _fetch_kick_fallback(url, raw_dir):
+    """Try the real, direct Kick API path first; only fall back to
+    streamlink if that genuinely fails (e.g. Kasada blocks the request,
+    or the VOD shape changes again)."""
+    result, err = _fetch_via_kick_api(url, raw_dir)
+    if result is not None:
+        return result, None
+    api_err = err
+    result, err = _fetch_via_streamlink(url, raw_dir)
+    if result is not None:
+        return result, None
+    return None, f"direct kick API failed ({api_err}); streamlink also failed ({err})"
 
 
 def main():
@@ -137,7 +237,7 @@ def main():
         except yt_dlp.utils.DownloadError as e:
             msg = str(e)
             if _is_kick_url(url) and ("404" in msg or "Unable to download JSON metadata" in msg):
-                fallback_result, fallback_err = _fetch_via_streamlink(url, raw_dir)
+                fallback_result, fallback_err = _fetch_kick_fallback(url, raw_dir)
                 if fallback_result is None:
                     print(json.dumps({
                         "error": f"yt-dlp failed ({msg[:200]}) and the kick.com streamlink "

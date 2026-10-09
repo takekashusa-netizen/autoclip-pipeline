@@ -378,7 +378,9 @@ def generate_srt_for_window(job_name, window_index, max_gap_sec=1.2, max_line_wo
         return None
 
     srt_dir = os.path.join(OUTPUTS, f"{job_name}_best_windows")
-    srt_path = os.path.join(srt_dir, f"{job_name}_window{window_index+1:02d}.srt")
+    _caps_dir = os.path.join(srt_dir, "captions")
+    os.makedirs(_caps_dir, exist_ok=True)
+    srt_path = os.path.join(_caps_dir, f"{job_name}_window{window_index+1:02d}.srt")
     with open(srt_path, "w") as f:
         f.write("\n".join(lines))
     return srt_path

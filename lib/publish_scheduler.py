@@ -416,10 +416,24 @@ def process_due_items():
                 item["result"] = result
                 mark_source_published(dup_job_name, root=ROOT)
             elif item["platform"] == "tiktok":
+                # Own-system TikTok posting (2026-09-26): chunked upload
+                # straight from this Mac via TikTok's Content Posting API,
+                # guarded by a transcript-level duplicate check so the same
+                # moment can never go out twice, even from a different job.
                 from tiktok_publish import publish_video
-                result = publish_video(item["video_path"], item["title"])
-                item["status"] = "published"
+                from dup_guard import check as dup_check, mark as dup_mark
+                dup_ok, dup_reason = dup_check(content_id, "tiktok")
+                if not dup_ok:
+                    item["status"] = "dropped_duplicate"
+                    item["error"] = f"duplicate gate: {dup_reason}"
+                    published.append(item)
+                    continue
+                result = publish_video(item["video_path"], item["title"],
+                                       item.get("description", ""), item.get("tags", []))
+                # inbox mode = draft waiting in the TikTok app for you to tap Post
+                item["status"] = "published" if result.get("mode") == "direct" else "sent_to_inbox"
                 item["result"] = result
+                dup_mark(content_id, "tiktok", note=result.get("mode", ""), result=result)
             elif item["platform"] == "instagram":
                 from instagram_publish import publish_reel
                 public_url = item.get("public_url")

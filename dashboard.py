@@ -239,8 +239,11 @@ def list_best_windows_jobs():
     return jobs
 
 
-def background_maintenance_loop(interval_sec=60, resume_interval_sec=600, publish_interval_sec=300,
-                                 metadata_interval_sec=60, schedule_interval_sec=60,
+# 2026-09-28: intervals raised to cut constant disk seeks on the iMac's 5400rpm
+# hard drive (measured: no SSD in this Mac). Metadata scan 60s -> 15 min,
+# schedule check 60s -> 5 min (posting slots are hourly), auto-resume 10 -> 30 min.
+def background_maintenance_loop(interval_sec=60, resume_interval_sec=1800, publish_interval_sec=300,
+                                 metadata_interval_sec=900, schedule_interval_sec=300,
                                  prune_interval_sec=86400, log_rotate_interval_sec=3600,
                                  metadata_retry_interval_sec=600,
                                  auto_publish=False, content_type="gaming"):

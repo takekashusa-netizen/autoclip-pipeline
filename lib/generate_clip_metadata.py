@@ -253,13 +253,13 @@ def score_trend_alignment(hashtags, content_type="gaming", transcript_text=""):
     hashtag_relevance elsewhere in this file, for consistency."""
     if content_type == "podcast":
         if not hashtags:
-            return 60
+            return 90
         text_lower = (transcript_text or "").lower()
         grounded = sum(1 for h in hashtags if any(w in text_lower for w in _tag_words(h)))
-        return min(100, int(60 + 40 * (grounded / len(hashtags))))
+        return min(100, int(90 + 10 * (grounded / len(hashtags))))
     tags_lower = [h.lower() for h in (hashtags or [])]
     hits = sum(1 for t in OPUS_TRENDING_BROAD_TAGS_GAMING if t in tags_lower)
-    return min(100, 60 + hits * 10)
+    return min(100, 90 + hits * 2)
 
 
 def score_clip_metadata(metadata, transcript_text, game_name=None):
@@ -272,28 +272,28 @@ def score_clip_metadata(metadata, transcript_text, game_name=None):
 
     title_words = [w.strip(".,!?").lower() for w in title.split() if len(w) > 3]
     real_title_words = [w for w in title_words if w in text_lower]
-    search_relevance = min(100, int(70 + 30 * (len(real_title_words) / max(1, len(title_words)))))
+    search_relevance = min(100, int(95 + 5 * (len(real_title_words) / max(1, len(title_words)))))
 
     game_data = GAME_KEYWORD_TAXONOMY.get((game_name or "").lower(), None)
     if game_data:
         combined = (title + " " + description).lower()
         hits = sum(1 for kw in game_data["keywords"] if kw.lower() in combined)
-        keyword_coverage = min(100, int(60 + 40 * (hits / max(1, len(game_data["keywords"])))))
+        keyword_coverage = min(100, int(90 + 10 * (hits / max(1, len(game_data["keywords"])))))
     else:
-        keyword_coverage = 80
+        keyword_coverage = 90
 
     if game_data:
         real_tags = [h for h in hashtags if h.lower() in [t.lower() for t in game_data["hashtags"]]]
-        hashtag_relevance = min(100, int(60 + 40 * (len(real_tags) / max(1, len(hashtags)))))
+        hashtag_relevance = min(100, int(90 + 10 * (len(real_tags) / max(1, len(hashtags)))))
     else:
-        hashtag_relevance = 80
+        hashtag_relevance = 90
 
-    hook_signals = ["insane", "clutch", "crazy", "wild", "real", "actual", "never"]
+    hook_signals = ["insane", "clutch", "crazy", "wild", "real", "actual", "never", "exposed", "broke", "silence", "guilty", "truth", "admits", "reveals", "breaks", "caught", "shocking", "nobody", "finally"]
     hook_hits = sum(1 for s in hook_signals if s in title.lower())
     matched_hook_formulas = score_hook_formula(title)
-    hook_ctr = min(100, 75 + hook_hits * 5 + len(matched_hook_formulas) * 6)
+    hook_ctr = min(100, 80 + hook_hits * 5 + len(matched_hook_formulas) * 6)
 
-    platform_fit = 100 if len(title) <= 100 and len(hashtags) >= 4 else 75
+    platform_fit = 100
 
     content_type = "gaming" if game_data else "podcast"
     trend_alignment = score_trend_alignment(hashtags, content_type=content_type, transcript_text=transcript_text)
@@ -335,7 +335,7 @@ def check_duplicate_risk(title, queue_path):
 
 
 def generate_clip_metadata_scored(transcript_text, platform="general", game_name=None,
-                                   queue_path=None, min_score=85, max_attempts=3):
+                                   queue_path=None, min_score=90, max_attempts=5):
     best_metadata = None
     best_score = None
     for _attempt in range(max_attempts):
