@@ -348,3 +348,50 @@ def generate_clip_metadata_scored(transcript_text, platform="general", game_name
         if score["total"] >= min_score:
             break
     return best_metadata, best_score
+
+
+# --- GtaxZombies caption cleanup (launch plan step 3) -------------------------
+# Every publisher (publish_scheduler, retries, dashboard, n8n queue) gets its
+# title/description/hashtags from the functions above, so cleaning here fixes
+# all of them at once. Fixes leaked JSON like '#MarvinGaye", "#MotownHistory'
+# and garbled tags like '#podcastclipscastClips'. Line breaks are kept.
+try:
+    import functools as _gz_ft, os as _gz_os, re as _gz_re, sys as _gz_sys
+    _gz_root = _gz_os.path.dirname(_gz_os.path.dirname(_gz_os.path.abspath(__file__)))
+    if _gz_root not in _gz_sys.path:
+        _gz_sys.path.insert(0, _gz_root)
+    from caption_fix import clean_caption as _gz_clean, normalize_tags as _gz_tags
+
+    def _gz_text(s):
+        return "\n".join(_gz_clean(line, tags=[]) for line in s.split("\n")) if isinstance(s, str) else s
+
+    def _gz_meta(m):
+        if not isinstance(m, dict):
+            return m
+        found = []
+        for k in ("title", "description"):
+            if isinstance(m.get(k), str):
+                found += _gz_re.findall(r"#[^\s]+", m[k])
+                m[k] = _gz_text(m[k]).strip()
+        raw = m.get("hashtags") or []
+        raw = list(raw) if isinstance(raw, (list, tuple)) else [raw]
+        m["hashtags"] = _gz_tags(raw + found, limit=15)
+        return m
+
+    def _gz_wrap(fn):
+        @_gz_ft.wraps(fn)
+        def wrapper(*a, **k):
+            r = fn(*a, **k)
+            if isinstance(r, dict):
+                return _gz_meta(r)
+            if isinstance(r, tuple):
+                return tuple(_gz_meta(x) if isinstance(x, dict) else x for x in r)
+            return r
+        return wrapper
+
+    for _gz_name in ("generate_clip_metadata", "generate_clip_metadata_from_text",
+                     "generate_clip_metadata_scored"):
+        if callable(globals().get(_gz_name)):
+            globals()[_gz_name] = _gz_wrap(globals()[_gz_name])
+except ImportError as _gz_err:  # never break metadata generation over cleanup
+    print(f"generate_clip_metadata: caption cleanup disabled ({_gz_err})", flush=True)
