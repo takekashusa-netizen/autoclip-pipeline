@@ -167,7 +167,9 @@ if [[ "$platform" == "longform" ]]; then
 fi
 
 if [[ -z "$clip_length" ]]; then
-  if [[ "$platform" == "tiktok" ]]; then
+  if [[ "$content_type" == *podcast* || "$content_type" == *interview* ]]; then
+    clip_length=75   # launch plan step 4: podcast/interview clips 60-90s (middle of range)
+  elif [[ "$platform" == "tiktok" ]]; then
     clip_length=25   # real research finding: 15-30s outperforms longer clips on TikTok specifically
   else
     clip_length=35   # real research-backed range, but clearly away from a minute per explicit preference
