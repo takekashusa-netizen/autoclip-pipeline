@@ -160,26 +160,29 @@ def smooth_track(pts, default_x, default_y):
     return sm
 
 
-def piecewise(keys):
-    """ffmpeg expression that linearly interpolates (t, v) keyframes over time t."""
-    if len(keys) == 1:
-        return f"{keys[0][1]:.1f}"
-    expr = f"{keys[-1][1]:.1f}"
-    for (t0, v0), (t1, v1) in reversed(list(zip(keys, keys[1:]))):
-        seg = f"{v0:.1f}+({v1 - v0:.1f})*(t-{t0:.2f})/{t1 - t0:.2f}"
-        expr = f"if(lt(t\\,{t1:.2f})\\,{seg}\\,{expr})"
-    return expr
+def crop_filter(W, H, ar, track, fps):
+    """Crop box with aspect `ar`, following the face horizontally (or vertically for tall sources).
 
-
-def crop_filter(W, H, ar, track):
-    """Crop box with aspect `ar`, following the face horizontally (or vertically for tall sources)."""
+    Returns (filter, sendcmd_text). The crop position is fed frame by frame through
+    ffmpeg's sendcmd from a small file, linearly interpolated between face samples.
+    (A single nested if() expression broke ffmpeg on long windows: 300 s = 600 keys.)
+    """
+    ts = np.array([t for t, _, _ in track], float)
+    dur = float(ts[-1]) + STEP if len(ts) else 0.0
+    frame_t = np.arange(0.0, max(dur, 1.0 / fps), 1.0 / fps)
     if W / H > ar:  # source wider than target: full height, move x
         cw, ch = int(H * ar) // 2 * 2, H
-        keys = [(t, min(max(cx - cw / 2, 0), W - cw)) for t, cx, _ in track]
-        return f"crop={cw}:{ch}:'{piecewise(keys)}':0"
-    cw, ch = W, int(W / ar) // 2 * 2  # source taller than target: full width, move y
-    keys = [(t, min(max(cy - ch / 2, 0), H - ch)) for t, _, cy in track]
-    return f"crop={cw}:{ch}:0:'{piecewise(keys)}'"
+        vals = [min(max(cx - cw / 2, 0), W - cw) for _, cx, _ in track]
+        axis = "x"
+    else:  # source taller than target: full width, move y
+        cw, ch = W, int(W / ar) // 2 * 2
+        vals = [min(max(cy - ch / 2, 0), H - ch) for _, _, cy in track]
+        axis = "y"
+    pos = np.interp(frame_t, ts, vals) if len(ts) > 1 else np.full(len(frame_t), vals[0] if vals else 0.0)
+    pos = np.floor(pos / 2) * 2  # even offsets keep yuv420p chroma aligned
+    cmds = "\n".join(f"{t:.4f} crop@gz {axis} {v:.0f};" for t, v in zip(frame_t, pos))
+    x0, y0 = (int(pos[0]), 0) if axis == "x" else (0, int(pos[0]))
+    return f"sendcmd=f=gzcrop.cmd,crop@gz={cw}:{ch}:{x0}:{y0}", cmds
 
 
 def caption_filter(fmt):
@@ -203,7 +206,9 @@ def export(src, clip, fmt, outdir, work, W, H, audio):
               f"[bg][fg]overlay=(W-w)/2:(H-h)/2{caps}[v]")
     else:
         track = smooth_track(face_track(src, start, end), W / 2, H / 2)
-        vf = f"[0:v]{crop_filter(W, H, f['ar'], track)},scale={f['w']}:{f['h']}{caps}[v]"
+        crop, cmds = crop_filter(W, H, f["ar"], track, frame_rate(src))
+        (pathlib.Path(work) / "gzcrop.cmd").write_text(cmds + "\n")
+        vf = f"[0:v]{crop},scale={f['w']}:{f['h']}{caps}[v]"
     out = pathlib.Path(outdir) / f"{clip['name']}_{fmt}.mp4"
     cmd = ["ffmpeg", "-y", "-loglevel", "error", "-ss", f"{start}", "-to", f"{end}", "-i", str(src),
            "-filter_complex", vf, "-map", "[v]"]
