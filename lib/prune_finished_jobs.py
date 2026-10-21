@@ -37,6 +37,19 @@ PROJECTS = os.path.join(ROOT, "projects")
 OUTPUTS = os.path.join(ROOT, "outputs")
 STRIP_SUBDIRS = ["raw", "rough-cut", "work", "music", "music-out"]
 
+# 2026-10-21 (launch plan): All-In orders re-cut a job's best windows from the RAW
+# source (1:1 + 16:9 via lib/export_allin.py), so raw/ must outlive export.
+# Best-windows jobs keep raw/ for GZ_KEEP_RAW_DAYS days (default 14) after
+# windows.json was written. When raw/ is finally stripped, source_url.json is
+# copied up to projects/<job>/ first, so export_allin can re-download it.
+import time
+KEEP_RAW_DAYS = float(os.environ.get("GZ_KEEP_RAW_DAYS", "14"))
+
+
+def _keep_raw(job):
+    wj = os.path.join(PROJECTS, job, "best-windows", "windows.json")
+    return os.path.isfile(wj) and (time.time() - os.path.getmtime(wj)) < KEEP_RAW_DAYS * 86400
+
 
 def _dir_size(path):
     total = 0
@@ -112,6 +125,12 @@ def prune(dry_run=False):
         job_freed = 0
         for sub in STRIP_SUBDIRS:
             p = os.path.join(base, sub)
+            if sub == "raw":
+                if _keep_raw(j):
+                    continue
+                su = os.path.join(p, "source_url.json")
+                if os.path.isfile(su) and not dry_run:
+                    shutil.copy2(su, os.path.join(base, "source_url.json"))
             if os.path.isdir(p):
                 if sub == "rough-cut":
                     # 2026-09-23: never delete rough-cut/script.json here.
