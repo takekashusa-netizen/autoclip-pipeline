@@ -21,6 +21,11 @@ from beat_planner import classify  # noqa: E402
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "lib"))
 from visual_analysis import motion_beats  # noqa: E402
 from audio_analysis import transient_beats  # noqa: E402
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
+try:  # optional: chat-proven + game-event signals (studio/signals.py). No file = no change in behaviour.
+    from studio.signals import Signals, window_for  # noqa: E402
+except Exception:  # pragma: no cover - studio package missing on an old checkout
+    Signals = None
 
 PRIORITY = {"impact": 4, "action": 3, "highlight": 3, "hook": 2, "stat": 1, "list_item": 1, "question": 1}
 
@@ -536,6 +541,24 @@ def main():
     # with marginal single-hit blips.
     for c in candidates:
         c["engagement_score"] = engagement_score(c, duration_sec=c["end"] - c["start"])
+
+    # Studio signals (chat spikes + HUD game events), if this job has them:
+    # boost windows that contain a proven moment, and add windows for strong
+    # moments the audio/visual pass missed entirely.
+    signals_path = os.environ.get("STUDIO_SIGNALS") or os.path.join(os.path.dirname(os.path.abspath(script_path)), "signals.json")
+    sig = Signals.load(signals_path) if Signals else None
+    if sig:
+        for m in sig.strong():
+            if not any(c["start"] <= m.get("peak_t", m["end"]) <= c["end"] for c in candidates):
+                ws, we = window_for(m, clip_length, duration)
+                candidates.append({"start": ws, "end": we, "score": HIGHLIGHT_SCORE, "text": m["label"],
+                                   "engagement_score": 0, "from_signal": True})
+        for c in candidates:
+            b, why = sig.bonus(c["start"], c["end"])
+            if b:
+                c["engagement_score"] = min(100, c["engagement_score"] + b)
+                c["signal_bonus"], c["signal_reasons"] = b, why[:3]
+                c["score"] = max(c["score"], HIGHLIGHT_SCORE) if b >= 15 else c["score"]
     candidates = [c for c in candidates if c["engagement_score"] >= QUALITY_FLOOR]
 
     picked = pick_non_overlapping(candidates, clip_count, bonus_cap)
@@ -543,7 +566,8 @@ def main():
     clips = [
         {"id": f"clip{i+1:02d}", "start": c["start"], "end": c["end"],
          "score": c["score"], "bonus": c.get("bonus", False), "preview": c["text"][:80],
-         "engagement_score": c["engagement_score"]}
+         "engagement_score": c["engagement_score"],
+         **({"signal_bonus": c["signal_bonus"], "signal_reasons": c["signal_reasons"]} if c.get("signal_bonus") else {})}
         for i, c in enumerate(picked)
     ]
     bonus_count = sum(1 for c in clips if c["bonus"])

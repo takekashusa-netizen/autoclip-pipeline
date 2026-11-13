@@ -2000,3 +2000,11 @@ Found while checking: takekash.com resolves to Vercel (76.76.21.x), but it is no
 ## 2026-09-26 — TikTok resubmitted before the site fix was live
 
 User resubmitted the TikTok app. Checked right after: https://takekash.com/privacy-policy and /terms-of-service still return 404, and the live homepage title is still "TakeKash — AI Clipping Agent for Twitch & YouTube Streamers" with no favicon. The live site is a Next.js app on Vercel in an account not connected here, and it is not built from `takekash-site-live`. The fixed files in `takekash-site-live` have not reached takekash.com. Until they do, the same review failures will repeat.
+
+## 2026-11-13 — Clip Studio feature pack + Railway deploy fix
+- Added `studio/` (13 features) + `studio.py` CLI + `presets/studio-tiers.json`; tiers keep Fiverr prices ($25/$50/$90), features stack upward; premium gate 90, standard 85, basic 80.
+- Chat + HUD signals feed clip_select.py through optional `rough-cut/signals.json` (+30 max bonus, strong-moment injection). No file = unchanged behaviour.
+- clip_pipeline.sh gains `--game` and `--chat`; signal failure is logged, never fatal.
+- Railway `api` had never deployed (Dockerfile.railway missing from GitHub). Added Dockerfile.railway (ffmpeg + tesseract, /data volume for projects/outputs) and `/healthz`.
+- API is fail-closed: ADMIN_TOKEN required for all /api routes from the internet; direct localhost (Mac) stays open; CORS limited to takekash.com.
+- Verified: 19/19 studio tests on synthetic media; auth lock checked (no token -> 503, wrong -> 401, right -> 200).

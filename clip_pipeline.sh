@@ -47,6 +47,8 @@ vertical=false
 auto_queue=false
 auto_approve=false
 content_type=""
+studio_game=""
+studio_chat=""
 keep_raw=true
 # Default flipped tonight after hitting this exact painful scenario
 # twice: the OLD default (false) deleted the raw source + rough_cut.mp4
@@ -75,6 +77,8 @@ while [[ $i -lt ${#args[@]} ]]; do
     --auto-queue) auto_queue=true ;;
     --auto-approve) auto_approve=true ;;
     --content-type) i=$((i+1)); content_type="${args[$i]}" ;;
+    --game) i=$((i+1)); studio_game="${args[$i]}" ;;
+    --chat) i=$((i+1)); studio_chat="${args[$i]}" ;;
     --keep-raw) keep_raw=true ;;
     --delete-raw) keep_raw=false ;;
   esac
@@ -307,6 +311,18 @@ if [[ "$aud_started" == true ]]; then
   else
     log "audio-analysis: ${audio_result}"
   fi
+fi
+
+# Studio signals: chat spikes + HUD game events -> rough-cut/signals.json,
+# which clip_select.py reads automatically. Optional and never fatal.
+if [[ -n "$studio_game" || -n "$studio_chat" ]]; then
+  sig_args=(signals --job "$job" --game "${studio_game:-none}")
+  if [[ -n "$studio_chat" ]]; then
+    if [[ "$studio_chat" == http* ]]; then sig_args+=(--chat-url "$studio_chat"); else sig_args+=(--chat "$studio_chat"); fi
+  fi
+  sig_result="$(python3 "${PIPELINE_ROOT}/studio.py" "${sig_args[@]}" 2>&1)" \
+    && log "studio-signals: $(echo "$sig_result" | tr -d '\n' | cut -c1-300)" \
+    || log "studio-signals: skipped ($(echo "$sig_result" | tail -2 | tr -d '\n'))"
 fi
 
 if [[ "$podcast_minutes" != "0" ]]; then

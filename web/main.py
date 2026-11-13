@@ -20,6 +20,41 @@ ALLOWED_EXTS = {".mp4", ".mov", ".mkv", ".webm", ".avi"}
 app = FastAPI(title="autoclip-pipeline")
 app.mount("/static", StaticFiles(directory=os.path.join(ROOT, "web", "static")), name="static")
 
+# --- Public-deploy safety (api.takekash.com) -------------------------------
+# Fail closed: when ADMIN_TOKEN is unset, every /api route is refused rather
+# than left open to the internet. Direct localhost requests (your Mac) stay open.
+import hmac  # noqa: E402
+
+from fastapi import Request  # noqa: E402
+from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
+
+_ADMIN_TOKEN = os.environ.get("ADMIN_TOKEN", "")
+_LOCAL = os.environ.get("PIPELINE_LOCAL") == "1"
+_OPEN_PATHS = {"/", "/healthz"}
+
+_origins = [o.strip() for o in os.environ.get("CORS_ORIGINS", "https://takekash.com,https://www.takekash.com").split(",") if o.strip()]
+app.add_middleware(CORSMiddleware, allow_origins=_origins, allow_methods=["*"], allow_headers=["*"])
+
+
+@app.middleware("http")
+async def _require_admin_token(request: Request, call_next):
+    path = request.url.path
+    direct_local = (request.client and request.client.host in ("127.0.0.1", "::1", "localhost")
+                    and "x-forwarded-for" not in request.headers)
+    if _LOCAL or direct_local or path in _OPEN_PATHS or path.startswith("/static") or request.method == "OPTIONS":
+        return await call_next(request)
+    if not _ADMIN_TOKEN:
+        return JSONResponse({"error": "server locked: ADMIN_TOKEN not configured"}, status_code=503)
+    got = request.headers.get("x-admin-token") or request.headers.get("authorization", "").removeprefix("Bearer ").strip()
+    if not hmac.compare_digest(got, _ADMIN_TOKEN):
+        return JSONResponse({"error": "unauthorized"}, status_code=401)
+    return await call_next(request)
+
+
+@app.get("/healthz")
+def healthz():
+    return {"ok": True}
+
 
 def _run(cmd):
     return subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
