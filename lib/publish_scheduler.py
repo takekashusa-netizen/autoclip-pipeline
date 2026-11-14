@@ -348,6 +348,17 @@ def process_due_items():
             # 0-indexed window number, not the full sub_job id.
             sub_window_match = re.match(r"^(.+)__window(\d+)$", content_id)
 
+            # SEO Studio final pass (2026-11-14): fit title/description/tags to
+            # each platform's real limits (Instagram 5 hashtags, TikTok 5,
+            # YouTube 3 visible + 500-char plain tag field) and enrich with the
+            # TakeKash SEO engine. Never blocks a publish: on any error the
+            # metadata goes out exactly as before.
+            try:
+                from seo_finalize import finalize as seo_finalize
+                seo_finalize(item)
+            except Exception as seo_err:
+                print(f"publish_scheduler: SEO finalize skipped for {content_id}: {seo_err}", flush=True)
+
             if item["platform"] == "youtube":
                 from youtube_publish import (upload_video, verify_content_type,
                                               check_duplicate_source_publish, mark_source_published)
