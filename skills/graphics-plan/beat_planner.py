@@ -45,7 +45,21 @@ def classify(seg, index, is_first):
         tags.append("question")
     if any(w in low for w in GAMING_HYPE_WORDS) or KILL_RE.search(low):
         tags.append("highlight")
+    # clip calls ("clip that"), trash talk, funny, rage, hype, hot takes
+    tags += [t for t in _phrase_tags(text) if t not in tags]
     return tags
+
+
+def _phrase_tags(text):
+    try:
+        import os as _os, sys as _sys
+        _lib = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "..", "..", "lib")
+        if _lib not in _sys.path:
+            _sys.path.insert(0, _lib)
+        from phrase_annotator import tags_for
+        return tags_for(text)
+    except Exception:
+        return []
 
 
 def plan_beats(kept_segments):

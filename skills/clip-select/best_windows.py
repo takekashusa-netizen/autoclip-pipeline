@@ -28,7 +28,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "lib"))
 from visual_analysis import motion_beats  # noqa: E402
 from audio_analysis import transient_beats  # noqa: E402
 
-PRIORITY = {"impact": 4, "action": 3, "highlight": 3, "hook": 2, "stat": 1, "list_item": 1, "question": 1}
+PRIORITY = {"clip_call": 5, "impact": 4, "action": 3, "highlight": 3, "trash_talk": 3, "funny": 3, "rage": 3, "hype": 3,
+            "hook": 2, "stat": 1, "list_item": 1, "question": 1, "hot_take": 1}
 
 
 def score(tags):
@@ -63,6 +64,16 @@ def build_interest_timeline(duration, kept_segments, visual_analysis, audio_anal
         s = score(tags)
         if s > 0:
             add_span(seg["start"], seg["end"], s)
+
+    # The play happens BEFORE "clip that" / the reaction: reach back so the
+    # window includes the moment itself, not just the line about it.
+    try:
+        from phrase_annotator import annotate
+        for ann in annotate(kept_segments):
+            if ann["lookback"] > 0:
+                add_span(ann["start"], ann["said_at"], ann["weight"])
+    except Exception:
+        pass
 
     if visual_analysis:
         for beat in motion_beats(visual_analysis):
@@ -259,6 +270,14 @@ def main():
             stream_timeline = json.load(open(tl_path))
         except Exception:
             stream_timeline = None
+
+    try:
+        from phrase_annotator import annotate, summary
+        _ann = annotate(kept_segments)
+        json.dump({"annotations": _ann, "counts": summary(_ann)},
+                  open(os.path.join(os.path.dirname(script_path), "annotations.json"), "w"), indent=2)
+    except Exception:
+        pass
 
     scores, bin_sec = build_interest_timeline(duration, kept_segments, visual_analysis, audio_analysis,
                                               content_type=content_type, stream_timeline=stream_timeline)

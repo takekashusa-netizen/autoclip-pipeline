@@ -27,7 +27,8 @@ try:  # optional: chat-proven + game-event signals (studio/signals.py). No file 
 except Exception:  # pragma: no cover - studio package missing on an old checkout
     Signals = None
 
-PRIORITY = {"impact": 4, "action": 3, "highlight": 3, "hook": 2, "stat": 1, "list_item": 1, "question": 1}
+PRIORITY = {"clip_call": 5, "impact": 4, "action": 3, "highlight": 3, "trash_talk": 3, "funny": 3, "rage": 3, "hype": 3,
+            "hook": 2, "stat": 1, "list_item": 1, "question": 1, "hot_take": 1}
 
 # 2026-09-17: user wants the WHOLE fight, not a fixed short slice — a real
 # engagement is now allowed to run this long if that's genuinely how long

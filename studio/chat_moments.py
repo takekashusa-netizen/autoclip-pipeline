@@ -26,7 +26,7 @@ HYPE = {
     "clip": 3.0, "clip it": 4.0, "clip that": 4.0, "no way": 2.5, "nah": 1.0, "w": 1.5, "dub": 1.5,
     "lmao": 1.5, "lol": 1.0, "omg": 2.0, "insane": 2.0, "crazy": 1.5, "clutch": 2.5, "goat": 2.0,
     "pog": 2.0, "poggers": 2.0, "kekw": 1.5, "lul": 1.0, "holy": 1.5, "yooo": 2.0, "sheesh": 2.0,
-    "run it back": 2.5, "what": 0.8, "how": 0.8, "?": 0.3, "!": 0.3,
+    "run it back": 2.5, "cooked": 2.0, "sit down": 2.0, "ratio": 1.5, "diff": 1.5, "bozo": 1.5, "lmfao": 2.0, "skill issue": 2.0, "what": 0.8, "how": 0.8, "?": 0.3, "!": 0.3,
 }
 
 

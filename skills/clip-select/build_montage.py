@@ -29,7 +29,8 @@ from audio_analysis import transient_beats  # noqa: E402
 sys.path.insert(0, os.path.dirname(__file__))
 from clip_select import build_word_boundary_index, snap_start_to_word_boundary, snap_end_to_word_boundary  # noqa: E402
 
-PRIORITY = {"impact": 4, "action": 3, "highlight": 3, "hook": 2, "stat": 1, "list_item": 1, "question": 1}
+PRIORITY = {"clip_call": 5, "impact": 4, "action": 3, "highlight": 3, "trash_talk": 3, "funny": 3, "rage": 3, "hype": 3,
+            "hook": 2, "stat": 1, "list_item": 1, "question": 1, "hot_take": 1}
 
 
 def score(tags):
