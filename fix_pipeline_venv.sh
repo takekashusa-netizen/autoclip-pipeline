@@ -69,7 +69,7 @@ echo "== 3/5: installing the real dependencies this pipeline actually imports ==
 # google-api-python-client, google-auth*  - Drive + YouTube API access
 # numpy              - audio/video analysis
 # requests           - general HTTP (TikTok/Instagram publish, etc.)
-PKGS=(anthropic Pillow faster-whisper google-api-python-client
+PKGS=(anthropic Pillow faster-whisper opencv-python-headless yt-dlp google-api-python-client
       google-auth google-auth-httplib2 google-auth-oauthlib numpy requests)
 # --prefer-binary: take a wheel over a source build whenever one exists
 # for this interpreter, even if pip would otherwise prefer a newer sdist.
