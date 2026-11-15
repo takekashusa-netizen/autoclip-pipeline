@@ -6,9 +6,11 @@ WORKDIR /app
 COPY web/requirements.txt web/requirements.txt
 COPY worker/requirements.txt worker/requirements.txt
 RUN pip install --no-cache-dir -r web/requirements.txt -r worker/requirements.txt \
-      numpy opencv-python-headless pillow anthropic
+      numpy opencv-python-headless pillow anthropic faster-whisper
 COPY . .
 RUN chmod +x *.sh skills/*.sh skills/*/run.sh 2>/dev/null || true
+# Speech-to-text model cache on the volume, so the Whisper model downloads once, not on every deploy
+ENV HF_HOME=/data/hf_cache PIPELINE_WHISPER_MODEL=small
 # Persist jobs/outputs on the Railway volume mounted at /data
 CMD mkdir -p /data/projects /data/outputs && rm -rf projects outputs \
     && ln -s /data/projects projects && ln -s /data/outputs outputs \
