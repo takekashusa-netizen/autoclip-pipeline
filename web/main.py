@@ -41,7 +41,9 @@ async def _require_admin_token(request: Request, call_next):
     path = request.url.path
     direct_local = (request.client and request.client.host in ("127.0.0.1", "::1", "localhost")
                     and "x-forwarded-for" not in request.headers)
-    if _LOCAL or direct_local or path in _OPEN_PATHS or path.startswith("/static") or request.method == "OPTIONS":
+    # customer routes authenticate themselves (signed tickets / signed links), see web/customer.py
+    if _LOCAL or direct_local or path in _OPEN_PATHS or path.startswith("/static") or request.method == "OPTIONS" \
+            or path in ("/api/pubkey", "/api/customer-jobs") or path.startswith("/api/customer-download/"):
         return await call_next(request)
     if not _ADMIN_TOKEN:
         return JSONResponse({"error": "server locked: ADMIN_TOKEN not configured"}, status_code=503)
@@ -54,6 +56,15 @@ async def _require_admin_token(request: Request, call_next):
 @app.get("/healthz")
 def healthz():
     return {"ok": True}
+
+
+from web import customer as _customer  # noqa: E402
+app.include_router(_customer.router)
+
+
+@app.on_event("startup")
+def _start_customer_worker():
+    _customer.start_worker()
 
 
 def _run(cmd):

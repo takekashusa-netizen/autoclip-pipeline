@@ -6,7 +6,7 @@ WORKDIR /app
 COPY web/requirements.txt web/requirements.txt
 COPY worker/requirements.txt worker/requirements.txt
 RUN pip install --no-cache-dir -r web/requirements.txt -r worker/requirements.txt \
-      numpy opencv-python-headless pillow anthropic faster-whisper
+      numpy opencv-python-headless pillow anthropic faster-whisper cryptography
 COPY . .
 RUN chmod +x *.sh skills/*.sh skills/*/run.sh 2>/dev/null || true
 # Speech-to-text model cache on the volume, so the Whisper model downloads once, not on every deploy
