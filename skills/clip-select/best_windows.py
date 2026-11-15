@@ -48,7 +48,7 @@ def is_loading_screen_bin(bin_start, bin_end, visual_analysis, threshold=0.5):
     return (sum(motion_scores) / len(motion_scores)) < 0.015
 
 
-def build_interest_timeline(duration, kept_segments, visual_analysis, audio_analysis, bin_sec=5.0, content_type="gaming"):
+def build_interest_timeline(duration, kept_segments, visual_analysis, audio_analysis, bin_sec=5.0, content_type="gaming", stream_timeline=None):
     n_bins = int(duration // bin_sec) + 1
     scores = [0.0] * n_bins
 
@@ -77,6 +77,29 @@ def build_interest_timeline(duration, kept_segments, visual_analysis, audio_anal
             bin_start = b * bin_sec
             if is_loading_screen_bin(bin_start, bin_start + bin_sec, visual_analysis):
                 scores[b] -= 1000  # heavy penalty — keeps windows off dead/loading time
+
+    # Stream understanding (lib/stream_understanding.py): vision + OCR dead space
+    # (menus, queues, BRB/AFK, black/frozen screens), real action level per
+    # frame, and a boost for games trending right now.
+    if stream_timeline:
+        try:
+            from gaming_trends import trend_rank, load as load_trends
+            trends = load_trends()
+        except Exception:
+            trend_rank, trends = (lambda g, t=None: None), None
+        for seg in stream_timeline.get("segments", []):
+            if seg.get("dead") and content_type != "podcast":
+                add_span(seg["start"], seg["end"], -1000)
+            elif seg.get("game"):
+                r = trend_rank(seg["game"], trends) if trends else None
+                if r:
+                    add_span(seg["start"], seg["end"], 0.5 if r <= 10 else 0.25)
+        # never let one clip straddle a game switch (Warzone -> 2K mid-clip)
+        for sw in stream_timeline.get("switches", []):
+            add_span(sw["t"] - bin_sec, sw["t"] + bin_sec, -1000)
+        for smp in stream_timeline.get("samples", []):
+            if smp.get("action", 0) >= 2 and not smp.get("dead"):
+                add_span(smp["t"] - 5, smp["t"] + 5, smp["action"])
 
     return scores, bin_sec
 
@@ -151,11 +174,34 @@ def find_best_windows(scores, bin_sec, window_sec, count, min_score_per_min=15.0
     # keeps every real window's caption-burn time bounded.
     max_gap_fill_bins = max(1, int(300.0 // bin_sec))
 
+    DEAD_BIN = -500.0  # bins penalized as dead space / game switches / loading screens
+
     def _emit_gap(start_b, end_b):
+        # Real fix (2026-11-14): gap-fill used to emit every leftover stretch
+        # as a window regardless of score, so dead space (menus, loading,
+        # BRB, black screens) and game switches became clips. Split the gap
+        # at dead bins and emit only the live runs that are long enough.
+        run = None
+        for b2 in range(start_b, end_b + 1):
+            live = b2 < end_b and scores[b2] > DEAD_BIN
+            if live and run is None:
+                run = b2
+            elif not live and run is not None:
+                if b2 - run >= min_gap_bins:
+                    _emit_live(run, b2)
+                run = None
+
+    def _emit_live(start_b, end_b):
         b = start_b
         while b < end_b:
             chunk_end = min(end_b, b + max_gap_fill_bins)
             gap_score = prefix[chunk_end] - prefix[b]
+            # No filler: a leftover stretch only becomes a clip if it carries
+            # the same per-minute action/moment density required of a picked
+            # window. Quiet gameplay with nothing happening is not posted.
+            if gap_score < min_score_per_min * ((chunk_end - b) * bin_sec / 60.0):
+                b = chunk_end
+                continue
             windows.append({"start": round(b * bin_sec, 2),
                              "end": round(chunk_end * bin_sec, 2),
                              "score": round(gap_score, 1)})
@@ -205,10 +251,28 @@ def main():
         except Exception:
             pass
 
-    scores, bin_sec = build_interest_timeline(duration, kept_segments, visual_analysis, audio_analysis, content_type=content_type)
+    # stream-timeline.json is written next to visual-analysis.json by lib/stream_understanding.py
+    stream_timeline = None
+    tl_path = os.path.join(os.path.dirname(visual_path or script_path), "stream-timeline.json")
+    if os.path.exists(tl_path):
+        try:
+            stream_timeline = json.load(open(tl_path))
+        except Exception:
+            stream_timeline = None
+
+    scores, bin_sec = build_interest_timeline(duration, kept_segments, visual_analysis, audio_analysis,
+                                              content_type=content_type, stream_timeline=stream_timeline)
     min_score_per_min = 15.0 if content_type != "podcast" else -999999.0
     windows = find_best_windows(scores, bin_sec, window_sec, window_count, min_score_per_min=min_score_per_min)
 
+    if stream_timeline:
+        from stream_understanding import games_in, dead_ratio
+        for w in windows:
+            g = games_in(stream_timeline, w["start"], w["end"])
+            w["games"] = g
+            w["game"] = g[0] if len(g) == 1 else (g[0] if g else None)
+            w["crosses_game_switch"] = len(g) > 1
+            w["dead_ratio"] = round(dead_ratio(stream_timeline, w["start"], w["end"]), 3)
     json.dump({"windows": windows}, open(out_path, "w"), indent=2)
     print(json.dumps({"window_count": len(windows),
                        "durations_sec": [round(w["end"] - w["start"], 1) for w in windows]}))

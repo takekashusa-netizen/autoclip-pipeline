@@ -9,6 +9,8 @@ broader LinkedIn/Twitter/email marketing content for the whole video.
 """
 import json
 import os
+import sys as _sys
+_sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import re
 import sys
 
@@ -16,17 +18,38 @@ PIPELINE_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUTPUTS = os.path.join(PIPELINE_ROOT, "outputs")
 
 
+def _context_dirs(job_name):
+    """The clip's own project dir, plus the base sub-job dir for platform-suffixed copies
+    (e.g. job123_window07_tiktok -> job123_window07 / job123__window07). These suffixed
+    queue ids are why 30 clips sat in metadata_failures.json with 'no real transcript'."""
+    import re as _re
+    names = [job_name]
+    base = _re.sub(r"_(tiktok|instagram|youtube|shorts)$", "", job_name)
+    names += [base, _re.sub(r"(?<!_)_window(\d+)$", r"__window\1", base), base.replace("__window", "_window")]
+    seen, out = set(), []
+    for n in names:
+        if n not in seen:
+            seen.add(n); out.append(os.path.join(PIPELINE_ROOT, "projects", n, "rough-cut"))
+    return out
+
+
 def generate_clip_metadata(job_name, platform="general"):
-    script_path = os.path.join(PIPELINE_ROOT, "projects", job_name, "rough-cut", "script.json")
-    if not os.path.exists(script_path):
-        raise RuntimeError(f"no real transcript found at {script_path}")
+    transcript_text, visual = "", None
+    for d in _context_dirs(job_name):
+        sp, vp = os.path.join(d, "script.json"), os.path.join(d, "clip-vision.json")
+        if not transcript_text and os.path.exists(sp):
+            transcript_text = (json.load(open(sp)).get("script_text") or "")[:3000]
+        if visual is None and os.path.exists(vp):
+            try:
+                visual = json.load(open(vp))
+            except Exception:
+                visual = None
+    if not transcript_text.strip() and not visual:
+        raise RuntimeError(f"no real transcript or clip-vision found for {job_name} (looked in {_context_dirs(job_name)})")
+    return generate_clip_metadata_from_text(transcript_text, platform, visual=visual)
 
-    script = json.load(open(script_path))
-    transcript_text = script.get("script_text", "")[:3000]
-    return generate_clip_metadata_from_text(transcript_text, platform)
 
-
-def generate_clip_metadata_from_text(transcript_text, platform="general"):
+def generate_clip_metadata_from_text(transcript_text, platform="general", visual=None):
     try:
         import anthropic
     except ImportError as e:
@@ -77,10 +100,15 @@ def generate_clip_metadata_from_text(transcript_text, platform="general"):
     }
     guidance = platform_guidance.get(platform, platform_guidance["general"])
 
+    seen = ""
+    if visual:
+        seen = (f"\nWhat is actually on screen (from frame-by-frame video analysis): game = {visual.get('game') or 'none'}; "
+                f"moment = {visual.get('moment_type')}; {visual.get('what_happened', '')}\n"
+                "Use the on-screen game and action for the title and tags when the transcript doesn't name them.\n")
     user_prompt = f"""Here is the real, actual transcript of one short video clip:
 
-{transcript_text}
-
+{transcript_text or '(no speech in this clip)'}
+{seen}
 {guidance}
 
 Before writing anything, identify what kind of content this genuinely
@@ -99,7 +127,7 @@ invented claims, no generic filler. Respond with ONLY valid JSON:
 
     client = anthropic.Anthropic(api_key=api_key)
     response = client.messages.create(
-        model="claude-sonnet-5",
+        model=__import__("ai_router").model_for_task("seo_metadata"),
         max_tokens=2000,  # real, permanent fix: real thinking tokens on sensitive-topic clips were consuming the whole old 800-token budget before any real text got produced
         messages=[{"role": "user", "content": user_prompt}],
     )

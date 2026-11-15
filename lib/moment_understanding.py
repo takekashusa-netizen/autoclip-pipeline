@@ -5,6 +5,8 @@ Real AI Moment Understanding (Layer 4).
 """
 import json
 import os
+import sys as _sys
+_sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import re
 
 
@@ -48,7 +50,7 @@ ONLY valid JSON: {{"moment_type": "...", "confidence": 0-100, "reasoning": "one 
 
     client = anthropic.Anthropic(api_key=api_key)
     response = client.messages.create(
-        model="claude-sonnet-5",
+        model=__import__("ai_router").model_for_task("moment_scoring"),
         max_tokens=300,
         messages=[{"role": "user", "content": prompt}],
     )

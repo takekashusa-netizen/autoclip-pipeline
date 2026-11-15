@@ -348,6 +348,29 @@ def process_due_items():
             # 0-indexed window number, not the full sub_job id.
             sub_window_match = re.match(r"^(.+)__window(\d+)$", content_id)
 
+            # Clip standards gate (2026-11-14): lib/clip_vision.py watched this
+            # clip and judged it ("cut" = nothing happens, mostly menus/loading,
+            # no payoff). Held clips are kept, not deleted, and recorded so they
+            # can be reviewed. CLIP_STANDARDS_GATE=off disables the gate.
+            if os.environ.get("CLIP_STANDARDS_GATE", "on") != "off":
+                try:
+                    from generate_clip_metadata import _context_dirs
+                    for _d in _context_dirs(content_id):
+                        _vp = os.path.join(_d, "clip-vision.json")
+                        if os.path.exists(_vp):
+                            _cv = json.load(open(_vp))
+                            if _cv.get("verdict") == "cut":
+                                item["status"] = "held_standards"
+                                item["error"] = f"clip standards: score {_cv.get('score')} — {_cv.get('reason', '')}"
+                                _record_metadata_failure(content_id, content_id, item.get("video_path", ""),
+                                                          item.get("platform", ""), item["error"], kind="standards")
+                            break
+                except Exception as std_err:
+                    print(f"publish_scheduler: standards check skipped for {content_id}: {std_err}", flush=True)
+                if item.get("status") == "held_standards":
+                    published.append(item)
+                    continue
+
             # SEO Studio final pass (2026-11-14): fit title/description/tags to
             # each platform's real limits (Instagram 5 hashtags, TikTok 5,
             # YouTube 3 visible + 500-char plain tag field) and enrich with the

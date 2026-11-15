@@ -287,6 +287,22 @@ else
   aud_started=true
 fi
 
+# Stream understanding (lib/stream_understanding.py): which game is on screen
+# minute by minute (handles mid-stream game switches), scene type, and dead
+# space (menus, loading, queues, BRB/AFK, black/frozen screens). Best-effort,
+# same crash-resilience pattern as above; best_windows.py picks it up from
+# rough-cut/stream-timeline.json automatically.
+stream_tl_json="$(job_dir "$job")/rough-cut/stream-timeline.json"
+su_started=false
+if [[ -f "$stream_tl_json" ]]; then
+  log "stream-understanding: reusing existing stream-timeline.json"
+else
+  su_out="$(job_dir "$job")/rough-cut/.stream-understanding.stdout.tmp"
+  run_with_timeout 1800 python3 "${PIPELINE_ROOT}/lib/stream_understanding.py" "$rough_cut_video" "$stream_tl_json" > "$su_out" 2>&1 &
+  su_pid=$!
+  su_started=true
+fi
+
 if [[ "$vis_started" == true ]]; then
   vis_exit=0
   wait "$vis_pid" || vis_exit=$?
@@ -386,6 +402,18 @@ if [[ "$best_windows_minutes" != "0" ]]; then
   windows_json="${bw_out_dir}/windows.json"
   source_duration="$(python3 -c "import json; d=json.load(open('${script_path}')); print(d.get('source_duration_sec', 0))" 2>/dev/null || echo 0)"
 
+  if [[ "${su_started:-false}" == true ]]; then
+    su_exit=0
+    wait "$su_pid" || su_exit=$?
+    if [[ $su_exit -ne 0 ]]; then
+      log "stream-understanding: FAILED (exit ${su_exit}) — continuing without it: $(tail -5 "$su_out" 2>/dev/null)"
+      rm -f "$stream_tl_json"
+    else
+      log "stream-understanding: $(tail -1 "$su_out" 2>/dev/null)"
+    fi
+    rm -f "$su_out"; su_started=false
+  fi
+
   bw_exit=0
   result="$(python3 "${SKILL_DIR}/best_windows.py" "$script_path" "$visual_json" "$audio_json" "$source_duration" "$best_windows_minutes" "$best_windows_count" "$windows_json" "${content_type:-gaming}" 2>&1)" || bw_exit=$?
   if [[ $bw_exit -ne 0 ]]; then
@@ -466,6 +494,11 @@ json.dump(out, open('${sub_rough_dir}/script.json', 'w'), indent=2)
 json.dump({'job': '${subjob}', 'keep': [[s['start'], s['end']] for s in segs], 'cut': []},
           open('${sub_rough_dir}/edl.json', 'w'), indent=2)
 "
+
+    # What actually happens in this clip + standards verdict (lib/clip_vision.py).
+    # Feeds titles/captions and the publish-time standards gate. Best-effort.
+    python3 "${PIPELINE_ROOT}/lib/clip_vision.py" "${sub_rough_dir}/rough_cut.mp4" "${sub_rough_dir}/clip-vision.json" \
+      --transcript "${sub_rough_dir}/script.json" > /dev/null 2>&1 || log "  window${win_num}: clip-vision skipped (no API key or failed)"
 
     if [[ ! -f "$(job_dir "$subjob")/job.json" ]]; then
       state_init "$subjob" "$format" "${sub_raw_dir}/source.mp4"
