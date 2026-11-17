@@ -2008,3 +2008,9 @@ User resubmitted the TikTok app. Checked right after: https://takekash.com/priva
 - Railway `api` had never deployed (Dockerfile.railway missing from GitHub). Added Dockerfile.railway (ffmpeg + tesseract, /data volume for projects/outputs) and `/healthz`.
 - API is fail-closed: ADMIN_TOKEN required for all /api routes from the internet; direct localhost (Mac) stays open; CORS limited to takekash.com.
 - Verified: 19/19 studio tests on synthetic media; auth lock checked (no token -> 503, wrong -> 401, right -> 200).
+
+## 2026-11-16 — New Mac: one-command full setup
+- `scripts/setup_mac.sh` expanded from pipeline-only to every project: Xcode CLT, Homebrew (persisted to ~/.zprofile), ffmpeg(+libass check)/tesseract/yt-dlp/imagemagick/redis/jq/gh/python 3.12/node/watchman/cocoapods, deploy CLIs (eas, railway, netlify, vercel, stripe, shopify, Claude Code), apps (Docker Desktop, OBS, Chrome, VS Code, Claude), repos (autoclip-pipeline, takekash-site-live, private `q` after gh sign-in), venv_pipeline + web/worker deps, site npm deps, SEO engine sync, dashboard launchd service, local Redis, `.env` template auto-loaded from ~/.zshrc.
+- Safeguards: asks sudo once and keeps it alive, caffeinate for the whole run, per-step failure list instead of aborting, re-runnable, full log at ~/mac_setup.log.
+- Not recoverable from GitHub: `takekash-app` (Expo) was only on the old Mac; QUEUE_SECRET and API keys must be re-entered.
+- Run: `curl -fsSL https://raw.githubusercontent.com/takekashusa-netizen/autoclip-pipeline/main/scripts/setup_mac.sh | bash`
