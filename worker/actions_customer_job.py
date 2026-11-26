@@ -1,6 +1,7 @@
 """Customer clip job, run on a free GitHub Actions runner (replaces the paid Railway "api" service).
 
-Flow:  takekash.com (Netlify) signs a job ticket -> GitHub repository_dispatch "customer-job"
+Flow:  every 5 min (or when the site wakes it) the workflow proves who it is with a GitHub OIDC token
+       and pulls signed tickets from takekash.com/api/engine-queue (no shared secret anywhere)
        -> this script: verify ticket -> download stream -> clip pipeline -> zip
        -> upload to the storage bucket -> 7-day presigned link -> HMAC-signed callback to the site.
 
@@ -27,6 +28,8 @@ sys.path.insert(0, ROOT)
 
 SITE_PUBKEY_URL = os.environ.get("SITE_PUBKEY_URL", "https://takekash.netlify.app/api/pubkey")
 SITE_CALLBACK_URL = os.environ.get("SITE_CALLBACK_URL", "https://takekash.netlify.app/api/clip-job-done")
+SITE_QUEUE_URL = os.environ.get("SITE_QUEUE_URL", "https://takekash.netlify.app/api/engine-queue")
+TICKETS_FILE = os.path.join(ROOT, ".engine_tickets.json")
 JID_RE = re.compile(r"^[a-z0-9]{8,40}$")
 HOST_RE = re.compile(r"^(www\.|m\.|clips\.)?(twitch\.tv|kick\.com|youtube\.com|youtu\.be)$", re.I)
 MAX_QUEUE_AGE = 60 * 60          # a runner may wait in queue; allow 1h from signing
@@ -113,19 +116,49 @@ def post_callback(cbk_b64, payload, tries=6):
     return False
 
 
-def main():
+def oidc_token():
+    url = os.environ["ACTIONS_ID_TOKEN_REQUEST_URL"] + "&audience=takekash-engine"
+    req = urllib.request.Request(url, headers={"Authorization": "Bearer " + os.environ["ACTIONS_ID_TOKEN_REQUEST_TOKEN"]})
+    with urllib.request.urlopen(req, timeout=20) as r:
+        return json.loads(r.read().decode())["value"]
+
+
+def poll():
+    """Stdlib only, runs before any install: claims queued jobs and reports how many."""
+    if os.environ.get("ENGINE_READY", "true") != "true":
+        log("storage keys not set yet; leaving jobs queued")   # don't claim work we can't deliver
+        out = os.environ.get("GITHUB_OUTPUT")
+        if out:
+            with open(out, "a") as fh:
+                fh.write("count=0\n")
+        return
+    req = urllib.request.Request(SITE_QUEUE_URL, data=b"{}", method="POST",
+                                 headers={"Authorization": "Bearer " + oidc_token(), "Content-Type": "application/json",
+                                          "User-Agent": "takekash-engine"})
+    with urllib.request.urlopen(req, timeout=30) as r:
+        tickets = json.loads(r.read().decode()).get("tickets", [])
+    fd = os.open(TICKETS_FILE, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    with os.fdopen(fd, "w") as fh:
+        json.dump(tickets, fh)
+    log(f"claimed {len(tickets)} job(s)")
+    out = os.environ.get("GITHUB_OUTPUT")
+    if out:
+        with open(out, "a") as fh:
+            fh.write(f"count={len(tickets)}\n")
+
+
+def run_ticket(body):
     try:
-        body = json.loads(os.environ["TICKET"])
         t = verify_ticket(body)
     except Exception as e:
-        fail(f"rejected ticket: {type(e).__name__}: {e}", code=2)   # no callback: unverified input
+        log(f"rejected ticket: {type(e).__name__}: {e}")   # no callback: unverified input
+        return False
     jid, url, clips, cbk = t["jid"], t["url"], t["clips"], t["cbk"]
-    print(f"::add-mask::{url}", flush=True)                           # keep the customer's link out of public logs
+    print(f"::add-mask::{url}", flush=True)                  # keep the customer's link out of public logs
     log(f"job {jid}: {clips} clip(s)")
 
     s3 = bucket()
     key = f"clips/{jid}.zip"
-    files = []
     if already_done(s3, key):
         log("already uploaded (re-run); re-sending callback")
         delivered = int(s3.head_object(Bucket=os.environ["BUCKET_NAME"], Key=key).get("Metadata", {}).get("clips", "0"))
@@ -148,14 +181,25 @@ def main():
             s3.upload_file(zpath, os.environ["BUCKET_NAME"], key,
                            ExtraArgs={"ContentType": "application/zip", "Metadata": {"clips": str(delivered)},
                                       "ContentDisposition": 'attachment; filename="takekash_clips.zip"'})
+            os.remove(zpath)
             log(f"uploaded {delivered} clip(s)")
 
     payload = {"v": 1, "jid": jid, "status": "done" if delivered else "failed", "delivered": delivered, "iat": int(time.time())}
     if delivered:
         payload["download"] = s3.generate_presigned_url("get_object", Params={"Bucket": os.environ["BUCKET_NAME"], "Key": key},
                                                         ExpiresIn=DOWNLOAD_TTL)
-    if not post_callback(cbk, payload):
-        fail("callback never accepted; site will show the job as processing", code=3)
+    return post_callback(cbk, payload)
+
+
+def main():
+    if len(sys.argv) > 1 and sys.argv[1] == "poll":
+        return poll()
+    tickets = json.load(open(TICKETS_FILE)) if os.path.exists(TICKETS_FILE) else []
+    if os.environ.get("TICKET") and os.environ["TICKET"] not in ("{}", "null", ""):
+        tickets.append(json.loads(os.environ["TICKET"]))      # direct ticket (manual re-run)
+    failed = sum(0 if run_ticket(t) else 1 for t in tickets)
+    if failed:
+        fail(f"{failed} job(s) did not complete", code=3)
 
 
 if __name__ == "__main__":

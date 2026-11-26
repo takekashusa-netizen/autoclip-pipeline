@@ -1,23 +1,40 @@
 # Free clip engine: replaces the paid Railway "api" service.
-# Triggered by takekash.com (Netlify) via repository_dispatch; runs on a standard GitHub-hosted runner,
-# which is free for public repositories. Logs are public, so the worker prints nothing customer-specific.
+# Every 5 minutes (or right away when the site wakes it) this workflow proves who it is with a GitHub OIDC
+# token and pulls signed job tickets from takekash.com. No shared secret is needed for that hand-off.
+# Runs on standard GitHub-hosted runners (free for public repos). Logs are public, so nothing customer-specific is printed.
 name: customer-job
 
 on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
   repository_dispatch:
     types: [customer-job]
 
 permissions:
   contents: read
+  id-token: write   # lets the run ask GitHub for an identity token the site verifies
+
+concurrency:
+  group: customer-job
+  cancel-in-progress: false
 
 jobs:
   clip:
     runs-on: ubuntu-latest
-    timeout-minutes: 150
+    timeout-minutes: 170
     steps:
       - uses: actions/checkout@v4
 
+      - name: Claim queued jobs
+        id: poll
+        env:
+          SITE_QUEUE_URL: https://takekash.netlify.app/api/engine-queue
+          ENGINE_READY: ${{ secrets.BUCKET_ACCESS_KEY_ID != '' && secrets.BUCKET_SECRET_ACCESS_KEY != '' }}
+        run: python3 worker/actions_customer_job.py poll
+
       - uses: actions/setup-python@v5
+        if: steps.poll.outputs.count != '0'
         with:
           python-version: "3.12"
           cache: pip
@@ -26,32 +43,34 @@ jobs:
             worker/requirements.txt
 
       - name: System tools
+        if: steps.poll.outputs.count != '0'
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq --no-install-recommends ffmpeg tesseract-ocr tesseract-ocr-eng
 
       - name: Whisper model cache
+        if: steps.poll.outputs.count != '0'
         uses: actions/cache@v4
         with:
           path: ~/.cache/huggingface
           key: whisper-small-v1
 
       - name: Python packages
+        if: steps.poll.outputs.count != '0'
         run: |
           pip install -q -r web/requirements.txt -r worker/requirements.txt \
             numpy opencv-python-headless pillow anthropic faster-whisper cryptography boto3
           chmod +x *.sh skills/*.sh skills/*/run.sh 2>/dev/null || true
 
       - name: Make the clips
+        if: steps.poll.outputs.count != '0'
         env:
-          # Passed through env (never interpolated into the shell) so a ticket can't inject commands.
-          TICKET: ${{ toJSON(github.event.client_payload) }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          BUCKET_ENDPOINT: ${{ secrets.BUCKET_ENDPOINT }}
-          BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
+          BUCKET_ENDPOINT: https://t3.storageapi.dev
+          BUCKET_NAME: clip-downloads-x86xwmczwz
+          BUCKET_REGION: auto
           BUCKET_ACCESS_KEY_ID: ${{ secrets.BUCKET_ACCESS_KEY_ID }}
           BUCKET_SECRET_ACCESS_KEY: ${{ secrets.BUCKET_SECRET_ACCESS_KEY }}
-          BUCKET_REGION: ${{ secrets.BUCKET_REGION }}
           SITE_PUBKEY_URL: https://takekash.netlify.app/api/pubkey
           SITE_CALLBACK_URL: https://takekash.netlify.app/api/clip-job-done
           PIPELINE_WHISPER_MODEL: small
