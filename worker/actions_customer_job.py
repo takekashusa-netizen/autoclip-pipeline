@@ -29,6 +29,7 @@ sys.path.insert(0, ROOT)
 SITE_PUBKEY_URL = os.environ.get("SITE_PUBKEY_URL", "https://takekash.netlify.app/api/pubkey")
 SITE_CALLBACK_URL = os.environ.get("SITE_CALLBACK_URL", "https://takekash.netlify.app/api/clip-job-done")
 SITE_QUEUE_URL = os.environ.get("SITE_QUEUE_URL", "https://takekash.netlify.app/api/engine-queue")
+SITE_PROGRESS_URL = os.environ.get("SITE_PROGRESS_URL", "https://takekash.netlify.app/api/engine-progress")
 TICKETS_FILE = os.path.join(ROOT, ".engine_tickets.json")
 JID_RE = re.compile(r"^[a-z0-9]{8,40}$")
 HOST_RE = re.compile(r"^(www\.|m\.|clips\.)?(twitch\.tv|kick\.com|youtube\.com|youtu\.be)$", re.I)
@@ -165,14 +166,18 @@ def run_ticket(body):
     else:
         from web import main as M
         name = f"cust_{jid}"
+        progress(cbk, jid, "started", f"run {os.environ.get('GITHUB_RUN_ID', '?')}")
         try:
             M._background_clip_run_from_url(name, url, os.environ.get("CUSTOMER_FORMAT", "short-tiktok-raw"),
                                             int(os.environ.get("CUSTOMER_CLIP_LENGTH", "45")), clips, False, "gaming")
+            if os.path.exists(os.path.join(M.PROJECTS, name, "raw", "source.mp4")):
+                progress(cbk, jid, "downloaded")
             files = M._clip_outputs(name)
         except Exception as e:
             log(f"pipeline crashed: {type(e).__name__}")
             files = []
         delivered = len(files)
+        progress(cbk, jid, "clipped" if files else "note", f"{delivered} clip(s)" if files else "pipeline produced no clips")
         if files:
             zpath = os.path.join(ROOT, f"{jid}.zip")
             with zipfile.ZipFile(zpath, "w", zipfile.ZIP_STORED) as zf:
@@ -183,12 +188,26 @@ def run_ticket(body):
                                       "ContentDisposition": 'attachment; filename="takekash_clips.zip"'})
             os.remove(zpath)
             log(f"uploaded {delivered} clip(s)")
+            progress(cbk, jid, "uploaded")
 
     payload = {"v": 1, "jid": jid, "status": "done" if delivered else "failed", "delivered": delivered, "iat": int(time.time())}
     if delivered:
         payload["download"] = s3.generate_presigned_url("get_object", Params={"Bucket": os.environ["BUCKET_NAME"], "Key": key},
                                                         ExpiresIn=DOWNLOAD_TTL)
     return post_callback(cbk, payload)
+
+
+def progress(cbk_b64, jid, step, detail=""):
+    """Best-effort live step report to the site (same per-job HMAC as the final callback)."""
+    try:
+        raw = json.dumps({"v": 1, "jid": jid, "step": step, "detail": detail[:200], "iat": int(time.time())}, separators=(",", ":")).encode()
+        mac = hmac.new(base64.b64decode(cbk_b64), raw, hashlib.sha256).hexdigest()
+        body = json.dumps({"payload": base64.b64encode(raw).decode(), "mac": mac}).encode()
+        req = urllib.request.Request(SITE_PROGRESS_URL, data=body, method="POST",
+                                     headers={"Content-Type": "application/json", "User-Agent": "takekash-engine"})
+        urllib.request.urlopen(req, timeout=15).close()
+    except Exception as e:
+        log(f"progress '{step}' not recorded: {type(e).__name__}")
 
 
 def main():
