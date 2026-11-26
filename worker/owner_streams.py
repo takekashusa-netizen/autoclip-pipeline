@@ -36,8 +36,32 @@ def log(m):
 
 
 def ytdlp(*args, capture=True):
-    return subprocess.run([sys.executable, "-m", "yt_dlp", "--no-warnings", *args],
+    # On the owner's own Mac only: use their own signed-in browser session (set by clip_my_streams.sh).
+    own = ["--cookies-from-browser", os.environ["OWNER_COOKIES_BROWSER"]] if os.environ.get("OWNER_COOKIES_BROWSER") else []
+    return subprocess.run([sys.executable, "-m", "yt_dlp", "--no-warnings", *own, *args],
                           capture_output=capture, text=True)
+
+
+def local():
+    """Owner's Mac: every past stream on every channel, one chunk after another, skipping chunks already done."""
+    done_file = os.path.join(OUTPUTS, ".owner_streams_done.json")
+    done = set(json.load(open(done_file))) if os.path.exists(done_file) else set()
+    streams = list_streams()
+    log(f"{len(streams)} stream(s) found")
+    for s in streams:
+        for start in range(0, s["duration"], CHUNK):
+            end = min(start + CHUNK, s["duration"])
+            name = f"{s['id']}-{start}"
+            if name in done or (end - start < MIN_LEN and start > 0):
+                continue
+            try:
+                clip(s["id"], start, end, s["src"])
+            except SystemExit as e:
+                log(f"{name}: {e} (moving on)")
+                continue
+            done.add(name)
+            os.makedirs(OUTPUTS, exist_ok=True)
+            json.dump(sorted(done), open(done_file, "w"))
 
 
 def list_streams():
@@ -159,7 +183,9 @@ def _write_summary(s):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) >= 2 and sys.argv[1] == "plan":
+    if len(sys.argv) >= 2 and sys.argv[1] == "local":
+        local()
+    elif len(sys.argv) >= 2 and sys.argv[1] == "plan":
         plan()
     elif len(sys.argv) in (5, 6) and sys.argv[1] == "clip":
         clip(*sys.argv[2:])
