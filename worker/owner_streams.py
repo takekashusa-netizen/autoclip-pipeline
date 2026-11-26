@@ -1,4 +1,5 @@
-"""Clip every best moment from the owner's own past live streams, on free GitHub Actions runners.
+"""Clip every best moment from the owner's own past live streams (Twitch / Kick VODs by default;
+YouTube refuses downloads from datacenter runners, so YouTube streams run on the owner's Mac instead), on free GitHub Actions runners.
 
   python worker/owner_streams.py plan            -> writes a job matrix (one entry per <=60-min chunk)
   python worker/owner_streams.py clip VID START END
@@ -23,11 +24,11 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECTS = os.path.join(ROOT, "projects")
 OUTPUTS = os.path.join(ROOT, "outputs")
 OWNER_CHANNELS = [c for c in os.environ.get(
-    "OWNER_CHANNELS", "https://www.youtube.com/@gtaxzombies/streams").split(",") if c.strip()]
+    "OWNER_CHANNELS", "https://www.twitch.tv/gtaxzombies/videos?filter=archives,https://kick.com/gtaxzombies/videos").split(",") if c.strip()]
 CHUNK = int(os.environ.get("OWNER_CHUNK_SECONDS", "3600"))
 MIN_LEN = 120                  # ignore streams shorter than 2 minutes
 MAX_CHUNKS = 250               # GitHub matrix ceiling is 256
-VID_RE = re.compile(r"^[A-Za-z0-9_-]{6,20}$")
+VID_RE = re.compile(r"^[A-Za-z0-9_-]{6,40}$")
 
 
 def log(m):
@@ -49,7 +50,10 @@ def list_streams():
         for e in json.loads(r.stdout).get("entries") or []:
             vid, dur = e.get("id"), int(e.get("duration") or 0)
             if vid and VID_RE.match(vid) and dur >= MIN_LEN:
-                out.append({"id": vid, "title": (e.get("title") or "")[:80], "duration": dur})
+                src = e.get("url") or e.get("webpage_url") or ""
+                if not src.startswith("http"):
+                    src = f"https://www.twitch.tv/videos/{vid.lstrip('v')}" if "twitch" in ch else f"https://www.youtube.com/watch?v={vid}"
+                out.append({"id": vid, "title": (e.get("title") or "")[:80], "duration": dur, "src": src})
     return out
 
 
@@ -65,7 +69,7 @@ def plan():
             end = min(start + CHUNK, s["duration"])
             if end - start < MIN_LEN and start > 0:      # fold a tiny tail into nothing
                 continue
-            matrix.append({"vid": s["id"], "start": start, "end": end,
+            matrix.append({"vid": s["id"], "src": s["src"], "start": start, "end": end,
                            "name": f"{s['id']}-{start // 60:04d}m"})
     matrix = matrix[:MAX_CHUNKS]
     log(f"{len(streams)} stream(s), {len(matrix)} chunk(s)")
@@ -98,7 +102,7 @@ def audio_ok(path):
     return True, f"audio ok (mean {m} dB, peak {k} dB)"
 
 
-def clip(vid, start, end):
+def clip(vid, start, end, url=None):
     if not VID_RE.match(vid):
         sys.exit("bad video id")
     start, end = int(start), int(end)
@@ -106,7 +110,9 @@ def clip(vid, start, end):
     raw_dir = os.path.join(PROJECTS, job, "raw")
     os.makedirs(raw_dir, exist_ok=True)
     src = os.path.join(raw_dir, "source.mp4")
-    url = f"https://www.youtube.com/watch?v={vid}"
+    url = url or f"https://www.youtube.com/watch?v={vid}"
+    if not re.match(r"^https://(www\.)?(twitch\.tv|kick\.com|youtube\.com)/", url):
+        sys.exit("unsupported source")
     log(f"{job}: downloading {start // 60}-{end // 60} min")
     r = ytdlp("-f", "bv*[height<=1080]+ba/b[height<=1080]/b", "--merge-output-format", "mp4",
               "--download-sections", f"*{start}-{end}", "--force-keyframes-at-cuts",
@@ -155,7 +161,7 @@ def _write_summary(s):
 if __name__ == "__main__":
     if len(sys.argv) >= 2 and sys.argv[1] == "plan":
         plan()
-    elif len(sys.argv) == 5 and sys.argv[1] == "clip":
+    elif len(sys.argv) in (5, 6) and sys.argv[1] == "clip":
         clip(*sys.argv[2:])
     else:
         sys.exit(__doc__)

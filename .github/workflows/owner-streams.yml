@@ -1,4 +1,4 @@
-# Clip every best moment from the owner's own past live streams (YouTube @gtaxzombies).
+# Clip every best moment from the owner's own past live streams (Twitch + Kick VODs).
 # Each stream is split into 1-hour chunks that run in parallel; chunks with no real audio are skipped.
 # Clips land as downloadable artifacts on the run page (kept 30 days).
 name: owner-streams
@@ -79,7 +79,7 @@ jobs:
         run: |
           echo "| chunk | audio | clips |" >> "$GITHUB_STEP_SUMMARY"
           echo "|---|---|---|" >> "$GITHUB_STEP_SUMMARY"
-          python worker/owner_streams.py clip "${{ matrix.vid }}" "${{ matrix.start }}" "${{ matrix.end }}"
+          python worker/owner_streams.py clip "${{ matrix.vid }}" "${{ matrix.start }}" "${{ matrix.end }}" "${{ matrix.src }}"
       - name: Save clips
         if: always()
         uses: actions/upload-artifact@v4
