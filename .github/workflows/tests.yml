@@ -12,5 +12,5 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: "20" }
       - run: sudo apt-get update && sudo apt-get install -y ffmpeg tesseract-ocr
-      - run: pip install pytest numpy pillow scipy soundfile requests cryptography "fastapi==0.162.7" "starlette==1.7.0" "httpx==0.28.1" "httpx2==2.13.1" -r web/requirements.txt
+      - run: pip install -r requirements-dev.txt -r web/requirements.txt
       - run: python -m pytest tests -q --durations=5
