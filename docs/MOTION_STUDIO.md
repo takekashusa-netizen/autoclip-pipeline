@@ -29,3 +29,14 @@ python3 motion.py make kash_sheet.png kash_poster.png --preset presets/kash.json
 
 ## Licences
 Kokoro voice model: Apache-2.0. Real-ESRGAN weights: BSD-3. Poppins and JetBrains Mono: OFL (included in `studio/motion/fonts`).
+
+## Brand ads (fulfilling a free-ad request)
+`python3 studio/motion/brandad.py brief.json OUT_DIR` turns a brand's reply (link, logo, goal) into a finished
+9:16 ad with voice-over, captions and a beat in ~30 seconds. Brief fields: brand, headline, 3 benefits,
+goal (buy/follow/book/download), url, colors {primary, accent, bg}, optional logo/product PNGs (relative to the
+brief), voice (female/male/king), watermark (default on: "Made by TakeKash" for the free tier).
+No logo or product? It builds a clean brand card in their colours.
+
+## KASH episode 2 — "Your first ad is on us"
+`studio/motion/freead.py <vo_dir> <out_dir> [lo hi]` + `freead_score.py` (katana split-reveal, hanko stamps,
+phone that builds an ad, NO CARD slam + 48H counter, enso CTA).
