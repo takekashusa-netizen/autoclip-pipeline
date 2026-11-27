@@ -4,7 +4,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 15          # whole-job hang guard; per-test guard lives in tests/conftest.py
-    env: { SEO_OFFLINE: "1", TEST_TIMEOUT: "30" }
+    env: { SEO_OFFLINE: "1", TAKEKASH_OFFLINE: "1", TEST_TIMEOUT: "30" }
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

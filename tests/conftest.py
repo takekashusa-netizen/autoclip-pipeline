@@ -10,6 +10,7 @@ import os, signal, sys
 import pytest
 
 os.environ.setdefault("SEO_OFFLINE", "1")
+os.environ.setdefault("TAKEKASH_OFFLINE", "1")     # every live lookup (trends, suggest) short-circuits: hermetic tests
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "lib"))
 
 LIMIT = int(os.environ.get("TEST_TIMEOUT", "30"))
@@ -33,3 +34,18 @@ def _deadline(request):
         yield
     finally:
         signal.alarm(0); signal.signal(signal.SIGALRM, old)
+
+
+# Script-style test files call sys.exit(1) on failure. At import time that used to abort the WHOLE run
+# (INTERNALERROR) and hide every other result; now it is reported as that one file's error and the rest run.
+class _SafeModule(pytest.Module):
+    def _getobj(self):
+        try:
+            return super()._getobj()
+        except SystemExit as e:
+            raise self.CollectError(f"{self.path.name} exited with {e.code} during import (see its FAIL line above)")
+
+
+def pytest_pycollect_makemodule(module_path, parent):
+    if module_path.name.startswith("test_"):
+        return _SafeModule.from_parent(parent, path=module_path)

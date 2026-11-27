@@ -33,6 +33,8 @@ SEED = ["Fortnite", "League of Legends", "Grand Theft Auto VI", "Call of Duty: W
 
 
 def _get(url, headers=None, data=None, timeout=15):
+    if os.environ.get("TAKEKASH_OFFLINE"):          # tests: never depend on live charts
+        raise OSError("offline mode")
     req = urllib.request.Request(url, data=data, headers=headers or {"User-Agent": "takekash-pipeline/1.0"})
     with urllib.request.urlopen(req, timeout=timeout) as r:
         return json.loads(r.read().decode())

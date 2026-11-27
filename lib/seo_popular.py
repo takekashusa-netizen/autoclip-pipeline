@@ -76,7 +76,7 @@ def _save_cache(c):
         pass
 
 
-_OFFLINE = {"down": bool(os.environ.get("SEO_OFFLINE"))}
+_OFFLINE = {"down": bool(os.environ.get("SEO_OFFLINE") or os.environ.get("TAKEKASH_OFFLINE"))}
 
 def suggest(q, timeout=3):
     """YouTube's own autocomplete for q (ranked). [] when offline/blocked.
