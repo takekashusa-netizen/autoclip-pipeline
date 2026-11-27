@@ -2020,3 +2020,9 @@ User resubmitted the TikTok app. Checked right after: https://takekash.com/priva
 - Own-the-stack: PyTorch and Hugging Face hosts are blocked here, so the anime upscaler (Real-ESRGAN anime_6B, BSD-3) loads `.pth` weights with a small unpickler and rebuilds the network as ONNX on onnxruntime. Voice = Kokoro (Apache-2.0). Both are fetched once from GitHub, size-checked, and cached in `motion_work/models`.
 - Brand character KASH (the Ronin of TakeKash): owner's generated poster + character sheet. Art, voice and renders live in `motion_work/` (git-ignored), because the repo is public.
 - Verified: tests/test_motion.py 2/2; the full packaged pipeline (assets -> poster -> voice -> score -> preview) re-run from a clean MOTION_HOME reproduces the delivered video's frames.
+
+## 2026-11-27 — Max-SEO popular-tag layer + hang guards
+- lib/seo_popular.py: ranked tag bank per topic + live YouTube autocomplete (24h cache, circuit breaker when offline). Wired into seo_finalize (publish time) and `motion.py seo` (runs in `make`).
+- Platform rules: Shorts 5 hashtags (#shorts + niche + #takekash, first 3 show above the title), TikTok #fyp + 3 niche + brand, IG hard cap 5, YouTube tags ≤500 chars. Preset `seo.topics` pins the video's real subject ahead of body-copy keywords.
+- Bug: hashtags() round-robin `while any(niche)` never ended when a topic had <12 tags, which hung the suite. Fixed with a bounded loop + regression test.
+- Never-again: tests/conftest.py hard per-test deadline (30s default, `@pytest.mark.budget(n)` for heavy video tests), suite runs offline (SEO_OFFLINE=1), GitHub Actions job with a 15-min cap runs every push.

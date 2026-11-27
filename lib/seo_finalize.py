@@ -88,6 +88,15 @@ def finalize(item):
     desc = item.get("description") or ""
     grounded = list(item.get("tags") or []) + _HASH_RE.findall(desc) + _HASH_RE.findall(title)
     engine_out = engine_seo(title, grounded)
+    # popular layer: ranked hashtags/tags people actually use for these topics (+ live YouTube suggest)
+    popular_tags = []
+    try:
+        import seo_popular as SP
+        txt = title + " " + desc + " " + " ".join(map(str, item.get("tags") or []))
+        grounded += [h for h in SP.hashtags(txt, platform if platform != "youtube" else "shorts", 5, brand=False) if h != "#fyp"]
+        popular_tags = SP.tags(txt, live=item.get("seo_live", True))
+    except Exception:
+        pass
 
     # hashtags never live inline in the body; we place the capped set ourselves
     body = re.sub(r"[ \t]{2,}", " ", _HASH_RE.sub("", desc)).strip()
@@ -100,6 +109,7 @@ def finalize(item):
         yt_pool = [_plain_tag(h) for h in grounded]
         if engine_out:
             yt_pool += (engine_out.get("results", {}).get("youtube", {}).get("tags") or [])
+        yt_pool += popular_tags
         item["tags"], item["tag_chars"] = pack_youtube_tags(yt_pool)
     elif platform == "instagram":
         caption_tags = " ".join(tags)

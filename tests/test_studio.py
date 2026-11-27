@@ -189,6 +189,7 @@ def test_schedule_dry_run(media):
     assert [x["platform"] for x in q] == ["tiktok", "youtube", "instagram"] and q[2]["title"] == "A"
 
 
+@pytest.mark.budget(120)
 def test_compilation(media, tmp_path):
     out = str(tmp_path / "comp.mp4")
     r = compilation.build([(media["clip"], 95), (media["vert"], 91), (media["clip"], 92)], out)
@@ -227,6 +228,7 @@ def test_learning_needs_data_then_learns(tmp_path, monkeypatch):
 
 
 # ---------------------------------------------------------------- CLI end-to-end
+@pytest.mark.budget(240)
 def test_cli_run_premium(media):
     r = subprocess.run([sys.executable, os.path.join(ROOT, "studio.py"), "run", media["dir"], "--tier", "premium",
                         "--cam", "1500,60,380,280", "--langs", "", "--compile", "--dry-run-schedule"],

@@ -1,6 +1,6 @@
 {
  "name": "kash",
- "_note": "KASH \u2014 the Ronin of TakeKash. Boxes are pixel crops on the 1536x1024 character sheet; erase = fractional rects to blank inside a crop.",
+ "_note": "KASH — the Ronin of TakeKash. Boxes are pixel crops on the 1536x1024 character sheet; erase = fractional rects to blank inside a crop.",
  "boxes": {
   "front": [
    8,
@@ -326,5 +326,24 @@
    "outro",
    "Your stream. My blade. TakeKash dot com."
   ]
- ]
+ ],
+ "seo": {
+  "subject": "TakeKash AI Clip Studio",
+  "hook": "KASH the Black Samurai Tours TakeKash",
+  "lines": [
+   "KASH, the black samurai king of TakeKash, walks you through the AI clip studio that turns one Twitch stream into a week of viral Shorts, TikToks and Reels: auto clips, captions, SEO titles and hashtags, stream overlays and edit flow.",
+   "Built by GtaxZombies for streamers, gamers and content creators who want to grow without editing all night."
+  ],
+  "links": [
+   "🔗 Start free → takekash.com",
+   "🎮 Live on Twitch → twitch.tv/gtaxzombies"
+  ],
+  "brand_line": "TakeKash — clip it, post it, get paid.",
+  "topics": [
+   "samurai",
+   "anime",
+   "ai",
+   "streamer"
+  ]
+ }
 }

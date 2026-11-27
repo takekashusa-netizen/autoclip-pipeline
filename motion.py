@@ -22,7 +22,7 @@ def sh(*a): subprocess.run([sys.executable, *a], cwd=MOT, check=True)
 
 def main():
     p = argparse.ArgumentParser(description='TakeKash Motion Studio')
-    p.add_argument('cmd', choices=['assets', 'poster', 'voice', 'score', 'preview', 'render', 'make'])
+    p.add_argument('cmd', choices=['assets', 'poster', 'voice', 'score', 'preview', 'render', 'seo', 'make'])
     p.add_argument('files', nargs='*')
     p.add_argument('--preset', default=os.path.join(HERE, 'presets', 'kash.json'))
     p.add_argument('--name', default='kash_tour')
@@ -55,6 +55,22 @@ def main():
                         '-map', '0:v', '-map', '1:a', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '256k', '-shortest', '-movflags', '+faststart',
                         final + '.tmp.mp4'], check=True)
         os.replace(final + '.tmp.mp4', final); print(final)
+    if a.cmd in ('seo', 'make'):
+        sys.path.insert(0, os.path.join(HERE, 'lib'))
+        import seo_popular as SP
+        S = P.get('seo', {})
+        pack = SP.shorts_pack(S.get('subject', 'TakeKash'), S.get('hook', 'TakeKash'), S.get('lines', []),
+                              links=S.get('links', []), brand_line=S.get('brand_line', ''), live=True, pinned=S.get('topics'))
+        os.makedirs(config.OUT, exist_ok=True)
+        base = os.path.join(config.OUT, a.name + '_seo')
+        json.dump(pack, open(base + '.json', 'w'), indent=1, ensure_ascii=False)
+        md = []
+        for plat in ('shorts', 'tiktok', 'instagram'):
+            d = pack[plat]; md.append(f"## {plat.upper()}")
+            if d.get('title'): md.append(f"**Title:** {d['title']}")
+            md.append("**Description:**\n" + d['description'])
+            if d.get('tags'): md.append("**Tags:** " + ', '.join(d['tags']))
+        open(base + '.md', 'w').write('\n\n'.join(md)); print(base + '.md')
 
 if __name__ == '__main__':
     main()

@@ -1,0 +1,16 @@
+name: tests
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15          # whole-job hang guard; per-test guard lives in tests/conftest.py
+    env: { SEO_OFFLINE: "1", TEST_TIMEOUT: "30" }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - uses: actions/setup-node@v4
+        with: { node-version: "20" }
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - run: pip install pytest numpy pillow scipy soundfile requests cryptography fastapi -r web/requirements.txt
+      - run: python -m pytest tests -q --durations=5
