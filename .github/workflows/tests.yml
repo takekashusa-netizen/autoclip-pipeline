@@ -11,6 +11,6 @@ jobs:
         with: { python-version: "3.11" }
       - uses: actions/setup-node@v4
         with: { node-version: "20" }
-      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg tesseract-ocr
       - run: pip install pytest numpy pillow scipy soundfile requests cryptography fastapi -r web/requirements.txt
       - run: python -m pytest tests -q --durations=5
