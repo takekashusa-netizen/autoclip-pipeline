@@ -37,3 +37,6 @@ logs/
 awesome-osint-arsenal/
 *.bak*
 takekash.db
+
+# Motion Studio work files (character art, voice, renders, models)
+motion_work/

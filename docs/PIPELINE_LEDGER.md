@@ -2014,3 +2014,9 @@ User resubmitted the TikTok app. Checked right after: https://takekash.com/priva
 - Safeguards: asks sudo once and keeps it alive, caffeinate for the whole run, per-step failure list instead of aborting, re-runnable, full log at ~/mac_setup.log.
 - Not recoverable from GitHub: `takekash-app` (Expo) was only on the old Mac; QUEUE_SECRET and API keys must be re-entered.
 - Run: `curl -fsSL https://raw.githubusercontent.com/takekashusa-netizen/autoclip-pipeline/main/scripts/setup_mac.sh | bash`
+
+## 2026-11-27 — TakeKash Motion Studio (in-house character videos)
+- Added `motion.py` + `studio/motion/` + `presets/kash.json`: character sheet -> cut + 4x upscale -> King voice -> score -> narrated 9:16 tour render, one command (`motion.py make`).
+- Own-the-stack: PyTorch and Hugging Face hosts are blocked here, so the anime upscaler (Real-ESRGAN anime_6B, BSD-3) loads `.pth` weights with a small unpickler and rebuilds the network as ONNX on onnxruntime. Voice = Kokoro (Apache-2.0). Both are fetched once from GitHub, size-checked, and cached in `motion_work/models`.
+- Brand character KASH (the Ronin of TakeKash): owner's generated poster + character sheet. Art, voice and renders live in `motion_work/` (git-ignored), because the repo is public.
+- Verified: tests/test_motion.py 2/2; the full packaged pipeline (assets -> poster -> voice -> score -> preview) re-run from a clean MOTION_HOME reproduces the delivered video's frames.
