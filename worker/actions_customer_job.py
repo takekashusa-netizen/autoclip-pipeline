@@ -21,6 +21,7 @@ import sys
 import time
 import urllib.parse
 import urllib.request
+import urllib.error
 import zipfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -206,6 +207,8 @@ def progress(cbk_b64, jid, step, detail=""):
         req = urllib.request.Request(SITE_PROGRESS_URL, data=body, method="POST",
                                      headers={"Content-Type": "application/json", "User-Agent": "takekash-engine"})
         urllib.request.urlopen(req, timeout=15).close()
+    except urllib.error.HTTPError as e:                     # say which answer the site gave, so failures can be fixed
+        log(f"progress '{step}' not recorded: HTTP {e.code}")
     except Exception as e:
         log(f"progress '{step}' not recorded: {type(e).__name__}")
 

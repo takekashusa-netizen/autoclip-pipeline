@@ -1,0 +1,92 @@
+# Clip every best moment from the owner's own past live streams (Twitch + Kick VODs).
+# Each stream is split into 1-hour chunks that run in parallel; chunks with no real audio are skipped.
+# Clips land as downloadable artifacts on the run page (kept 30 days).
+name: owner-streams
+
+on:
+  push:
+    branches: [owner-streams]
+    paths: [".github/workflows/owner-streams.yml", "worker/owner_streams.py"]
+  workflow_dispatch:
+    inputs:
+      only_videos:
+        description: "Optional: comma-separated YouTube video IDs (blank = every past stream)"
+        required: false
+        default: ""
+  schedule:
+    - cron: "17 9 * * *"     # daily, picks up new streams (only once this file is on main)
+
+permissions:
+  contents: read
+
+concurrency:
+  group: owner-streams
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+      count: ${{ steps.plan.outputs.count }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -q "yt-dlp>=2025.1"
+      - id: plan
+        env:
+          ONLY_VIDEOS: ${{ github.event.inputs.only_videos }}
+        run: python worker/owner_streams.py plan
+
+  clip:
+    needs: plan
+    if: needs.plan.outputs.count != '0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 175
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    name: clip ${{ matrix.name }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            web/requirements.txt
+            worker/requirements.txt
+      - name: System tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends ffmpeg tesseract-ocr tesseract-ocr-eng
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: whisper-small-v1
+      - name: Python packages
+        run: |
+          pip install -q -r web/requirements.txt -r worker/requirements.txt \
+            numpy opencv-python-headless pillow anthropic faster-whisper "yt-dlp>=2025.1"
+          chmod +x *.sh skills/*.sh skills/*/run.sh 2>/dev/null || true
+      - name: Clip this hour
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          PIPELINE_WHISPER_MODEL: small
+          PIPELINE_COOKIE_BROWSER: ""
+        run: |
+          echo "| chunk | audio | clips |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---|---|" >> "$GITHUB_STEP_SUMMARY"
+          python worker/owner_streams.py clip "${{ matrix.vid }}" "${{ matrix.start }}" "${{ matrix.end }}" "${{ matrix.src }}"
+      - name: Save clips
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: clips-${{ matrix.name }}
+          path: |
+            outputs/owner-*.final.mp4
+            outputs/owner-*__summary.json
+          if-no-files-found: ignore
+          retention-days: 30
