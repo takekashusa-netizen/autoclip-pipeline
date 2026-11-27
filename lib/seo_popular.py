@@ -45,6 +45,9 @@ BANK = {
     "creator":  (r"\b(creator|content|editing|editor|editflow|overlay|seo|caption|tags|hashtags|youtube|tiktok|views|grow)\w*",
                  ["#contentcreator", "#creatortips", "#videoediting", "#youtubetips"],
                  ["content creator", "content creation", "video editing", "youtube tips", "grow on youtube", "short form content", "stream overlay"]),
+    "business": (r"\b(business|brand|brands|shop|shops|store|marketing|ads?|advert\w*|product|small business|entrepreneur)\b",
+                 ["#smallbusiness", "#marketing", "#smallbusinessowner", "#entrepreneur", "#tiktokads"],
+                 ["small business marketing", "free ad", "video ads for small business", "tiktok ads", "how to advertise on tiktok", "marketing tips", "ugc ads"]),
     "brand":    (r".", ["#takekash", "#gtaxzombies"], ["takekash", "take kash", "takekash.com", "gtaxzombies", "kash"]),
 }
 # hashtags that ride on every platform's broad slot

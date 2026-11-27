@@ -44,3 +44,8 @@ def test_shorts_pack_limits():
 def test_pinned_topics_lead():
     h = SP.hashtags("long body about ai tools content creator youtube tips seo", "shorts", 5, pinned=["samurai", "anime"])
     assert h[:3] == ["#shorts", "#samurai", "#anime"]
+
+
+def test_business_topic_for_brand_offers():
+    h = SP.hashtags("free ad for small business brands and shops", "tiktok", 5, pinned=["business"])
+    assert h[:2] == ["#fyp", "#smallbusiness"] and h[-1] == "#takekash"
