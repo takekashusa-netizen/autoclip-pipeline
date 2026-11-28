@@ -35,3 +35,20 @@ python3 studio.py run outputs/<folder> --tier premium --job JOB --cam 1500,60,38
 - Learning loop refuses to adjust scores until 15+ published clips have real view counts.
 
 Tests: `python3 -m pytest tests/test_studio.py -q` (19 tests, synthetic media).
+
+## tighten — viral pacing + word-aligned hook, plan before render
+Rules (strict, from word timestamps only):
+- Dead air: any no-speech gap > 0.35 s is cut, words keep 0.08 s padding, spans < 0.25 s merge.
+  A gap whose audio is clearly loud (game audio, hits, crowd) is KEPT: on gaming clips the play happens between words.
+- Fillers: isolated um / uh / er / ah / hmm are cut.
+- Hook (`--hook`): sentences scored by question (+3), number (+2), strong words (+2 each, max 4), "!" (+1),
+  loudness (+0..2), 1.2–4 s long (else −3), not already in the first second. Best ≥ 3 becomes a cold open.
+Workflow:
+```
+python3 studio.py tighten clip.mp4 --hook            # -> clip.cutlist.json + clip.storyboard.jpg (timecoded shots)
+python3 studio.py tighten clip.cutlist.json --approve
+python3 studio.py tighten clip.cutlist.json --render clip.tight.mp4
+```
+Editing the cut list after approval needs a new approval. Tier runs (standard/premium/owner) use tighten
+unattended before hook_first; the pipeline's second-pass review is the approval there. Clips without speech are skipped.
+Brand ads use the same gate: `brandad.py brief.json OUT --plan` → `--approve` → render.

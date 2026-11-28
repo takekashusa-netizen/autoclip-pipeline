@@ -31,6 +31,7 @@ import traceback
 ROOT = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, ROOT)
 
+from studio import tighten  # noqa: E402
 from studio import (active_speaker, brand_safe, chat_moments, compilation, game_events, hook_first,  # noqa: E402
                     learning, media_kit, schedule, score_report, signals, split_layout, thumbs_titles, translate)
 from studio.common import StudioError, clip_stem, find_srt, probe  # noqa: E402
@@ -143,6 +144,15 @@ def cmd_run(a):
             step("brand_safe", lambda: brand_safe.make(working, out))
             if res["steps"]["brand_safe"].get("out"):
                 working = out
+        if "tighten" in feats:                     # dead air + fillers out, from word timestamps (timing unchanged by brand_safe)
+            out = os.path.join(od, f"{stem}.tight.mp4")
+            def _tight():
+                from studio.common import load_words
+                return tighten.make(working, out, words=load_words(clip), hook=False)
+            step("tighten", _tight)
+            if res["steps"]["tighten"].get("out"):
+                working = out
+                rep["features"]["tighten"] = 1
         if "hook_first" in feats:
             out = os.path.join(od, f"{stem}.hook.mp4")
             step("hook_first", lambda: hook_first.make(working, out, signal_times=payoff_times))
@@ -240,6 +250,12 @@ def main():
             x.add_argument("--mute-music", action="store_true")
         if name == "split":
             x.add_argument("--cam")
+    tg = sp.add_parser("tighten", help="plan (cut list + storyboard) -> approve -> render")
+    tg.add_argument("clip", help="clip to plan, or a .cutlist.json with --approve/--render")
+    tg.add_argument("--hook", action="store_true", help="cold-open on the best word-aligned hook")
+    tg.add_argument("--approve", action="store_true")
+    tg.add_argument("--render", metavar="OUT")
+    tg.add_argument("--yes", action="store_true", help="render without approval")
     t = sp.add_parser("translate")
     t.add_argument("clip")
     t.add_argument("--langs", required=True)
@@ -276,6 +292,13 @@ def main():
             cmd_run(a)
         elif a.cmd == "hook-first":
             jdump(hook_first.make(a.clip, a.out, a.payoff, tease_text=a.text))
+        elif a.cmd == "tighten":
+            if a.approve:
+                jdump(tighten.approve(a.clip))
+            elif a.render:
+                jdump(tighten.render(a.clip, a.render, force=a.yes))
+            else:
+                jdump(tighten.plan(a.clip, hook=a.hook))
         elif a.cmd == "brand-safe":
             jdump(brand_safe.make(a.clip, a.out, a.mode, mute_music=a.mute_music))
         elif a.cmd == "split":

@@ -3,23 +3,59 @@
   "basic": {
     "price_usd": 25,
     "gate": 80,
-    "features": ["signals", "score_report"]
+    "features": [
+      "signals",
+      "score_report"
+    ]
   },
   "standard": {
     "price_usd": 50,
     "gate": 85,
-    "features": ["signals", "score_report", "hook_first", "thumbs_titles", "brand_safe", "split_layout"]
+    "features": [
+      "signals",
+      "score_report",
+      "tighten",
+      "hook_first",
+      "thumbs_titles",
+      "brand_safe",
+      "split_layout"
+    ]
   },
   "premium": {
     "price_usd": 90,
     "gate": 90,
-    "features": ["signals", "score_report", "hook_first", "thumbs_titles", "brand_safe", "split_layout",
-                 "schedule", "translate", "compilation", "media_kit", "learning", "podcast"]
+    "features": [
+      "signals",
+      "score_report",
+      "tighten",
+      "hook_first",
+      "thumbs_titles",
+      "brand_safe",
+      "split_layout",
+      "schedule",
+      "translate",
+      "compilation",
+      "media_kit",
+      "learning",
+      "podcast"
+    ]
   },
   "owner": {
     "price_usd": 0,
     "gate": 90,
-    "features": ["signals", "score_report", "hook_first", "thumbs_titles", "brand_safe", "split_layout",
-                 "schedule", "translate", "compilation", "media_kit", "learning"]
+    "features": [
+      "signals",
+      "score_report",
+      "tighten",
+      "hook_first",
+      "thumbs_titles",
+      "brand_safe",
+      "split_layout",
+      "schedule",
+      "translate",
+      "compilation",
+      "media_kit",
+      "learning"
+    ]
   }
 }

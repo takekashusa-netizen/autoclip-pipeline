@@ -1,5 +1,7 @@
 """Brand ad generator: fulfills a TakeKash free-ad request end to end.
-    python3 brandad.py brief.json OUT_DIR            -> OUT_DIR/<slug>-ad-9x16.mp4 (+ voice, score, stills)
+    python3 brandad.py brief.json OUT_DIR --plan     -> voice + storyboard.jpg (timecoded keyframes) + cutlist.json
+    python3 brandad.py brief.json OUT_DIR --approve  -> locks the plan (fingerprint of brief + voice timing)
+    python3 brandad.py brief.json OUT_DIR            -> full render, only if the current plan is approved (--yes to skip)
 brief.json:
   {"brand": "Sunsentry", "headline": "Never charge your camera again", "benefits": ["...", "...", "..."],
    "goal": "buy" | "follow" | "book" | "download", "url": "sunsentry.com",
@@ -233,16 +235,55 @@ def _part(args):
     if p.returncode != 0: raise RuntimeError(f'ffmpeg failed for {lo}-{hi}')
     os.replace(tmp, os.path.join(out, f'part_{lo:05d}.mp4')); return lo
 
-def main(brief, out, workers=2, stills_only=False):
+def _sig(brief, out):
+    """fingerprint of what the plan was approved for: the brief + the voice timing"""
+    import hashlib
+    h = hashlib.sha256(open(brief, 'rb').read()); h.update(open(os.path.join(out, 'vo', 'vo.json'), 'rb').read())
+    return h.hexdigest()[:16]
+
+def cut_list():
+    """timestamped structure: scenes + every voice line with start/end (what gets approved)"""
+    scenes = [('hook', 0.0, AT['b1'] - 0.5), ('product + benefits', AT['b1'] - 0.5, AT['cta'] - 0.4), ('cta', AT['cta'] - 0.4, DUR)]
+    return {'brand': B['brand'], 'duration': DUR, 'fps': FPS, 'size': [W, H],
+            'scenes': [{'name': n, 'start': round(a, 2), 'end': round(b, 2)} for n, a, b in scenes],
+            'voice': [{'key': k, 'start': AT[k], 'end': round(AT[k] + VO[k]['dur'], 2), 'text': VO[k]['text']} for k in AT],
+            'goal_button': GOAL.get(B.get('goal', 'buy'), 'SHOP NOW'), 'url': B.get('url', '')}
+
+def plan(brief, out):
+    """storyboard (keyframes with timecodes) + cutlist.json; nothing is rendered in full until approved"""
+    load(brief, out); cl_ = cut_list()
+    json.dump(cl_, open(os.path.join(out, 'cutlist.json'), 'w'), indent=1)
+    ts = [AT['hook'] + 0.2, AT['hook'] + VO['hook']['dur'], AT['b1'] + 0.4, AT['b3'] + 0.4, AT['cta'] + 0.3, DUR - 0.6]
+    tiles = []
+    for t in ts:
+        im = frame(t).resize((270, 480)); d = ImageDraw.Draw(im)
+        d.rectangle([0, 0, 270, 34], fill=(0, 0, 0)); d.text((8, 6), f'{t:05.2f}s', font=F('Bold', 20), fill=(255, 255, 255))
+        tiles.append(im)
+    sb = Image.new('RGB', (270 * 3 + 40, 480 * 2 + 30), (30, 30, 32))
+    for i, im in enumerate(tiles): sb.paste(im, (10 + (i % 3) * 280, 10 + (i // 3) * 490))
+    sb.save(os.path.join(out, 'storyboard.jpg'), quality=88)
+    print('PLAN', os.path.join(out, 'storyboard.jpg'), os.path.join(out, 'cutlist.json'))
+    print('approve with: python3 brandad.py', brief, out, '--approve')
+
+def approve(brief, out):
+    json.dump({'sig': _sig(brief, out)}, open(os.path.join(out, 'approved.json'), 'w')); print('APPROVED', _sig(brief, out))
+
+def approved(brief, out):
+    try: return json.load(open(os.path.join(out, 'approved.json')))['sig'] == _sig(brief, out)
+    except Exception: return False
+
+def main(brief, out, workers=2, mode='render', force=False):
     os.makedirs(out, exist_ok=True); b = json.load(open(brief))
     if not os.path.exists(os.path.join(out, 'vo', 'vo.json')):
         sys.path.insert(0, HERE); import voice
         voice.make(lines_of(b), style=VOICES.get(b.get('voice', 'female'), {}), out_dir=os.path.join(out, 'vo'))
+    if mode == 'plan': return plan(brief, out)
+    if mode == 'approve': return approve(brief, out)
+    if not (force or approved(brief, out)):
+        plan(brief, out)
+        raise SystemExit('Not rendered: approve the storyboard + cut list first (--approve), or pass --yes. '
+                         'Changing the brief after approval needs a new approval.')
     load(brief, out)
-    if stills_only:
-        for x in (AT['hook'] + 1.2, AT['b2'] + 0.8, AT['cta'] + 0.8):
-            frame(x).save(os.path.join(out, f'still_{x:05.2f}.jpg'), quality=88)
-        return
     n = int(DUR * FPS); cuts = [n * i // workers for i in range(workers + 1)]
     with Pool(workers) as pool: pool.map(_part, [(brief, out, cuts[i], cuts[i + 1]) for i in range(workers)])
     score(out)
@@ -255,4 +296,5 @@ def main(brief, out, workers=2, stills_only=False):
     return final
 
 if __name__ == '__main__':
-    main(sys.argv[1], sys.argv[2], stills_only='--stills' in sys.argv)
+    a = sys.argv
+    main(a[1], a[2], mode='plan' if ('--plan' in a or '--stills' in a) else 'approve' if '--approve' in a else 'render', force='--yes' in a)
