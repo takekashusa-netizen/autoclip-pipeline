@@ -160,6 +160,10 @@ def run_ticket(body):
     log(f"job {jid}: {clips} clip(s)")
 
     s3 = bucket()
+    upload_key = url[len("upload://"):] if url.startswith("upload://") else None
+    if upload_key:                                         # customer's own file, already in our bucket
+        url = s3.generate_presigned_url("get_object", Params={"Bucket": os.environ["BUCKET_NAME"], "Key": upload_key}, ExpiresIn=6 * 3600)
+        print(f"::add-mask::{url}", flush=True)
     key = f"clips/{jid}.zip"
     if already_done(s3, key):
         log("already uploaded (re-run); re-sending callback")
@@ -189,6 +193,11 @@ def run_ticket(body):
                                       "ContentDisposition": 'attachment; filename="takekash_clips.zip"'})
             os.remove(zpath)
             log(f"uploaded {delivered} clip(s)")
+            if upload_key:                                 # source no longer needed: don't keep customers' files
+                try:
+                    s3.delete_object(Bucket=os.environ["BUCKET_NAME"], Key=upload_key)
+                except Exception as e:
+                    log(f"source cleanup skipped: {type(e).__name__}")
             progress(cbk, jid, "uploaded")
 
     payload = {"v": 1, "jid": jid, "status": "done" if delivered else "failed", "delivered": delivered, "iat": int(time.time())}
