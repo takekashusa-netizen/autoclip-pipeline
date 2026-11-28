@@ -40,3 +40,8 @@ takekash.db
 
 # Motion Studio work files (character art, voice, renders, models)
 motion_work/
+
+# editor/manual backups never get committed
+*.bak
+*.bak[0-9]
+*.bak-*
