@@ -32,6 +32,7 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, ROOT)
 
 from studio import tighten  # noqa: E402
+from studio import made_by  # noqa: E402
 from studio import (active_speaker, brand_safe, chat_moments, compilation, game_events, hook_first,  # noqa: E402
                     learning, media_kit, schedule, score_report, signals, split_layout, thumbs_titles, translate)
 from studio.common import StudioError, clip_stem, find_srt, probe  # noqa: E402
@@ -171,6 +172,11 @@ def cmd_run(a):
             out = os.path.join(od, f"{stem}.podcast.mp4")
             step("podcast", lambda: active_speaker.make(clip, out))
             if res["steps"]["podcast"].get("out"):
+                working = out
+        if os.environ.get("STUDIO_NO_MARK") != "1":   # every clip ships branded: "Made by TakeKash"
+            out = os.path.join(od, f"{stem}.final.mp4")
+            step("made_by", lambda: made_by.make(working, out))
+            if res["steps"]["made_by"].get("out"):
                 working = out
         titles = []
         if "thumbs_titles" in feats:

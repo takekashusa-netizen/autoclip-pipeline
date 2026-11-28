@@ -52,3 +52,7 @@ python3 studio.py tighten clip.cutlist.json --render clip.tight.mp4
 Editing the cut list after approval needs a new approval. Tier runs (standard/premium/owner) use tighten
 unattended before hook_first; the pipeline's second-pass review is the approval there. Clips without speech are skipped.
 Brand ads use the same gate: `brandad.py brief.json OUT --plan` → `--approve` → render.
+
+## Made by TakeKash
+Every clip the studio ships carries a small "Made by TakeKash" mark (studio/made_by.py), top-left inside the
+platform safe zone, as the last render step of every tier. Set STUDIO_NO_MARK=1 only for a white-label order.

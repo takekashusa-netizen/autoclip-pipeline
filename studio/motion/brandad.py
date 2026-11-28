@@ -1,4 +1,4 @@
-"""Brand ad generator: fulfills a TakeKash free-ad request end to end.
+"""Brand ad generator (internal use: TakeKash's own promos, not a product we sell).
     python3 brandad.py brief.json OUT_DIR --plan     -> voice + storyboard.jpg (timecoded keyframes) + cutlist.json
     python3 brandad.py brief.json OUT_DIR --approve  -> locks the plan (fingerprint of brief + voice timing)
     python3 brandad.py brief.json OUT_DIR            -> full render, only if the current plan is approved (--yes to skip)

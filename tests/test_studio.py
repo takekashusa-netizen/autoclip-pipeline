@@ -238,5 +238,6 @@ def test_cli_run_premium(media):
     assert out["passed"] == 2 and not out["errors"], out
     summ = json.load(open(out["summary"]))
     c1 = next(c for c in summ["clips"] if c["clip"].endswith("clip01.mp4"))
-    assert c1["final"].endswith(".split.mp4") and "hook_first" in c1["steps"] and "brand_safe" in c1["steps"]
+    assert c1["final"].endswith(".final.mp4") and c1["steps"]["made_by"].get("out")          # every clip ships "Made by TakeKash"
+    assert c1["steps"]["split_layout"].get("out", "").endswith(".split.mp4") and "hook_first" in c1["steps"] and "brand_safe" in c1["steps"]
     assert os.path.exists(os.path.join(media["dir"], "studio", "compilation.mp4"))
